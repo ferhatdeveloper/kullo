@@ -1,6 +1,6 @@
 import { router } from "expo-router";
-import { Calendar, MapPin, Package, Truck, Weight } from "lucide-react-native";
-import { useState } from "react";
+import { Calculator, Calendar, MapPin, Package, Truck, Weight } from "lucide-react-native";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { PriceCalculator } from "../../components/PriceCalculator";
 import { Screen, ScreenHeader } from "../../components/ui/Screen";
 import {
   getLoadCategoryLabel,
@@ -24,6 +25,12 @@ import {
   TruckType,
   useFreightStore,
 } from "../../lib/freight-store";
+import {
+  getCityDistance,
+  getSuggestedPrice,
+  PriceBreakdown,
+  usePricingStore,
+} from "../../lib/freight-pricing";
 import { colors, fonts, radius, shadow, space } from "../../lib/theme";
 
 const CATEGORIES: LoadCategory[] = [
@@ -52,6 +59,7 @@ export default function CreateLoadScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { addLoad } = useFreightStore();
+  const { getCurrentFuelPrice } = usePricingStore();
   
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -68,6 +76,22 @@ export default function CreateLoadScreen() {
   const [priceType, setPriceType] = useState<"fixed" | "negotiable">("fixed");
   const [requirements, setRequirements] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [calculatedPrice, setCalculatedPrice] = useState<PriceBreakdown | null>(null);
+
+  const distance = getCityDistance(pickupCity, deliveryCity);
+  const fuelPrice = getCurrentFuelPrice(truckType === "pickup" ? "regular" : "diesel");
+  const weightTons = weightUnit === "ton" ? parseFloat(weight) || 0 : (parseFloat(weight) || 0) / 1000;
+  
+  const suggestedPrice = distance
+    ? getSuggestedPrice(distance, truckType, fuelPrice, weightTons)
+    : null;
+
+  useEffect(() => {
+    if (suggestedPrice && !price) {
+      setPrice(Math.round(suggestedPrice.suggested / 1000).toString());
+    }
+  }, [suggestedPrice]);
 
   const validateForm = (): boolean => {
     if (!title.trim()) {
@@ -335,6 +359,65 @@ export default function CreateLoadScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t("freight.pricing")}</Text>
 
+            {suggestedPrice && distance && (
+              <View style={styles.suggestedPriceCard}>
+                <View style={styles.suggestedPriceHeader}>
+                  <Calculator size={16} color={colors.flame} strokeWidth={2} />
+                  <Text style={styles.suggestedPriceTitle}>{t("pricing.suggestedPrice")}</Text>
+                </View>
+                <View style={styles.suggestedPriceInfo}>
+                  <Text style={styles.suggestedPriceLabel}>{t("pricing.distance")}: {distance} km</Text>
+                  <Text style={styles.suggestedPriceLabel}>{t("pricing.fuel")}: {fuelPrice} IQD/L</Text>
+                </View>
+                <View style={styles.suggestedPriceValues}>
+                  <View style={styles.suggestedPriceItem}>
+                    <Text style={styles.suggestedPriceItemLabel}>{t("pricing.minimum")}</Text>
+                    <Text style={styles.suggestedPriceItemValue}>{Math.round(suggestedPrice.min / 1000)}K</Text>
+                  </View>
+                  <View style={[styles.suggestedPriceItem, styles.suggestedPriceItemMain]}>
+                    <Text style={styles.suggestedPriceItemLabel}>{t("pricing.recommended")}</Text>
+                    <Text style={styles.suggestedPriceItemValueMain}>{Math.round(suggestedPrice.suggested / 1000)}K</Text>
+                  </View>
+                  <View style={styles.suggestedPriceItem}>
+                    <Text style={styles.suggestedPriceItemLabel}>{t("pricing.maximum")}</Text>
+                    <Text style={styles.suggestedPriceItemValue}>{Math.round(suggestedPrice.max / 1000)}K</Text>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  style={styles.useRecommendedBtn}
+                  onPress={() => setPrice(Math.round(suggestedPrice.suggested / 1000).toString())}
+                >
+                  <Text style={styles.useRecommendedText}>{t("pricing.recommended")} ({Math.round(suggestedPrice.suggested / 1000)}K IQD)</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={styles.calculatorToggle}
+              onPress={() => setShowCalculator(!showCalculator)}
+            >
+              <Calculator size={16} color={colors.flame} strokeWidth={2} />
+              <Text style={styles.calculatorToggleText}>
+                {showCalculator ? t("common.hide") : t("pricing.calculator")}
+              </Text>
+            </TouchableOpacity>
+
+            {showCalculator && (
+              <View style={styles.calculatorWrapper}>
+                <PriceCalculator
+                  pickupCity={pickupCity}
+                  deliveryCity={deliveryCity}
+                  truckType={truckType}
+                  weightTons={weightTons}
+                  onPriceCalculated={(breakdown) => {
+                    setCalculatedPrice(breakdown);
+                    setPrice(Math.round(breakdown.total / 1000).toString());
+                  }}
+                  showSuggested={false}
+                />
+              </View>
+            )}
+
             <View style={styles.row}>
               <View style={[styles.inputGroup, { flex: 2 }]}>
                 <Text style={styles.label}>{t("freight.price")}</Text>
@@ -560,6 +643,96 @@ const styles = StyleSheet.create({
   },
   priceTypeTextActive: {
     color: colors.flame,
+  },
+  suggestedPriceCard: {
+    backgroundColor: colors.flameSoft,
+    borderRadius: radius.md,
+    padding: space.md,
+    marginBottom: space.md,
+    borderWidth: 1,
+    borderColor: "rgba(255,106,0,0.2)",
+  },
+  suggestedPriceHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.sm,
+    marginBottom: space.sm,
+  },
+  suggestedPriceTitle: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 13,
+    color: colors.ink,
+  },
+  suggestedPriceInfo: {
+    flexDirection: "row",
+    gap: space.md,
+    marginBottom: space.sm,
+  },
+  suggestedPriceLabel: {
+    fontFamily: fonts.body,
+    fontSize: 11,
+    color: colors.inkMuted,
+  },
+  suggestedPriceValues: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: space.sm,
+  },
+  suggestedPriceItem: {
+    alignItems: "center",
+    flex: 1,
+  },
+  suggestedPriceItemMain: {
+    backgroundColor: colors.white,
+    borderRadius: radius.sm,
+    padding: space.sm,
+    marginHorizontal: space.xs,
+  },
+  suggestedPriceItemLabel: {
+    fontFamily: fonts.body,
+    fontSize: 10,
+    color: colors.inkMuted,
+  },
+  suggestedPriceItemValue: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 14,
+    color: colors.ink,
+  },
+  suggestedPriceItemValueMain: {
+    fontFamily: fonts.display,
+    fontSize: 16,
+    color: colors.flame,
+  },
+  useRecommendedBtn: {
+    backgroundColor: colors.flame,
+    borderRadius: radius.sm,
+    paddingVertical: space.sm,
+    alignItems: "center",
+  },
+  useRecommendedText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 12,
+    color: colors.white,
+  },
+  calculatorToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: space.sm,
+    paddingVertical: space.sm,
+    marginBottom: space.md,
+    borderWidth: 1,
+    borderColor: colors.flame,
+    borderRadius: radius.sm,
+    borderStyle: "dashed",
+  },
+  calculatorToggleText: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 13,
+    color: colors.flame,
+  },
+  calculatorWrapper: {
+    marginBottom: space.md,
   },
   footer: {
     paddingHorizontal: space.lg,
