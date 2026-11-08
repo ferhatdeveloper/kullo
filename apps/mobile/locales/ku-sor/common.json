@@ -58,9 +58,9 @@
     "budgetUnder25M": "Under 25M IQD",
     "budgetUnder50M": "Under 50M IQD",
     "budgetUnder100M": "Under 100M IQD",
-    "goodDeal": "Good Deal",
-    "responsiveDealer": "Responsive",
-    "allServices": "All services"
+    "goodDeal": "مامەڵەی باش",
+    "responsiveDealer": "خێرا وەڵاندەرەوە",
+    "allServices": "هەموو خزمەتگوزارییەکان"
   },
   "search": {
     "title": "گەڕان بۆ ئۆتۆمبێل",
@@ -111,11 +111,11 @@
     "smartServices": "خزمەتگوزاری زیرک بۆ کڕین و فرۆشتن",
     "serviceSell": "فرۆشتن",
     "serviceRent": "ئۆتۆمبێل بەکرێ بگرە",
-    "savedTitle": "Saved",
-    "savedBody": "Search added to saved searches.",
-    "saveFailed": "Could not save search.",
-    "explorePlaceholder": "Search…",
-    "price": "Price"
+    "savedTitle": "پاشەکەوتکرا",
+    "savedBody": "گەڕان زیادکرا بۆ گەڕانە پاشەکەوتکراوەکان.",
+    "saveFailed": "گەڕان پاشەکەوت نەکرا.",
+    "explorePlaceholder": "گەڕان…",
+    "price": "نرخ"
   },
   "sell": {
     "title": "ئۆتۆمبێلەکەت بفرۆشە",
@@ -158,8 +158,8 @@
     "familyDriverLogin": "بۆ داواکردنی شۆفێری ژن بچۆ ژوورەوە.",
     "familyDriverSetGender": "لە پڕۆفایل جێندەر بکە ژن.",
     "familyHint": "هەڵبژاردەی شۆفێری ژن بۆ خێزان — تەنها ئەندامە ژنەکان",
-    "withDriver": "With driver",
-    "withDriverFee": "+{{fee}}/day",
+    "withDriver": "لەگەڵ شۆفێر",
+    "withDriverFee": "+{{fee}}/ڕۆژ",
     "moreBuy": "بڕۆ بۆ کڕینی ئۆتۆمبێل"
   },
   "vehicle": {
@@ -176,9 +176,9 @@
     "aiAnalysis": "شیکردنەوەی AI",
     "conditionScore": "نمرەی دۆخ",
     "damageReport": "ڕاپۆرتی زیان",
-    "verifiedBadge": "Verified",
-    "responsiveBadge": "Responsive",
-    "goodDealBadge": "Good Deal"
+    "verifiedBadge": "پشتڕاستکراوە",
+    "responsiveBadge": "خێرا وەڵاندەرەوە",
+    "goodDealBadge": "مامەڵەی باش"
   },
   "profile": {
     "title": "پرۆفایل",
@@ -226,7 +226,7 @@
     "km": "کم",
     "year": "ساڵ",
     "currency": "د.ع",
-    "select": "Select"
+    "select": "هەڵبژێرە"
   },
   "errors": {
     "network": "پەیوەندی ئینتەرنێتت بپشکنە",
@@ -642,14 +642,14 @@
     }
   },
   "sellPicker": {
-    "title": "Post a listing",
-    "subtitle": "What do you want to sell or rent?",
-    "vehicle": "Vehicle",
-    "vehicleHint": "Cars for sale or rent",
-    "realty": "Realty",
-    "realtyHint": "Homes, land, commercial",
-    "shop": "Shopping",
-    "shopHint": "Fashion and store items"
+    "title": "ڕیکلام دابنێ",
+    "subtitle": "دەتەوێت چی بفرۆشیت یان بەکرێ بدەیت؟",
+    "vehicle": "ئۆتۆمبێل",
+    "vehicleHint": "ئۆتۆمبێل بۆ فرۆشتن یان کرێ",
+    "realty": "خانووبەرە",
+    "realtyHint": "نیشتەجێ، زەوی، بازرگانی",
+    "shop": "کڕین",
+    "shopHint": "جلوبەرگ و بەرهەمەکانی فرۆشگا"
   },
   "cars": {
     "title": "ئۆتۆمبێل",

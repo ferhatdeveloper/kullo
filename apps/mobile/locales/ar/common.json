@@ -58,9 +58,9 @@
     "budgetUnder25M": "أقل من 25M IQD",
     "budgetUnder50M": "أقل من 50M IQD",
     "budgetUnder100M": "أقل من 100M IQD",
-    "goodDeal": "Good Deal",
-    "responsiveDealer": "Responsive",
-    "allServices": "All services"
+    "goodDeal": "صفقة جيدة",
+    "responsiveDealer": "سريع الاستجابة",
+    "allServices": "جميع الخدمات"
   },
   "search": {
     "title": "بحث عن السيارات",
@@ -114,8 +114,8 @@
     "savedTitle": "تم الحفظ",
     "savedBody": "أُضيف البحث إلى عمليات البحث المحفوظة.",
     "saveFailed": "تعذر حفظ البحث.",
-    "explorePlaceholder": "Search…",
-    "price": "Price"
+    "explorePlaceholder": "ابحث…",
+    "price": "السعر"
   },
   "sell": {
     "title": "بيع سيارتك",
@@ -158,8 +158,8 @@
     "familyDriverLogin": "سجّل الدخول لطلب سائقة.",
     "familyDriverSetGender": "اضبط الجنس إلى أنثى في ملفك الشخصي.",
     "familyHint": "خيار سائقة للعائلات متاح — للأعضاء الإناث فقط",
-    "withDriver": "With driver",
-    "withDriverFee": "+{{fee}}/day",
+    "withDriver": "مع سائق",
+    "withDriverFee": "+{{fee}}/يوم",
     "moreBuy": "الانتقال إلى شراء سيارة"
   },
   "vehicle": {
@@ -177,9 +177,9 @@
     "aiAnalysis": "تحليل الذكاء الاصطناعي",
     "conditionScore": "درجة الحالة",
     "damageReport": "تقرير الأضرار",
-    "verifiedBadge": "Verified",
-    "responsiveBadge": "Responsive",
-    "goodDealBadge": "Good Deal"
+    "verifiedBadge": "موثق",
+    "responsiveBadge": "سريع الرد",
+    "goodDealBadge": "صفقة جيدة"
   },
   "profile": {
     "title": "الملف الشخصي",
@@ -415,41 +415,41 @@
     }
   },
   "realty": {
-    "title": "Real estate",
-    "subtitle": "Homes, land and commercial listings",
-    "post": "Post listing",
-    "empty": "No realty listings for this filter",
-    "notFound": "Listing not found",
-    "typesLabel": "Type",
+    "title": "العقارات",
+    "subtitle": "إعلانات المنازل والأراضي والعقارات التجارية",
+    "post": "أضف إعلاناً",
+    "empty": "لا توجد إعلانات عقارية لهذا الفلتر",
+    "notFound": "الإعلان غير موجود",
+    "typesLabel": "النوع",
     "types": {
-      "housing": "Housing",
-      "land": "Land",
-      "commercial": "Commercial"
+      "housing": "سكني",
+      "land": "أرض",
+      "commercial": "تجاري"
     },
     "offer": {
-      "sale": "For sale",
-      "rent": "For rent"
+      "sale": "للبيع",
+      "rent": "للإيجار"
     },
-    "offerLabel": "Offer",
-    "area": "Area",
-    "rooms": "Rooms",
-    "bathrooms": "Baths",
-    "deed": "Deed",
-    "zoning": "Zoning",
-    "perMonth": " / mo",
-    "contact": "Contact agent",
-    "contactTitle": "Contact",
-    "contactBody": "Demo — messaging wires up later.",
+    "offerLabel": "نوع العرض",
+    "area": "المساحة",
+    "rooms": "الغرف",
+    "bathrooms": "الحمامات",
+    "deed": "السند",
+    "zoning": "التصنيف",
+    "perMonth": " / شهر",
+    "contact": "تواصل مع الوكيل",
+    "contactTitle": "اتصال",
+    "contactBody": "تجريبي — المراسلة لاحقاً.",
     "sell": {
-      "title": "Post realty listing",
-      "subtitle": "Publish a home, land or shop",
-      "titleField": "Title",
-      "price": "Price",
-      "publish": "Publish",
-      "missingTitle": "Missing info",
-      "missingBody": "Title, area and price are required.",
-      "publishedTitle": "Listing received",
-      "publishedBody": "Your realty listing was saved as demo."
+      "title": "أضف إعلان عقاري",
+      "subtitle": "انشر منزل أو أرض أو محل",
+      "titleField": "العنوان",
+      "price": "السعر",
+      "publish": "نشر",
+      "missingTitle": "معلومات ناقصة",
+      "missingBody": "العنوان والمساحة والسعر مطلوبة.",
+      "publishedTitle": "تم استلام الإعلان",
+      "publishedBody": "تم حفظ إعلانك العقاري كتجريبي."
     },
     "search": "بحث",
     "saleAndRent": "بيع وإيجار",
@@ -671,15 +671,15 @@
     "empty": "لا توجد خدمات مطابقة"
   },
   "superHome": {
-    "title": "Everything on kullo",
-    "subtitle": "Cars, realty, shopping and food — one home feed.",
-    "search": "Search on kullo…",
-    "chipForYou": "For you",
-    "vehicles": "Vehicle listings",
-    "realty": "Realty listings",
-    "shop": "Fashion & stores",
-    "food": "Food & restaurants",
-    "mart": "Market & food",
+    "title": "كل شيء على كولو",
+    "subtitle": "سيارات وعقارات وتسوق وطعام — صفحة رئيسية واحدة.",
+    "search": "ابحث على كولو…",
+    "chipForYou": "لك",
+    "vehicles": "إعلانات السيارات",
+    "realty": "إعلانات العقارات",
+    "shop": "أزياء ومتاجر",
+    "food": "طعام ومطاعم",
+    "mart": "سوق وطعام",
     "searchPlaceholder": "ابحث عن علامة أو منتج أو فئة…",
     "forYou": "For you",
     "hubKullo": "kullo",
@@ -731,14 +731,14 @@
     }
   },
   "sellPicker": {
-    "title": "Post a listing",
-    "subtitle": "What do you want to sell or rent?",
-    "vehicle": "Vehicle",
-    "vehicleHint": "Cars for sale or rent",
-    "realty": "Realty",
-    "realtyHint": "Homes, land, commercial",
-    "shop": "Shopping",
-    "shopHint": "Fashion and store items"
+    "title": "أضف إعلاناً",
+    "subtitle": "ماذا تريد بيعه أو تأجيره؟",
+    "vehicle": "مركبة",
+    "vehicleHint": "سيارات للبيع أو الإيجار",
+    "realty": "عقارات",
+    "realtyHint": "منازل، أراض، تجاري",
+    "shop": "تسوق",
+    "shopHint": "أزياء ومنتجات المتاجر"
   },
   "cars": {
     "title": "سيارات",

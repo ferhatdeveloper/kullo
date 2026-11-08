@@ -58,9 +58,9 @@
     "budgetUnder25M": "Under 25M IQD",
     "budgetUnder50M": "Under 50M IQD",
     "budgetUnder100M": "Under 100M IQD",
-    "goodDeal": "Good Deal",
-    "responsiveDealer": "Responsive",
-    "allServices": "All services"
+    "goodDeal": "Bihayek baş",
+    "responsiveDealer": "Bersivdar",
+    "allServices": "Hemû xizmet"
   },
   "search": {
     "title": "Erebeyan Bigere",
@@ -111,11 +111,11 @@
     "smartServices": "Xizmetên jîr ji bo kirîn û firotinê",
     "serviceSell": "Bifroşe",
     "serviceRent": "Otomobîlê bike kirê",
-    "savedTitle": "Saved",
-    "savedBody": "Search added to saved searches.",
-    "saveFailed": "Could not save search.",
-    "explorePlaceholder": "Search…",
-    "price": "Price"
+    "savedTitle": "Tomar bû",
+    "savedBody": "Lêgerîn li lêgerînên tomarkirî hate zêdekirin.",
+    "saveFailed": "Lêgerîn nehat tomar kirin.",
+    "explorePlaceholder": "Bigere…",
+    "price": "Bihayê"
   },
   "sell": {
     "title": "Erebeya xwe bifiroşe",
@@ -158,8 +158,8 @@
     "familyDriverLogin": "Ji bo xwestina ajokerê jin têkeve.",
     "familyDriverSetGender": "Di profîlê de cinsê bike jin.",
     "familyHint": "Vebijarka ajokerê jin ji bo malbatê — tenê endamên jin",
-    "withDriver": "With driver",
-    "withDriverFee": "+{{fee}}/day",
+    "withDriver": "Bi ajokar",
+    "withDriverFee": "+{{fee}}/roj",
     "moreBuy": "Here bo kirîna otomobîlê"
   },
   "vehicle": {
@@ -176,9 +176,9 @@
     "aiAnalysis": "Analîza AI",
     "conditionScore": "Puana rewşê",
     "damageReport": "Rapora ziyanê",
-    "verifiedBadge": "Verified",
-    "responsiveBadge": "Responsive",
-    "goodDealBadge": "Good Deal"
+    "verifiedBadge": "Pejirandî",
+    "responsiveBadge": "Bersivdar",
+    "goodDealBadge": "Bihayek baş"
   },
   "profile": {
     "title": "Profîl",
@@ -226,7 +226,7 @@
     "km": "km",
     "year": "sal",
     "currency": "₺",
-    "select": "Select"
+    "select": "Hilbijêre"
   },
   "errors": {
     "network": "Girêdana înterneta xwe kontrol bike",
@@ -642,14 +642,14 @@
     }
   },
   "sellPicker": {
-    "title": "Post a listing",
-    "subtitle": "What do you want to sell or rent?",
-    "vehicle": "Vehicle",
-    "vehicleHint": "Cars for sale or rent",
-    "realty": "Realty",
-    "realtyHint": "Homes, land, commercial",
-    "shop": "Shopping",
-    "shopHint": "Fashion and store items"
+    "title": "Îlan bike",
+    "subtitle": "Tu çi dixwazî bifiroşî an bike kirê?",
+    "vehicle": "Erebe",
+    "vehicleHint": "Erebeya firotin an kirê",
+    "realty": "Xanî",
+    "realtyHint": "Mal, erd, bazirganî",
+    "shop": "Kirîn",
+    "shopHint": "Cil û hilberên dikanan"
   },
   "cars": {
     "title": "Otomobîl",

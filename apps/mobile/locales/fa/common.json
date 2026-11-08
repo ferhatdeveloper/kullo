@@ -58,9 +58,9 @@
     "budgetUnder25M": "Under 25M IQD",
     "budgetUnder50M": "Under 50M IQD",
     "budgetUnder100M": "Under 100M IQD",
-    "goodDeal": "Good Deal",
-    "responsiveDealer": "Responsive",
-    "allServices": "All services"
+    "goodDeal": "معامله خوب",
+    "responsiveDealer": "پاسخگو",
+    "allServices": "همه خدمات"
   },
   "search": {
     "title": "جستجوی خودرو",
@@ -111,11 +111,11 @@
     "smartServices": "خدمات هوشمند خرید و فروش",
     "serviceSell": "فروش",
     "serviceRent": "اجاره خودرو",
-    "savedTitle": "Saved",
-    "savedBody": "Search added to saved searches.",
-    "saveFailed": "Could not save search.",
-    "explorePlaceholder": "Search…",
-    "price": "Price"
+    "savedTitle": "ذخیره شد",
+    "savedBody": "جستجو به جستجوهای ذخیره شده اضافه شد.",
+    "saveFailed": "جستجو ذخیره نشد.",
+    "explorePlaceholder": "جستجو…",
+    "price": "قیمت"
   },
   "sell": {
     "title": "فروش خودرو",
@@ -158,8 +158,8 @@
     "familyDriverLogin": "برای درخواست راننده زن وارد شوید.",
     "familyDriverSetGender": "در پروفایل جنسیت را زن تنظیم کنید.",
     "familyHint": "گزینه راننده زن برای خانواده — فقط اعضای زن",
-    "withDriver": "With driver",
-    "withDriverFee": "+{{fee}}/day",
+    "withDriver": "با راننده",
+    "withDriverFee": "+{{fee}}/روز",
     "moreBuy": "رفتن به خرید خودرو"
   },
   "vehicle": {
@@ -176,9 +176,9 @@
     "aiAnalysis": "تحلیل هوش مصنوعی",
     "conditionScore": "امتیاز وضعیت",
     "damageReport": "گزارش آسیب",
-    "verifiedBadge": "Verified",
-    "responsiveBadge": "Responsive",
-    "goodDealBadge": "Good Deal"
+    "verifiedBadge": "تایید شده",
+    "responsiveBadge": "پاسخگو",
+    "goodDealBadge": "معامله خوب"
   },
   "profile": {
     "title": "پروفایل",
@@ -226,7 +226,7 @@
     "km": "کیلومتر",
     "year": "سال",
     "currency": "﷼",
-    "select": "Select"
+    "select": "انتخاب"
   },
   "errors": {
     "network": "اتصال اینترنت خود را بررسی کنید",
@@ -642,14 +642,14 @@
     }
   },
   "sellPicker": {
-    "title": "Post a listing",
-    "subtitle": "What do you want to sell or rent?",
-    "vehicle": "Vehicle",
-    "vehicleHint": "Cars for sale or rent",
-    "realty": "Realty",
-    "realtyHint": "Homes, land, commercial",
-    "shop": "Shopping",
-    "shopHint": "Fashion and store items"
+    "title": "ثبت آگهی",
+    "subtitle": "چه چیزی می‌خواهید بفروشید یا اجاره دهید؟",
+    "vehicle": "خودرو",
+    "vehicleHint": "خودرو برای فروش یا اجاره",
+    "realty": "املاک",
+    "realtyHint": "مسکن، زمین، تجاری",
+    "shop": "فروشگاه",
+    "shopHint": "پوشاک و محصولات فروشگاه"
   },
   "cars": {
     "title": "خودروها",
