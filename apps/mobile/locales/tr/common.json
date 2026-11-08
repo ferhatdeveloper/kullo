@@ -1382,7 +1382,40 @@
     "messagePlaceholder": "Mesaj yazın…",
     "sellerDefault": "Satıcı",
     "message": "Mesaj",
-    "callShort": "Görüş"
+    "callShort": "Görüş",
+    "videoCall": "Görüntülü Görüşme",
+    "frontCamera": "Ön kamera",
+    "backCamera": "Arka kamera",
+    "cameraOn": "Kamera açık",
+    "cameraOff": "Kamera kapalı",
+    "speakerOn": "Hoparlör açık",
+    "speakerOff": "Hoparlör kapalı"
+  },
+  "track": {
+    "eta": "Tahmini varış",
+    "status": "Durum",
+    "pickup": "Alım noktası",
+    "dropoff": "Teslimat adresi",
+    "items": "Ürünler",
+    "total": "Toplam",
+    "support": "Yardım mı lazım? Destek ile iletişime geç",
+    "agent": {
+      "driver": "Sürücü",
+      "courier": "Kurye",
+      "delivery": "Teslimatçı"
+    },
+    "orderStatus": {
+      "pending": "Beklemede",
+      "confirmed": "Onaylandı",
+      "preparing": "Hazırlanıyor",
+      "ready": "Hazır",
+      "assigned": "Atandı",
+      "pickedUp": "Alındı",
+      "enRoute": "Yolda",
+      "arriving": "Yaklaşıyor",
+      "delivered": "Teslim edildi",
+      "cancelled": "İptal edildi"
+    }
   },
   "auction": {
     "title": "Açık artırma",

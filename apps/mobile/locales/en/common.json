@@ -1376,7 +1376,40 @@
     "messagePlaceholder": "Write a message…",
     "sellerDefault": "Seller",
     "message": "Message",
-    "callShort": "Call"
+    "callShort": "Call",
+    "videoCall": "Video Call",
+    "frontCamera": "Front camera",
+    "backCamera": "Back camera",
+    "cameraOn": "Camera on",
+    "cameraOff": "Camera off",
+    "speakerOn": "Speaker on",
+    "speakerOff": "Speaker off"
+  },
+  "track": {
+    "eta": "Estimated arrival",
+    "status": "Status",
+    "pickup": "Pickup",
+    "dropoff": "Delivery address",
+    "items": "Items",
+    "total": "Total",
+    "support": "Need help? Contact support",
+    "agent": {
+      "driver": "Driver",
+      "courier": "Courier",
+      "delivery": "Delivery"
+    },
+    "orderStatus": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "assigned": "Assigned",
+      "pickedUp": "Picked up",
+      "enRoute": "On the way",
+      "arriving": "Arriving",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    }
   },
   "auction": {
     "title": "Auctions",

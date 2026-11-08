@@ -771,5 +771,57 @@
     "savedEmptyAds": "لا إعلانات محفوظة بعد",
     "heroLead": "أي سيارة تفكر فيها… ",
     "heroBrand": "اعثر عليها في Kullo"
+  },
+  "meet": {
+    "title": "مكالمة محلية",
+    "inAppBadge": "داخل التطبيق · بدون اتصال خارجي",
+    "connecting": "جاري الاتصال…",
+    "hint": "المكالمة الصوتية تبقى داخل التطبيق — لا حاجة لواتساب أو رقم هاتف.",
+    "mute": "كتم",
+    "unmute": "إلغاء الكتم",
+    "speaker": "مكبر الصوت",
+    "chatTitle": "الدردشة",
+    "chatSubtitle": "رسائل داخل التطبيق",
+    "bannerTitle": "مكالمة مباشرة",
+    "bannerBody": "مكالمة صوتية محلية مع البائع",
+    "start": "اتصل",
+    "emptyChat": "لا رسائل بعد. اكتب أو ابدأ مكالمة.",
+    "messagePlaceholder": "اكتب رسالة…",
+    "sellerDefault": "البائع",
+    "message": "رسالة",
+    "callShort": "اتصال",
+    "videoCall": "مكالمة فيديو",
+    "frontCamera": "الكاميرا الأمامية",
+    "backCamera": "الكاميرا الخلفية",
+    "cameraOn": "الكاميرا مفعلة",
+    "cameraOff": "الكاميرا معطلة",
+    "speakerOn": "مكبر الصوت مفعل",
+    "speakerOff": "مكبر الصوت معطل"
+  },
+  "track": {
+    "eta": "الوقت المتوقع للوصول",
+    "status": "الحالة",
+    "pickup": "نقطة الاستلام",
+    "dropoff": "عنوان التوصيل",
+    "items": "المنتجات",
+    "total": "المجموع",
+    "support": "تحتاج مساعدة؟ تواصل مع الدعم",
+    "agent": {
+      "driver": "السائق",
+      "courier": "المندوب",
+      "delivery": "التوصيل"
+    },
+    "orderStatus": {
+      "pending": "قيد الانتظار",
+      "confirmed": "تم التأكيد",
+      "preparing": "قيد التحضير",
+      "ready": "جاهز",
+      "assigned": "تم التعيين",
+      "pickedUp": "تم الاستلام",
+      "enRoute": "في الطريق",
+      "arriving": "يقترب",
+      "delivered": "تم التوصيل",
+      "cancelled": "ملغي"
+    }
   }
 }
