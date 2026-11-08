@@ -1,8 +1,8 @@
 {
-  "name": "seyyare-men",
+  "name": "kullo",
   "version": "0.1.0",
   "private": true,
-  "description": "Küresel AI-destekli araç ilan ve kiralama platformu",
+  "description": "Kullo (kullo.berqenas.com) — Irak genel pazar: ilan, vasıta, kiralama, yemek, kurye",
   "license": "MIT",
   "engines": {
     "node": ">=20.0.0",

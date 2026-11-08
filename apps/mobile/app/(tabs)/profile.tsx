@@ -10,11 +10,13 @@ import {
   Gavel,
   Globe,
   Heart,
+  Hotel,
   Info,
-  LayoutGrid,
+  LayoutDashboard,
   Megaphone,
   Server,
   Share2,
+  Stethoscope,
   Store,
   Users,
   Wallet,
@@ -44,6 +46,7 @@ import {
 } from "../../lib/currency-store";
 import { iqdPerUsd } from "../../lib/hatwan-rates";
 import { localeNativeName, supportedLocales, type LocaleCode } from "../../lib/locales";
+import { useLocalePrefsStore } from "../../lib/locale-prefs-store";
 import { colors, fonts, radius, shadow, space } from "../../lib/theme";
 
 export default function ProfileScreen() {
@@ -77,8 +80,10 @@ export default function ProfileScreen() {
     }, []),
   );
 
+  const setLang = useLocalePrefsStore((s) => s.setLang);
+
   const changeLocale = (locale: LocaleCode) => {
-    void i18n.changeLanguage(locale);
+    void setLang(locale);
     setCurrentLocale(locale);
   };
 
@@ -252,9 +257,9 @@ export default function ProfileScreen() {
         <SectionHeader title={t("profile.sectionAccount")} />
         <View style={styles.menu}>
           <MenuItem
-            icon={<LayoutGrid size={20} color={colors.flame} strokeWidth={2} />}
+            icon={<LayoutDashboard size={20} color={colors.flame} strokeWidth={2} />}
             label={t("modeSelect.changeMode")}
-            onPress={() => router.push("/(tabs)/services")}
+            onPress={() => router.push("/mode-select")}
           />
           <MenuItem
             icon={<Heart size={20} color={colors.flame} strokeWidth={2} />}
@@ -296,8 +301,13 @@ export default function ProfileScreen() {
           <MenuItem
             icon={<Users size={20} color={colors.flame} strokeWidth={2} />}
             label={t("hub.sharedRide")}
-            last
             onPress={() => router.push("/shared-ride")}
+          />
+          <MenuItem
+            icon={<Stethoscope size={20} color={colors.flame} strokeWidth={2} />}
+            label={t("health.myAppointments")}
+            last
+            onPress={() => router.push("/health/appointments")}
           />
         </View>
 
@@ -309,6 +319,11 @@ export default function ProfileScreen() {
             icon={<Store size={20} color={colors.flame} strokeWidth={2} />}
             label={t("partner.title")}
             onPress={() => router.push("/partner")}
+          />
+          <MenuItem
+            icon={<Hotel size={20} color={colors.flame} strokeWidth={2} />}
+            label={t("hotels.myHotel")}
+            onPress={() => router.push("/hotels/manage")}
           />
           <MenuItem
             icon={<Megaphone size={20} color={colors.flame} strokeWidth={2} />}

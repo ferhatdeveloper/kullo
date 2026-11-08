@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, I18nManager, Platform, StyleSheet, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { I18nManager, Platform, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -24,13 +24,23 @@ import { ToastHost } from "../components/agent/ToastHost";
 import { SplashOverlay } from "../components/brand";
 import { useCityStore } from "../lib/city-store";
 import { useCurrencyStore } from "../lib/currency-store";
+import { useLocalePrefsStore } from "../lib/locale-prefs-store";
 import { useApiBaseStore } from "../lib/api-base-store";
 import { useDriverStore } from "../lib/driver-store";
+import { useFoodCartStore } from "../lib/food-cart-store";
+import { useHotelsInventory } from "../lib/hotels-inventory-store";
+import { useMarketplaceStore } from "../lib/marketplace-store";
 import { useModeStore } from "../lib/mode-store";
+import { useCareerStore } from "../lib/career-store";
+import { useTradesStore } from "../lib/trades-store";
 import { useWalletStore } from "../lib/wallet-store";
 import { isRTL, type LocaleCode } from "../lib/locales";
 import { colors } from "../lib/theme";
 import { router } from "expo-router";
+
+export const unstable_settings = {
+  initialRouteName: "mode-select",
+};
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -44,29 +54,54 @@ export default function RootLayout() {
   const [splashVisible, setSplashVisible] = useState(true);
   const onSplashFinish = useCallback(() => setSplashVisible(false), []);
   const hydrateCurrency = useCurrencyStore((s) => s.hydrate);
+  const hydrateLocalePrefs = useLocalePrefsStore((s) => s.hydrate);
   const hydrateWallet = useWalletStore((s) => s.hydrate);
   const hydrateMode = useModeStore((s) => s.hydrate);
   const hydrateCity = useCityStore((s) => s.hydrate);
   const hydrateApiBase = useApiBaseStore((s) => s.hydrate);
   const hydrateDriver = useDriverStore((s) => s.hydrate);
+  const hydrateFoodCart = useFoodCartStore((s) => s.hydrate);
+  const hydrateMarketplace = useMarketplaceStore((s) => s.hydrate);
+  const hydrateHotelsInventory = useHotelsInventory((s) => s.hydrate);
+  const hydrateTrades = useTradesStore((s) => s.hydrate);
+  const hydrateCareer = useCareerStore((s) => s.hydrate);
   const modeHydrated = useModeStore((s) => s.hydrated);
-  const hasChosenMode = useModeStore((s) => s.hasChosen);
 
   useEffect(() => {
     void hydrateCurrency();
+    void hydrateLocalePrefs();
     void hydrateWallet();
     void hydrateMode();
     void hydrateCity();
     void hydrateApiBase();
     void hydrateDriver();
-  }, [hydrateCurrency, hydrateWallet, hydrateMode, hydrateCity, hydrateApiBase, hydrateDriver]);
+    void hydrateFoodCart();
+    void hydrateMarketplace();
+    void hydrateHotelsInventory();
+    void hydrateTrades();
+    void hydrateCareer();
+  }, [
+    hydrateCurrency,
+    hydrateLocalePrefs,
+    hydrateWallet,
+    hydrateMode,
+    hydrateCity,
+    hydrateApiBase,
+    hydrateDriver,
+    hydrateFoodCart,
+    hydrateMarketplace,
+    hydrateHotelsInventory,
+    hydrateTrades,
+    hydrateCareer,
+  ]);
 
+  const gatedToHub = useRef(false);
   useEffect(() => {
-    if (splashVisible || !modeHydrated) return;
-    if (!hasChosenMode) {
-      router.replace("/mode-select");
-    }
-  }, [splashVisible, modeHydrated, hasChosenMode]);
+    if (splashVisible || !modeHydrated || gatedToHub.current) return;
+    // İlk açılışta bir kez hizmet kapısı — sonra Ana/tabs navigasyonunu ezme
+    gatedToHub.current = true;
+    router.replace("/mode-select");
+  }, [splashVisible, modeHydrated]);
 
   const queryClient = useMemo(
     () =>
@@ -76,6 +111,8 @@ export default function RootLayout() {
             staleTime: 60_000,
             retry: 1,
             refetchOnWindowFocus: false,
+            /** Ağ yokken de cache/seed ile UI dolu kalsın */
+            networkMode: "offlineFirst",
           },
         },
       }),
@@ -89,11 +126,7 @@ export default function RootLayout() {
   }
 
   if (!fontsLoaded) {
-    return (
-      <View style={styles.boot}>
-        <ActivityIndicator color={colors.flame} />
-      </View>
-    );
+    return <View style={styles.boot} />;
   }
 
   return (
@@ -108,14 +141,15 @@ export default function RootLayout() {
               contentStyle: { backgroundColor: colors.paper },
             }}
           >
-            <Stack.Screen name="(tabs)" />
             <Stack.Screen name="mode-select" options={{ headerShown: false, animation: "fade" }} />
+            <Stack.Screen name="(tabs)" />
             <Stack.Screen name="auth/login" options={{ presentation: "modal" }} />
             <Stack.Screen name="auth/register" options={{ presentation: "modal" }} />
             <Stack.Screen name="about" options={{ headerShown: false }} />
             <Stack.Screen name="notifications" options={{ headerShown: false }} />
             <Stack.Screen name="saved-searches" options={{ headerShown: false }} />
             <Stack.Screen name="vehicle/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="vehicle-sell" options={{ headerShown: false }} />
             <Stack.Screen name="rental/[id]" options={{ headerShown: false }} />
             <Stack.Screen name="auctions" options={{ headerShown: false }} />
             <Stack.Screen name="auction/[id]" options={{ headerShown: false }} />
@@ -124,7 +158,26 @@ export default function RootLayout() {
             <Stack.Screen name="guide" options={{ headerShown: false }} />
             <Stack.Screen name="wallet" options={{ headerShown: false }} />
             <Stack.Screen name="car-wash" options={{ headerShown: false }} />
+            <Stack.Screen name="hotels" options={{ headerShown: false }} />
+            <Stack.Screen name="travel" options={{ headerShown: false }} />
+            <Stack.Screen name="health" options={{ headerShown: false }} />
+            <Stack.Screen name="career" options={{ headerShown: false }} />
+            <Stack.Screen name="b2b" options={{ headerShown: false }} />
+            <Stack.Screen name="trades" options={{ headerShown: false }} />
             <Stack.Screen name="shared-ride" options={{ headerShown: false }} />
+            <Stack.Screen name="realty/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="realty/favorites" options={{ headerShown: false }} />
+            <Stack.Screen name="realty/ai-search" options={{ headerShown: false }} />
+            <Stack.Screen name="realty/map" options={{ headerShown: false }} />
+            <Stack.Screen name="realty/projects" options={{ headerShown: false }} />
+            <Stack.Screen name="realty/project/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="realty/agencies" options={{ headerShown: false }} />
+            <Stack.Screen name="realty-sell" options={{ headerShown: false }} />
+            <Stack.Screen name="shop/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="shop-store/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="shop-sell" options={{ headerShown: false }} />
+            <Stack.Screen name="food/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="food-cart" options={{ headerShown: false }} />
             <Stack.Screen name="partner/index" options={{ headerShown: false }} />
             <Stack.Screen name="partner/contract" options={{ headerShown: false }} />
             <Stack.Screen name="driver/index" options={{ headerShown: false }} />
@@ -134,7 +187,6 @@ export default function RootLayout() {
             <Stack.Screen name="chat/[id]" options={{ headerShown: false }} />
             <Stack.Screen name="meet/[id]" options={{ headerShown: false }} />
             <Stack.Screen name="seller/[id]" options={{ headerShown: false }} />
-            <Stack.Screen name="stores" options={{ headerShown: false }} />
             <Stack.Screen
               name="negotiate/[vehicleId]"
               options={{ headerShown: false }}

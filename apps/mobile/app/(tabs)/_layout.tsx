@@ -1,9 +1,9 @@
 import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Home, LayoutGrid, Plus, Search, User } from "lucide-react-native";
-import { Platform, StyleSheet, View } from "react-native";
+import { Home, Search, Store, User } from "lucide-react-native";
+import { Platform } from "react-native";
 
-import { colors, fonts, shadow } from "../../lib/theme";
+import { colors, fonts } from "../../lib/theme";
 
 export default function TabsLayout() {
   const { t } = useTranslation();
@@ -28,15 +28,7 @@ export default function TabsLayout() {
           fontFamily: fonts.bodySemi,
           marginTop: 2,
         },
-        headerStyle: {
-          backgroundColor: colors.paper,
-          shadowOpacity: 0,
-          elevation: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.line,
-        },
-        headerTintColor: colors.ink,
-        headerTitleStyle: { fontFamily: fonts.displayMed, fontSize: 17 },
+        headerShown: false,
         headerShadowVisible: false,
       }}
     >
@@ -44,38 +36,36 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: t("tabs.home"),
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => <Home size={size} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => (
+            <Home size={size} color={color} strokeWidth={2} />
+          ),
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
           title: t("tabs.search"),
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => <Search size={size} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => (
+            <Search size={size} color={color} strokeWidth={2} />
+          ),
+          /** Araç dikeyi kendi CarsShell alt menüsünü kullanır */
+          tabBarStyle: { display: "none" },
         }}
       />
+      {/* İlan Ver FAB kaldırıldı — rota deep-link için gizli */}
       <Tabs.Screen
         name="sell"
         options={{
+          href: null,
           title: t("tabs.sell"),
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <View style={[styles.sellBtn, focused && styles.sellBtnActive]}>
-              <Plus size={22} color={colors.white} strokeWidth={2.4} />
-            </View>
-          ),
-          tabBarLabel: () => null,
         }}
       />
       <Tabs.Screen
-        name="services"
+        name="stores"
         options={{
-          title: t("tabs.services"),
-          headerShown: false,
+          title: t("tabs.stores"),
           tabBarIcon: ({ color, size }) => (
-            <LayoutGrid size={size} color={color} strokeWidth={2} />
+            <Store size={size} color={color} strokeWidth={2} />
           ),
         }}
       />
@@ -83,42 +73,36 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: t("tabs.profile"),
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => <User size={size} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => (
+            <User size={size} color={color} strokeWidth={2} />
+          ),
         }}
       />
+      {/* Dikey hub’lar — marketplace tab bar gizli, kendi kabukları var */}
       <Tabs.Screen
-        name="stores"
-        options={{
-          title: t("tabs.stores"),
-          headerShown: false,
-          href: null,
-        }}
+        name="realty"
+        options={{ href: null, tabBarStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="shop"
+        options={{ href: null, tabBarStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="food"
+        options={{ href: null, tabBarStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="mart"
+        options={{ href: null, tabBarStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="services"
+        options={{ href: null, tabBarStyle: { display: "none" } }}
       />
       <Tabs.Screen
         name="rentals"
-        options={{
-          title: t("tabs.rentals"),
-          headerShown: false,
-          href: null,
-        }}
+        options={{ href: null, tabBarStyle: { display: "none" } }}
       />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  sellBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: colors.viridian,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: -8,
-    ...shadow.float,
-  },
-  sellBtnActive: {
-    backgroundColor: colors.viridianDeep,
-  },
-});

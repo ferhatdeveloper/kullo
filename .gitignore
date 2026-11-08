@@ -54,6 +54,9 @@ apps/mobile/.env.lan
 *expo-qr*.png
 .expo-qr.png
 
+# Local REA reference captures (APKs, screenshots — too large for git)
+.rea-refs/
+
 # iOS / Android (Expo managed ise genelde yok)
 ios/
 android/

@@ -168,7 +168,7 @@ const DEMO_DEALERS = [
   },
 ] as const;
 
-type Page = "home" | "privacy" | "terms";
+type Page = "home" | "privacy" | "terms" | "pricing";
 
 export function App() {
   const [page, setPage] = useState<Page>("home");
@@ -269,6 +269,11 @@ export function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const go = (next: Page) => {
+    setPage(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const scrollRail = (dir: -1 | 1) => {
     railRef.current?.scrollBy({ left: dir * 340, behavior: "smooth" });
   };
@@ -304,6 +309,10 @@ export function App() {
     );
   }
 
+  if (page === "pricing") {
+    return <PricingPage onBack={goHome} onCta={() => go("home")} />;
+  }
+
   return (
     <div className="dc">
       {/* —— White sticky nav (DubiCars) —— */}
@@ -323,6 +332,9 @@ export function App() {
             <a href="#auctions">Müzayede</a>
             <a href="#why">Değer biç</a>
             <a href="#sell">Sat</a>
+            <button type="button" className="dc-navlink-btn" onClick={() => go("pricing")}>
+              Fiyatlandırma
+            </button>
           </nav>
 
           <div className="dc-nav__actions">
@@ -423,7 +435,7 @@ export function App() {
               ‹
             </button>
             <div className="dc-rail" ref={railRef} role="list">
-              {(loading ? Array.from({ length: 5 }) : featured).map((item, i) =>
+              {(loading ? Array.from<Vehicle>({ length: 5 }) : featured).map((item, i) =>
                 item ? (
                   <article key={item.id} className="dc-card" role="listitem">
                     <div className="dc-card__media">
@@ -744,7 +756,7 @@ export function App() {
             </div>
             {error ? <p className="dc-alert">{error}</p> : null}
             <div className="dc-grid">
-              {(loading ? Array.from({ length: 8 }) : list).map((item, i) =>
+              {(loading ? Array.from<Vehicle>({ length: 8 }) : list).map((item, i) =>
                 item ? (
                   <article key={item.id} className="dc-card dc-card--grid">
                     <div className="dc-card__media">
@@ -816,6 +828,9 @@ export function App() {
               <button type="button" onClick={() => setPage("terms")}>
                 Şartlar
               </button>
+              <button type="button" onClick={() => setPage("pricing")}>
+                Fiyatlandırma
+              </button>
             </div>
           </div>
           <p>© {new Date().getFullYear()} Seyyare · Irak araç pazarı</p>
@@ -843,6 +858,437 @@ function LegalPage({
       {body.map((p) => (
         <p key={p}>{p}</p>
       ))}
+    </div>
+  );
+}
+
+const PRICING_FEES = [
+  {
+    title: "İlan yayınlama",
+    val: "25.000",
+    unit: "IQD / ilan",
+    desc: "Her aktif ilan için tek seferlik ücret. Cüzdandan otomatik düşer.",
+  },
+  {
+    title: "Öne çıkarma (App)",
+    val: "15.000",
+    unit: "IQD / 7 gün",
+    desc: "Uygulama içi keşfet bölümünde üst sıralarda gösterim.",
+  },
+  {
+    title: "Öne çıkarma (Sosyal)",
+    val: "35.000",
+    unit: "IQD / 7 gün",
+    desc: "Instagram, Facebook ve Twitter'da otomatik paylaşım + DM mesajı.",
+  },
+  {
+    title: "Escrow komisyonu",
+    val: "%2",
+    unit: "satış tutarı",
+    desc: "Açık arttırma ve Kullo Güvenli Ödeme'de satıcıdan alınır.",
+  },
+  {
+    title: "Yemek komisyonu",
+    val: "%15",
+    unit: "sipariş tutarı",
+    desc: "Restoran siparişlerinden alınan platform payı. Teslimat ayrıca ücretlendirilir.",
+  },
+  {
+    title: "Mağaza komisyonu",
+    val: "%8",
+    unit: "GMV",
+    desc: "Shop dikeyinde (giyim, elektronik, ev) mağaza başına aylık oran.",
+  },
+  {
+    title: "Yolculuk komisyonu",
+    val: "%10",
+    unit: "yolculuk tutarı",
+    desc: "Taksi/ride hizmetinde sürücüden alınan platform payı.",
+  },
+  {
+    title: "Kullo Onaylı rozeti",
+    val: "50.000",
+    unit: "IQD / ilan",
+    desc: "Fiziksel muayene + belge kontrolü rozeti. 3 kata kadar daha fazla mesaj.",
+  },
+];
+
+const PRICING_PLANS = [
+  {
+    id: "starter",
+    eyebrow: "Bireysel",
+    title: "Bireysel Satıcı",
+    desc: "Bir-iki arası araç, ev veya ürün satmak isteyenler için.",
+    priceMonth: "Ücretsiz",
+    priceMonthValue: 0,
+    priceYear: "Ücretsiz",
+    billed: "Sadece yayınlama ücretleri geçerli.",
+    cta: "Ücretsiz başla",
+    ctaStyle: "outline" as const,
+    features: [
+      { on: true, text: "Sınırsız ilan taslağı" },
+      { on: true, text: "25.000 IQD listing fee (ilan başına)" },
+      { on: true, text: "AI fiyat tahmini (aylık 3 ücretsiz)" },
+      { on: true, text: "5 dilde otomatik çeviri" },
+      { on: true, text: "Cüzdan & Hatwan ödemesi" },
+      { on: false, text: "AI hasar raporu" },
+      { on: false, text: "Öne çıkarma indirimi" },
+      { on: false, text: "Mağaza sayfası & CRM" },
+    ],
+  },
+  {
+    id: "pro",
+    eyebrow: "En popüler",
+    title: "AI Pro",
+    desc: "Sık ilan veren, açık arttırma kullanan ve AI'dan tam yararlanan kullanıcılar için.",
+    priceMonth: "9.99",
+    priceYear: "99",
+    billed: "Aylık · yıllık abonelikle %17 indirim.",
+    cta: "AI Pro'ya geç",
+    ctaStyle: "solid" as const,
+    feature: true,
+    features: [
+      { on: true, text: "Sınırsız ilan + 0 IQD listing fee" },
+      { on: true, text: "Sınırsız AI fiyat tahmini" },
+      { on: true, text: "AI hasar raporu (aylık 20)" },
+      { on: true, text: "AI ilan yazımı + 5 dil çevirisi" },
+      { on: true, text: "Öne çıkarma paketlerinde %30 indirim" },
+      { on: true, text: "Müzayede erken erişim" },
+      { on: false, text: "Bayi vitrini & CRM" },
+      { on: false, text: "API erişimi" },
+    ],
+  },
+  {
+    id: "dealer",
+    eyebrow: "Bayi & Kurumsal",
+    title: "Bayi / Kurumsal",
+    desc: "Galeriler, emlakçılar, mağazalar, restoranlar ve kurumsal satıcılar için.",
+    priceMonth: "49",
+    priceYear: "490",
+    billed: "Bayi · Emlakçı · Mağazacı · Restoran rolleri için aylık abonelik.",
+    cta: "Bayi olarak başvur",
+    ctaStyle: "solid" as const,
+    features: [
+      { on: true, text: "AI Pro'daki her şey dahil" },
+      { on: true, text: "Sınırsız ilan + 0 IQD listing fee" },
+      { on: true, text: "Bayi vitrini & mağaza sayfası" },
+      { on: true, text: "Müşteri CRM ve sohbet otomasyonu" },
+      { on: true, text: "Öne çıkarma paketlerinde %50 indirim" },
+      { on: true, text: "Sınırsız AI hasar raporu" },
+      { on: true, text: "Çoklu kullanıcı & ekip yönetimi" },
+      { on: true, text: "Öncelikli destek & API erişimi" },
+    ],
+  },
+];
+
+const PRICING_FAQ = [
+  {
+    q: "Listing fee (ilan ücreti) ne zaman alınır?",
+    a: "İlan yayına alınırken bir defa alınır. İlan 60 gün boyunca aktif kalır; yeniden yayına alırsanız tekrar ücretlenir. Taslak ilanlar ücretsizdir.",
+  },
+  {
+    q: "AI Pro abonelik ücreti iade edilir mi?",
+    a: "İlk 7 gün içinde tam iade. Sonrasında yıllık planda kalan süre için orantılı iade uygulanır.",
+  },
+  {
+    q: "Bayi paketinde komisyon oranları değişir mi?",
+    a: "Evet. Bayi/Kurumsal üyeler escrow komisyonunda %50 indirim alır (örn. açık arttırma %2 yerine %1). Detaylar sözleşmede belirtilir.",
+  },
+  {
+    q: "Hangi ödeme yöntemleriyle ödeyebilirim?",
+    a: "Kullo Cüzdan (Hatwan), QI Card, Zain Cash, FIB, FastPay ve banka havalesi/EFT. Yemek ve mağaza siparişlerinde kapıda ödeme seçenekleri ayrıca aktiftir.",
+  },
+  {
+    q: "5 dilde otomatik çeviri gerçekten ücretsiz mi?",
+    a: "Bireysel pakette ilan başına 1 çeviri ücretsiz. AI Pro pakette sınırsız çeviri. Çeviri OpenRouter üzerinden yapılır ve kalitesi GPT-4o sınıfıdır.",
+  },
+  {
+    q: "Kurumsal / API erişimi için ne yapmalıyım?",
+    a: "Bayi/Kurumsal pakete abone olup sales@kullo.app üzerinden API anahtarı talep edin. 5.000+ stoklu galeriler ve zincir mağazalar için özel fiyatlandırma sunulur.",
+  },
+];
+
+function PricingPage({
+  onBack,
+  onCta,
+}: {
+  onBack: () => void;
+  onCta: () => void;
+}) {
+  const [cycle, setCycle] = useState<"month" | "year">("month");
+
+  return (
+    <div className="dc">
+      <header className="dc-nav">
+        <div className="dc-nav__inner">
+          <button type="button" className="dc-nav__brand" onClick={onBack}>
+            <img src="/brand/seyyare-mark-light.png" alt="" width={32} height={32} />
+            <span>
+              seyyare<span>.men</span>
+            </span>
+          </button>
+
+          <nav className="dc-nav__links" aria-label="Ana menü">
+            <a href="#plans" onClick={(e) => { e.preventDefault(); document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" }); }}>Planlar</a>
+            <a href="#fees" onClick={(e) => { e.preventDefault(); document.getElementById("fees")?.scrollIntoView({ behavior: "smooth" }); }}>Ücretler</a>
+            <a href="#compare" onClick={(e) => { e.preventDefault(); document.getElementById("compare")?.scrollIntoView({ behavior: "smooth" }); }}>Karşılaştır</a>
+            <a href="#faq" onClick={(e) => { e.preventDefault(); document.getElementById("faq")?.scrollIntoView({ behavior: "smooth" }); }}>SSS</a>
+          </nav>
+
+          <div className="dc-nav__actions">
+            <span className="dc-nav__lang" aria-hidden>
+              🇮🇶 TR
+            </span>
+            <a className="dc-btn dc-btn--outline" href="#plans" onClick={(e) => { e.preventDefault(); document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" }); }}>
+              Planları gör
+            </a>
+            <a className="dc-btn dc-btn--soft" onClick={onCta} href="#home">
+              Ana sayfa
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section className="dc-pricing-hero">
+          <p className="dc-eyebrow" style={{ color: "var(--accent)" }}>
+            Fiyatlandırma
+          </p>
+          <h1>
+            Sade, <em>şeffaf</em> fiyatlandırma
+          </h1>
+          <p>
+            İlan yayınlama, öne çıkarma, abonelik ve komisyonlar — tek bir sayfa. Gizli
+            ücret yok, sürpriz fatura yok.
+          </p>
+
+          <div className="dc-pricing-toggle" role="tablist" aria-label="Faturalama döngüsü">
+            <button
+              type="button"
+              className={cycle === "month" ? "is-on" : ""}
+              onClick={() => setCycle("month")}
+              role="tab"
+              aria-selected={cycle === "month"}
+            >
+              Aylık
+            </button>
+            <button
+              type="button"
+              className={cycle === "year" ? "is-on" : ""}
+              onClick={() => setCycle("year")}
+              role="tab"
+              aria-selected={cycle === "year"}
+            >
+              Yıllık <span style={{ color: "#fff", background: "var(--accent)", borderRadius: 999, padding: "0.1rem 0.4rem", fontSize: "0.7rem", marginLeft: "0.3rem" }}>−%17</span>
+            </button>
+          </div>
+        </section>
+
+        <section className="dc-pricing-grid" id="plans">
+          {PRICING_PLANS.map((p) => (
+            <article
+              key={p.id}
+              className={`dc-plan ${p.feature ? "dc-plan--feature" : ""}`}
+            >
+              {p.feature ? <span className="dc-plan__badge">En popüler</span> : null}
+              <p className="dc-plan__eyebrow">{p.eyebrow}</p>
+              <h2 className="dc-plan__title">{p.title}</h2>
+              <p className="dc-plan__desc">{p.desc}</p>
+              <div className="dc-plan__price">
+                {p.priceMonthValue === 0 ? (
+                  <strong>Ücretsiz</strong>
+                ) : (
+                  <>
+                    <strong>
+                      {cycle === "month" ? `$${p.priceMonth}` : `$${p.priceYear}`}
+                    </strong>
+                    <span>/ {cycle === "month" ? "ay" : "yıl"}</span>
+                  </>
+                )}
+              </div>
+              <p className="dc-plan__billed">{p.billed}</p>
+              <a
+                className={`dc-plan__cta dc-plan__cta--${p.ctaStyle}`}
+                href="#cta"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById("cta")?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                {p.cta}
+              </a>
+              <ul className="dc-plan__feat">
+                {p.features.map((f, i) => (
+                  <li key={i} className={f.on ? "" : "is-mute"}>
+                    {f.text}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </section>
+
+        <section className="dc-fees" id="fees">
+          <h2>Birim ücretler & komisyonlar</h2>
+          <p className="dc-fees__lead">
+            Hangi işlemde ne kadar ücret alındığını net gör. Tüm ücretler IQD cinsinden
+            ve KDV hariçtir. Yıllık bayi sözleşmelerinde özel oranlar uygulanır.
+          </p>
+          <div className="dc-fees__grid">
+            {PRICING_FEES.map((f) => (
+              <div key={f.title} className="dc-fee">
+                <p className="dc-fee__title">{f.title}</p>
+                <p className="dc-fee__val">
+                  {f.val}
+                  <small>{f.unit}</small>
+                </p>
+                <p className="dc-fee__desc">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="dc-compare" id="compare">
+          <h2>Planları yan yana karşılaştır</h2>
+          <p className="dc-compare__lead">
+            Hangi özelliğin hangi paketle geldiğini tek tabloda gör.
+          </p>
+          <table className="dc-compare__table">
+            <thead>
+              <tr>
+                <th>Özellik</th>
+                <th>Bireysel</th>
+                <th>AI Pro</th>
+                <th>Bayi / Kurumsal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Aylık ilan ücreti</td>
+                <td>25.000 IQD / ilan</td>
+                <td className="is-on">0 IQD</td>
+                <td className="is-on">0 IQD</td>
+              </tr>
+              <tr>
+                <td>AI fiyat tahmini</td>
+                <td>3 / ay</td>
+                <td className="is-on">Sınırsız</td>
+                <td className="is-on">Sınırsız</td>
+              </tr>
+              <tr>
+                <td>AI hasar raporu</td>
+                <td className="is-mute">Yok</td>
+                <td className="is-on">20 / ay</td>
+                <td className="is-on">Sınırsız</td>
+              </tr>
+              <tr>
+                <td>5 dilde çeviri</td>
+                <td>1 çeviri / ilan</td>
+                <td className="is-on">Sınırsız</td>
+                <td className="is-on">Sınırsız</td>
+              </tr>
+              <tr>
+                <td>Öne çıkarma indirimi</td>
+                <td className="is-mute">Yok</td>
+                <td className="is-on">%30</td>
+                <td className="is-on">%50</td>
+              </tr>
+              <tr>
+                <td>Mağaza sayfası & CRM</td>
+                <td className="is-mute">Yok</td>
+                <td className="is-mute">Yok</td>
+                <td className="is-on">Var</td>
+              </tr>
+              <tr>
+                <td>Escrow komisyonu</td>
+                <td>%2</td>
+                <td>%2</td>
+                <td className="is-on">%1</td>
+              </tr>
+              <tr>
+                <td>Müzayede erken erişim</td>
+                <td className="is-mute">Yok</td>
+                <td className="is-on">Var</td>
+                <td className="is-on">Var</td>
+              </tr>
+              <tr>
+                <td>API erişimi</td>
+                <td className="is-mute">Yok</td>
+                <td className="is-mute">Yok</td>
+                <td className="is-on">Var</td>
+              </tr>
+              <tr>
+                <td>Destek</td>
+                <td>Topluluk</td>
+                <td>7/24 uygulama içi</td>
+                <td className="is-on">Öncelikli + telefon</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section className="dc-faq" id="faq">
+          <h2>Sık sorulan sorular</h2>
+          {PRICING_FAQ.map((f, i) => (
+            <details key={i} className="dc-faq__item" {...(i === 0 ? { open: true } : {})}>
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </section>
+
+        <section className="dc-pricing-cta" id="cta">
+          <div>
+            <h2>Hâlâ karar veremedin mi?</h2>
+            <p>
+              Ücretsiz başla, AI Pro'yu 7 gün dene. Bayi paketi için ekibimiz seninle
+              iletişime geçsin.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+            <a className="dc-btn dc-btn--accent" href="#app" onClick={onCta}>
+              Ücretsiz başla
+            </a>
+            <a className="dc-btn" href="mailto:sales@kullo.app" style={{ background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.3)" }}>
+              Satış ekibiyle görüş
+            </a>
+          </div>
+        </section>
+      </main>
+
+      <footer className="dc-foot">
+        <div className="dc-foot__inner">
+          <div className="dc-foot__brand">
+            <img src="/brand/seyyare-mark-light.png" alt="" width={24} height={24} />
+            <span>
+              seyyare<span>.men</span>
+            </span>
+          </div>
+          <div className="dc-foot__cols">
+            <div>
+              <h4>Alışveriş</h4>
+              <a href="#listings">İkinci el</a>
+              <a href="#rentals">Kiralama</a>
+              <a href="#auctions">Müzayede</a>
+            </div>
+            <div>
+              <h4>Servisler</h4>
+              <a href="#services">Taksi</a>
+              <a href="#wallet">Cüzdan</a>
+              <a href="#ai">AI asistan</a>
+            </div>
+            <div>
+              <h4>Şirket</h4>
+              <button type="button" onClick={onBack}>
+                Ana sayfa
+              </button>
+              <button type="button">Gizlilik</button>
+              <button type="button">Şartlar</button>
+            </div>
+          </div>
+          <p>© {new Date().getFullYear()} Seyyare · Irak araç pazarı</p>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -136,7 +136,7 @@ Kullanıcı mesajı → ai-service /ai/assistant
 ```bash
 # Production VPS'e deploy
 ssh user@seyyare.men
-git clone https://github.com/ferhatdeveloper/seyyare.men.git
+git clone https://github.com/ferhatdeveloper/kullo.git
 cd seyyare.men
 ./scripts/generate-secrets.sh > .env.production
 

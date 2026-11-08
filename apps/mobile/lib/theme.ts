@@ -1,11 +1,10 @@
 /**
- * Seyyare brand tokens — black asphalt + flame orange (logo).
- * Marketplace polish inspired by DubiCars / YallaMotor / CarSwitch.
+ * Kullo brand tokens — deep green lockup + orange accent (kullo_logo_exact).
  */
 import { Platform, type ViewStyle } from "react-native";
 
 export const colors = {
-  ink: "#0A0A0A",
+  ink: "#0C2D29",
   inkMuted: "#4A4A4A",
   inkFaint: "#8A8A8A",
   line: "#E8E8E8",
@@ -13,15 +12,18 @@ export const colors = {
   paper: "#F7F7F7",
   white: "#FFFFFF",
 
-  /** Logo flame */
-  flame: "#FF6A00",
-  flameMid: "#FF8C1A",
-  flameDeep: "#E04F00",
+  /** Logo orange (play tip + smile) */
+  flame: "#F36A1C",
+  flameMid: "#FB8A3A",
+  flameDeep: "#D9550E",
   flameSoft: "#FFF1E6",
 
+  /** Brand green soft — hizmet kartları */
+  brandSoft: "#E6F0ED",
+
   /** Aliases — existing screens use viridian* */
-  viridian: "#FF6A00",
-  viridianDeep: "#E04F00",
+  viridian: "#F36A1C",
+  viridianDeep: "#D9550E",
   viridianSoft: "#FFF1E6",
 
   brass: "#C47A2A",

@@ -34,6 +34,10 @@ interface WalletState {
   chargeBoost: (
     channel: BoostChannel,
   ) => Promise<{ ok: true; fee: number } | { ok: false; need: number }>;
+  /** Genel harcama (yemek siparişi vb.) */
+  spend: (
+    amountIqd: number,
+  ) => Promise<{ ok: true; fee: number } | { ok: false; need: number }>;
   canAffordListing: () => boolean;
 }
 
@@ -171,6 +175,18 @@ export const useWalletStore = create<WalletState>((set, get) => ({
 
   chargeBoost: async (channel) => {
     const fee = BOOST_FEES_IQD[channel];
+    const current = get().balanceIqd;
+    if (current < fee) {
+      return { ok: false as const, need: fee - current };
+    }
+    const next = current - fee;
+    set({ balanceIqd: next });
+    await persist(next);
+    return { ok: true as const, fee };
+  },
+
+  spend: async (amountIqd) => {
+    const fee = Math.max(0, Math.floor(amountIqd));
     const current = get().balanceIqd;
     if (current < fee) {
       return { ok: false as const, need: fee - current };

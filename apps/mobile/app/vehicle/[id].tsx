@@ -427,6 +427,30 @@ export default function VehicleDetailScreen() {
             );
           })()}
           <Text style={styles.title}>{title}</Text>
+          <View style={styles.keySpecRow}>
+            <View style={styles.keySpecItem}>
+              <Calendar size={14} color={colors.inkFaint} strokeWidth={2} />
+              <Text style={styles.keySpecText}>{vehicle.year}</Text>
+            </View>
+            <Text style={styles.keySpecDot}>·</Text>
+            <View style={styles.keySpecItem}>
+              <Gauge size={14} color={colors.inkFaint} strokeWidth={2} />
+              <Text style={styles.keySpecText}>
+                {(vehicle.mileage_km ?? 0).toLocaleString("tr-TR")} km
+              </Text>
+            </View>
+            {vehicle.body_name || vehicle.fuel_name ? (
+              <>
+                <Text style={styles.keySpecDot}>·</Text>
+                <View style={styles.keySpecItem}>
+                  <Fuel size={14} color={colors.inkFaint} strokeWidth={2} />
+                  <Text style={styles.keySpecText} numberOfLines={1}>
+                    {vehicle.body_name ?? vehicle.fuel_name}
+                  </Text>
+                </View>
+              </>
+            ) : null}
+          </View>
           <View style={styles.metaRow}>
             <Eye size={14} color={colors.inkFaint} />
             <Text style={styles.metaText}>
@@ -439,7 +463,41 @@ export default function VehicleDetailScreen() {
           </View>
         </View>
 
+        <TouchableOpacity
+          style={styles.sellerCard}
+          onPress={() => router.push(`/seller/${vehicle.seller_id}`)}
+          activeOpacity={0.85}
+        >
+          <View style={styles.sellerAvatar}>
+            <Text style={styles.sellerAvatarText}>{sellerName.charAt(0).toUpperCase()}</Text>
+          </View>
+          <View style={styles.flex}>
+            <View style={styles.sellerNameRow}>
+              <Text style={styles.sellerName}>{sellerName}</Text>
+              {vehicle.seller?.verified ? (
+                <ShieldCheck size={15} color={colors.flame} strokeWidth={2.2} />
+              ) : null}
+            </View>
+            {vehicle.seller?.verified ? (
+              <Text style={styles.verified}>Doğrulanmış satıcı</Text>
+            ) : null}
+            {vehicle.seller?.rating_avg != null ? (
+              <View style={styles.ratingRow}>
+                <Star size={12} color={colors.flame} fill={colors.flame} />
+                <Text style={styles.ratingText}>
+                  {vehicle.seller.rating_avg.toFixed(1)}
+                  {vehicle.seller.rating_count != null
+                    ? ` · ${vehicle.seller.rating_count} değerlendirme`
+                    : ""}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+          <ChevronRight size={18} color={colors.inkFaint} />
+        </TouchableOpacity>
+
         <View style={styles.specs}>
+          <Text style={styles.overviewTitle}>{t("vehicle.overview")}</Text>
           <View style={styles.specGrid}>
             <SpecItem icon={<Calendar size={18} color={colors.flame} />} label="Yıl" value={String(vehicle.year)} />
             <SpecItem
@@ -489,39 +547,6 @@ export default function VehicleDetailScreen() {
           <Text style={styles.sectionTitle}>{t("vehicle.description")}</Text>
           <Text style={styles.description}>{description}</Text>
         </View>
-
-        <TouchableOpacity
-          style={styles.sellerCard}
-          onPress={() => router.push(`/seller/${vehicle.seller_id}`)}
-          activeOpacity={0.85}
-        >
-          <View style={styles.sellerAvatar}>
-            <Text style={styles.sellerAvatarText}>{sellerName.charAt(0).toUpperCase()}</Text>
-          </View>
-          <View style={styles.flex}>
-            <View style={styles.sellerNameRow}>
-              <Text style={styles.sellerName}>{sellerName}</Text>
-              {vehicle.seller?.verified ? (
-                <ShieldCheck size={15} color={colors.flame} strokeWidth={2.2} />
-              ) : null}
-            </View>
-            {vehicle.seller?.verified ? (
-              <Text style={styles.verified}>Doğrulanmış satıcı</Text>
-            ) : null}
-            {vehicle.seller?.rating_avg != null ? (
-              <View style={styles.ratingRow}>
-                <Star size={12} color={colors.flame} fill={colors.flame} />
-                <Text style={styles.ratingText}>
-                  {vehicle.seller.rating_avg.toFixed(1)}
-                  {vehicle.seller.rating_count != null
-                    ? ` · ${vehicle.seller.rating_count} değerlendirme`
-                    : ""}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-          <ChevronRight size={18} color={colors.inkFaint} />
-        </TouchableOpacity>
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
@@ -783,6 +808,30 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
     lineHeight: 24,
   },
+  keySpecRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    marginTop: space.sm,
+    gap: 4,
+  },
+  keySpecItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    maxWidth: "40%",
+  },
+  keySpecText: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 13,
+    color: colors.inkMuted,
+  },
+  keySpecDot: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    color: colors.inkFaint,
+    marginHorizontal: 2,
+  },
   metaRow: { flexDirection: "row", alignItems: "center", marginTop: space.md },
   metaText: {
     marginLeft: 4,
@@ -800,6 +849,15 @@ const styles = StyleSheet.create({
     paddingVertical: space.sm,
     paddingHorizontal: space.md,
     ...shadow.soft,
+  },
+  overviewTitle: {
+    fontFamily: fonts.displayMed,
+    fontSize: 15,
+    color: colors.ink,
+    paddingHorizontal: 4,
+    paddingTop: space.sm,
+    paddingBottom: 4,
+    letterSpacing: -0.2,
   },
   specGrid: { flexDirection: "row", flexWrap: "wrap" },
   specItem: {

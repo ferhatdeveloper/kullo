@@ -1,23 +1,22 @@
 import { StatusBar } from "expo-status-bar";
-import { View, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, View } from "react-native";
 
-import { ModeSelect } from "../components/ModeSelect";
+import { ServicesHub } from "../components/ServicesHub";
 import { colors } from "../lib/theme";
 
-/** Careem-style first-entry service picker. */
+/**
+ * İlk giriş kapısı — alt menü yok, tam ekran hizmetler.
+ * Her uygulama açılışında buraya yönlendirilir.
+ */
 export default function ModeSelectScreen() {
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
-      <SafeAreaView style={styles.flex} edges={["bottom"]}>
-        <ModeSelect variant="full" />
-      </SafeAreaView>
+      <ServicesHub />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.ink },
-  flex: { flex: 1 },
 });

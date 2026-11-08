@@ -1,20 +1,20 @@
 import { router } from "expo-router";
-import { Clapperboard, Sparkles, Stars } from "lucide-react-native";
+import { Clapperboard, ChevronRight, Sparkles, Stars } from "lucide-react-native";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
-  ScrollView,
+  FlatList,
+  Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { setStatusBarStyle } from "expo-status-bar";
 
 import { Screen, ScreenHeader } from "../components/ui/Screen";
-import { colors, fonts, radius, shadow, space } from "../lib/theme";
+import { colors, fonts, radius, space } from "../lib/theme";
 
 const PACKS = [
   {
@@ -22,24 +22,25 @@ const PACKS = [
     Icon: Clapperboard,
     titleKey: "socialAgency.packBasic",
     bodyKey: "socialAgency.packBasicBody",
-    price: "150,000 IQD / ay",
+    price: "150K IQD/ay",
   },
   {
     key: "pro",
     Icon: Sparkles,
     titleKey: "socialAgency.packPro",
     bodyKey: "socialAgency.packProBody",
-    price: "350,000 IQD / ay",
+    price: "350K IQD/ay",
   },
   {
     key: "agency",
     Icon: Stars,
     titleKey: "socialAgency.packAgency",
     bodyKey: "socialAgency.packAgencyBody",
-    price: "Özel teklif",
+    price: "Özel",
   },
 ] as const;
 
+/** Dens paket satırları — Kariyer JobCard yoğunluğu; tek şişkin kart yok. */
 export default function SocialAgencyScreen() {
   const { t } = useTranslation();
 
@@ -60,88 +61,98 @@ export default function SocialAgencyScreen() {
         subtitle={t("socialAgency.subtitle")}
         onBack={() => router.back()}
       />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.lead}>{t("socialAgency.lead")}</Text>
-
-        {PACKS.map((p) => {
+      <FlatList
+        data={PACKS}
+        keyExtractor={(item) => item.key}
+        contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <Text style={styles.lead}>{t("socialAgency.lead")}</Text>
+        }
+        renderItem={({ item: p }) => {
           const Icon = p.Icon;
           return (
-            <View key={p.key} style={styles.card}>
+            <Pressable
+              style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+              onPress={() => request(t(p.titleKey))}
+              accessibilityRole="button"
+              accessibilityLabel={`${t(p.titleKey)}, ${t("socialAgency.cta")}`}
+            >
               <View style={styles.icon}>
-                <Icon size={20} color={colors.flame} strokeWidth={2.2} />
+                <Icon size={16} color={colors.flame} strokeWidth={2.2} />
               </View>
-              <Text style={styles.title}>{t(p.titleKey)}</Text>
-              <Text style={styles.body}>{t(p.bodyKey)}</Text>
-              <Text style={styles.price}>{p.price}</Text>
-              <TouchableOpacity
-                style={styles.cta}
-                onPress={() => request(t(p.titleKey))}
-                activeOpacity={0.88}
-              >
-                <Text style={styles.ctaText}>{t("socialAgency.cta")}</Text>
-              </TouchableOpacity>
-            </View>
+              <View style={styles.body}>
+                <Text style={styles.title} numberOfLines={1}>
+                  {t(p.titleKey)}
+                </Text>
+                <Text style={styles.hint} numberOfLines={1}>
+                  {t(p.bodyKey)}
+                </Text>
+              </View>
+              <Text style={styles.price} numberOfLines={1}>
+                {p.price}
+              </Text>
+              <ChevronRight size={16} color={colors.inkFaint} strokeWidth={2.2} />
+            </Pressable>
           );
-        })}
-      </ScrollView>
+        }}
+      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: space.xl, paddingBottom: space.section, gap: space.md },
+  list: {
+    paddingHorizontal: space.lg,
+    paddingBottom: space.section,
+    gap: 6,
+  },
   lead: {
-    fontFamily: fonts.body,
-    fontSize: 14,
-    color: colors.inkMuted,
-    lineHeight: 20,
-    marginBottom: space.sm,
-  },
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: space.lg,
-    ...shadow.soft,
-  },
-  icon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.flameSoft,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: space.sm,
-  },
-  title: {
-    fontFamily: fonts.displayMed,
-    fontSize: 17,
-    color: colors.ink,
-    marginBottom: 4,
-  },
-  body: {
     fontFamily: fonts.body,
     fontSize: 13,
     color: colors.inkMuted,
     lineHeight: 18,
-    marginBottom: space.sm,
+    marginBottom: 8,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: colors.white,
+    borderRadius: radius.sm,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(12,45,41,0.1)",
+    minHeight: 56,
+  },
+  icon: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.sm,
+    backgroundColor: colors.flameSoft,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  body: { flex: 1, minWidth: 0, gap: 1 },
+  title: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 13,
+    color: colors.ink,
+  },
+  hint: {
+    fontFamily: fonts.body,
+    fontSize: 11,
+    color: colors.inkFaint,
   },
   price: {
     fontFamily: fonts.bodySemi,
-    fontSize: 14,
+    fontSize: 11,
     color: colors.flameDeep,
-    marginBottom: space.md,
+    flexShrink: 0,
+    maxWidth: 88,
+    textAlign: "right",
   },
-  cta: {
-    backgroundColor: colors.ink,
-    borderRadius: radius.md,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  ctaText: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 14,
-    color: colors.white,
-  },
+  pressed: { opacity: 0.92 },
 });

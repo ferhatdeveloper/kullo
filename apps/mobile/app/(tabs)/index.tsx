@@ -2,156 +2,230 @@ import { StatusBar } from "expo-status-bar";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import {
+  Briefcase,
+  Building2,
   Car,
-  ChevronDown,
-  ChevronUp,
-  Droplets,
-  Gavel,
-  Mic,
-  Newspaper,
-  Search,
-  Share2,
-  ShieldCheck,
-  Sparkles,
-  Store,
-  Users,
-  Wallet,
-  Zap,
+  CarTaxiFront,
+  Flower2,
+  Hammer,
+  Hotel,
+  KeyRound,
+  LayoutDashboard,
+  Plane,
+  Shirt,
+  ShoppingBasket,
+  Stethoscope,
+  UtensilsCrossed,
+  Warehouse,
+  Wrench,
 } from "lucide-react-native";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useMemo, useState } from "react";
 import {
-  Image,
+  Dimensions,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 
-import { BrandStrip } from "../../components/BrandStrip";
+import { SoftGradient as LinearGradient } from "../../components/SoftGradient";
 import { AppHeader } from "../../components/brand";
-import { PromoCarousel } from "../../components/PromoCarousel";
-import { RecentTriplesCarousel } from "../../components/RecentTriplesCarousel";
-import { Skeleton } from "../../components/Skeleton";
+import { OfflineCover } from "../../components/OfflineCover";
+import { SuperHomeFeed } from "../../components/SuperHomeFeed";
 import { type VehicleListItem } from "../../components/VehicleCard";
-import { Badge, Chip, SectionHeader } from "../../components/ui";
 import { api } from "../../lib/api";
-import { withBrandLogos } from "../../lib/brand-logos";
-import { MARKET_CITIES, useCityStore } from "../../lib/city-store";
-import { DEMO_VEHICLES, type DemoAuction } from "../../lib/demo-data";
-import { useCurrencyStore } from "../../lib/currency-store";
-import { isResponsiveDealer } from "../../lib/marketplace-heuristics";
+import { DEMO_VEHICLES, withStoreAttribution } from "../../lib/demo-data";
+import { hasOfflineBundle } from "../../lib/offline-image-map";
 import {
   readVehiclesSnapshot,
   writeVehiclesSnapshot,
 } from "../../lib/offline-snapshot";
 import { colors, fonts, radius, shadow, space } from "../../lib/theme";
 
-type StoreItem = {
-  id: string;
-  name: string;
-  city?: string;
-  verified?: boolean;
-  rating_avg?: number;
-  cover_url?: string;
+const SCREEN_W = Dimensions.get("window").width;
+const BANNER_W = SCREEN_W - space.lg * 2;
+
+/** Snapshot/API cover remote ise offline map’teki demo cover’a düş. */
+function withBundledCovers(list: VehicleListItem[]): VehicleListItem[] {
+  return list.map((v, i) => {
+    if (hasOfflineBundle(v.cover_url)) return v;
+    const demo = DEMO_VEHICLES[i % DEMO_VEHICLES.length];
+    return { ...v, cover_url: demo?.cover_url ?? v.cover_url };
+  });
+}
+
+type Banner = {
+  key: string;
+  uri: string;
+  eyebrowKey: string;
+  titleKey: string;
+  subKey: string;
+  go: () => void;
 };
 
-const BODY_TYPES = [
+const BANNERS: Banner[] = [
   {
-    key: "SUV",
-    label: "SUV",
-    image:
-      "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=600&q=80",
+    key: "deals",
+    uri: "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1200&q=80",
+    eyebrowKey: "superHome.deals",
+    titleKey: "superHome.bannerHeroTitle",
+    subKey: "superHome.bannerHeroSub",
+    go: () =>
+      router.push({ pathname: "/(tabs)/mart", params: { martPane: "home" } }),
   },
   {
-    key: "Sedan",
-    label: "Sedan",
-    image:
-      "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=600&q=80",
+    key: "cars",
+    uri: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=80",
+    eyebrowKey: "superHome.bannerCars",
+    titleKey: "superHome.bannerCarsTitle",
+    subKey: "superHome.bannerCarsSub",
+    go: () =>
+      router.push({
+        pathname: "/(tabs)/search",
+        params: { intent: "buy", carsPane: "home" },
+      }),
   },
   {
-    key: "Hatchback",
-    label: "Hatch",
-    image:
-      "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=600&q=80",
+    key: "realty",
+    uri: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80",
+    eyebrowKey: "superHome.bannerRealty",
+    titleKey: "superHome.bannerRealtyTitle",
+    subKey: "superHome.bannerRealtySub",
+    go: () => router.push("/(tabs)/realty"),
   },
   {
-    key: "Pickup",
-    label: "Pickup",
-    image:
-      "https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    key: "Hibrit",
-    label: "Hibrit",
-    image:
-      "https://images.unsplash.com/photo-1593941707881-a5cfde87040b?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    key: "Elektrik",
-    label: "EV",
-    image:
-      "https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=600&q=80",
+    key: "food",
+    uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
+    eyebrowKey: "hub.food",
+    titleKey: "superHome.bannerFoodTitle",
+    subKey: "superHome.bannerFoodSub",
+    go: () =>
+      router.push({ pathname: "/(tabs)/mart", params: { martPane: "home" } }),
   },
 ];
 
-const STORY_CHIPS = [
-  { key: "verified", labelKey: "home.trustVerified", go: () => router.push({ pathname: "/(tabs)/search", params: { openResults: "1" } }) },
-  { key: "auction", labelKey: "home.auctions", go: () => router.push("/auctions") },
-  { key: "rent", labelKey: "hub.rent", go: () => router.push("/(tabs)/rentals") },
-  { key: "boost", labelKey: "hub.boost", go: () => router.push("/boost") },
-  { key: "social", labelKey: "hub.socialAgency", go: () => router.push("/social-agency") },
+/** Tek keşif katmanı — dairesel dikey kısayollar (Hizmetler featured sırasıyla uyumlu) */
+const CIRCLES = [
+  {
+    key: "food",
+    Icon: UtensilsCrossed,
+    labelKey: "hub.food",
+    go: () =>
+      router.push({ pathname: "/(tabs)/mart", params: { martPane: "home" } }),
+  },
+  {
+    key: "market",
+    Icon: ShoppingBasket,
+    labelKey: "hub.market",
+    go: () =>
+      router.push({ pathname: "/(tabs)/mart", params: { martPane: "market" } }),
+  },
+  {
+    key: "taxi",
+    Icon: CarTaxiFront,
+    labelKey: "hub.taxi",
+    go: () => router.push("/taxi"),
+  },
+  {
+    key: "realty",
+    Icon: Building2,
+    labelKey: "hub.realty",
+    go: () => router.push("/(tabs)/realty"),
+  },
+  {
+    key: "cars-buy",
+    Icon: Car,
+    labelKey: "hub.buy",
+    go: () =>
+      router.push({
+        pathname: "/(tabs)/search",
+        params: { intent: "buy", carsPane: "home" },
+      }),
+  },
+  {
+    key: "cars-rent",
+    Icon: KeyRound,
+    labelKey: "hub.rent",
+    go: () =>
+      router.push({
+        pathname: "/(tabs)/rentals",
+        params: { intent: "rent", rentPane: "home" },
+      }),
+  },
+  {
+    key: "fashion",
+    Icon: Shirt,
+    labelKey: "hub.fashion",
+    go: () => router.push("/(tabs)/shop"),
+  },
+  {
+    key: "health",
+    Icon: Stethoscope,
+    labelKey: "hub.health",
+    go: () => router.push("/health"),
+  },
+  {
+    key: "career",
+    Icon: Briefcase,
+    labelKey: "hub.career",
+    go: () => router.push("/career"),
+  },
+  {
+    key: "travel",
+    Icon: Plane,
+    labelKey: "hub.travel",
+    go: () => router.push("/travel"),
+  },
+  {
+    key: "hotels",
+    Icon: Hotel,
+    labelKey: "hub.hotels",
+    go: () => router.push("/hotels"),
+  },
+  {
+    key: "b2b",
+    Icon: Warehouse,
+    labelKey: "hub.wholesale",
+    go: () => router.push("/b2b"),
+  },
+  {
+    key: "trades",
+    Icon: Hammer,
+    labelKey: "hub.trades",
+    go: () => router.push("/trades"),
+  },
+  {
+    key: "flowers",
+    Icon: Flower2,
+    labelKey: "hub.flowers",
+    go: () => router.push("/food/flowers"),
+  },
+  {
+    key: "services",
+    Icon: Wrench,
+    labelKey: "tabs.services",
+    go: () => router.push("/(tabs)/services"),
+  },
+  {
+    key: "all",
+    Icon: LayoutDashboard,
+    labelKey: "home.allServices",
+    go: () => router.push("/mode-select"),
+  },
 ] as const;
 
-const HUB_MORE = [
-  { key: "guide", Icon: Newspaper, labelKey: "hub.guide", go: () => router.push("/guide") },
-  { key: "wash", Icon: Droplets, labelKey: "hub.wash", go: () => router.push("/car-wash") },
-  { key: "shared", Icon: Users, labelKey: "hub.sharedRide", go: () => router.push("/shared-ride") },
-  { key: "social", Icon: Share2, labelKey: "hub.socialAgency", go: () => router.push("/social-agency") },
-  { key: "pay", Icon: Wallet, labelKey: "hub.pay", go: () => router.push("/wallet") },
-  { key: "auctions", Icon: Gavel, labelKey: "home.auctions", go: () => router.push("/auctions") },
-] as const;
-
-/** IQD budget shortcut bands (millions). */
-const BUDGET_BANDS = [
-  { maxPrice: 10_000_000, labelKey: "home.budgetUnder10M" },
-  { maxPrice: 25_000_000, labelKey: "home.budgetUnder25M" },
-  { maxPrice: 50_000_000, labelKey: "home.budgetUnder50M" },
-  { maxPrice: 100_000_000, labelKey: "home.budgetUnder100M" },
-] as const;
-
+/** Süper-app Ana — yoğun marketplace keşif (ink + flame) */
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
-  const [moreOpen, setMoreOpen] = useState(false);
-  const formatListing = useCurrencyStore((s) => s.formatListing);
-  const selectedCity = useCityStore((s) => s.city);
-  const setSelectedCity = useCityStore((s) => s.setCity);
+  const [bannerIdx, setBannerIdx] = useState(0);
+  const bannerRef = useRef<ScrollView>(null);
 
-  const searchParams = useMemo(() => {
-    const params: Record<string, string> = {};
-    if (selectedCity !== "all") params.city = selectedCity;
-    return params;
-  }, [selectedCity]);
-
-  const goSearch = (extra?: Record<string, string>) => {
-    router.push({
-      pathname: "/(tabs)/search",
-      params: { ...searchParams, ...extra },
-    });
-  };
-
-  const { data: liveAuctions = [] } = useQuery({
-    queryKey: ["live-auctions"],
-    queryFn: () =>
-      api.rpc<DemoAuction[]>("list_live_auctions", { p_limit: 10 }).then((rows) =>
-        Array.isArray(rows) ? rows : [],
-      ),
-    staleTime: 30_000,
-  });
-
-  const { data: recent, isLoading } = useQuery({
-    queryKey: ["vehicles-recent", i18n.language],
+  const { data: recent } = useQuery({
+    queryKey: ["vehicles-recent-home", i18n.language],
     queryFn: async () => {
       try {
         const feed = await api.rpc<VehicleListItem[]>("list_active_listings_feed", {
@@ -166,490 +240,104 @@ export default function HomeScreen() {
       } catch {
         /* fall through */
       }
-
-      try {
-        const search = await api.rpc<VehicleListItem[]>("search_vehicles", {
-          p_locale: i18n.language,
-          p_sort_by: "created_at",
-          p_sort_dir: "desc",
-          p_page_size: 10,
-          p_page_offset: 0,
-        });
-        if (Array.isArray(search) && search.length > 0) {
-          void writeVehiclesSnapshot(search);
-          return search;
-        }
-      } catch {
-        /* fall through to snapshot */
-      }
-
       const snap = await readVehiclesSnapshot();
-      return snap ?? [];
+      return withBundledCovers(
+        (snap ?? DEMO_VEHICLES) as VehicleListItem[],
+      );
     },
-  });
-
-  const { data: listingCount } = useQuery({
-    queryKey: ["active-listing-count"],
-    queryFn: () => api.rpc<number>("count_active_listings"),
+    initialData: DEMO_VEHICLES as VehicleListItem[],
     staleTime: 60_000,
   });
 
-  const { data: refs } = useQuery({
-    queryKey: ["reference", i18n.language],
-    queryFn: () =>
-      api.rpc<{ brands: Array<{ id: number; name: string }> }>("list_reference_data", {
-        p_locale: i18n.language,
-      }),
-    staleTime: 60 * 60 * 1000,
-  });
+  const vehicles = withStoreAttribution(
+    withBundledCovers(recent ?? (DEMO_VEHICLES as VehicleListItem[])),
+  );
 
-  const { data: stores, isLoading: storesLoading } = useQuery({
-    queryKey: ["stores"],
-    queryFn: () =>
-      api.rpc<StoreItem[]>("list_stores", {}).then((rows) =>
-        Array.isArray(rows) ? rows : [],
-      ),
-  });
-
-  const brands = withBrandLogos(refs?.brands ?? []);
-  const vehicles = recent ?? [];
-  const inventoryCount =
-    typeof listingCount === "number" && listingCount > 0
-      ? listingCount
-      : DEMO_VEHICLES.length > 0
-        ? DEMO_VEHICLES.length
-        : Math.max(vehicles.length, 1);
-  const featured = vehicles.filter((v) => v.featured).slice(0, 5);
-  const featuredList = featured.length > 0 ? featured : vehicles.slice(0, 4);
-
-  const featuredDealers = useMemo(() => {
-    const rows = stores ?? [];
-    const verified = rows.filter((s) => s.verified);
-    const rest = rows.filter((s) => !s.verified);
-    return [...verified, ...rest].slice(0, 8);
-  }, [stores]);
-
-  const popularModels = useMemo(() => {
-    const map = new Map<string, { name: string; count: number; cover_url?: string | null }>();
-    const source = DEMO_VEHICLES.length > 0 ? DEMO_VEHICLES : vehicles;
-    for (const v of source) {
-      const key = [v.make_name, v.model].filter(Boolean).join(" ").trim();
-      if (!key) continue;
-      const cur = map.get(key);
-      const cover = (v as { cover_url?: string | null }).cover_url;
-      if (cur) {
-        cur.count += 1;
-        if (!cur.cover_url && cover) cur.cover_url = cover;
-      } else {
-        map.set(key, { name: key, count: 1, cover_url: cover });
-      }
-    }
-    return Array.from(map.values())
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
-  }, [vehicles]);
-
+  const onBannerScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const x = e.nativeEvent.contentOffset.x;
+    const i = Math.round(x / (BANNER_W + 10));
+    if (i !== bannerIdx && i >= 0 && i < BANNERS.length) setBannerIdx(i);
+  };
 
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
-      <AppHeader />
+      <AppHeader
+        variant="market"
+        searchPlaceholder={t("superHome.searchPlaceholder")}
+        onSearchPress={() =>
+          router.push({ pathname: "/(tabs)/search", params: { openResults: "1" } })
+        }
+      />
       <ScrollView
         style={styles.flex}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.sheet}>
-          <PromoCarousel items={featuredList} />
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.storyRow}
-          >
-            {STORY_CHIPS.map((s) => (
-              <TouchableOpacity
-                key={s.key}
-                style={styles.storyChip}
-                onPress={s.go}
-                activeOpacity={0.88}
-              >
-                <Text style={styles.storyChipText}>{t(s.labelKey)}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          <View style={styles.trustRow}>
-            <View style={styles.trustItem}>
-              <ShieldCheck size={16} color={colors.flame} strokeWidth={2.2} />
-              <Text style={styles.trustText}>{t("home.trustVerified")}</Text>
-            </View>
-            <View style={styles.trustItem}>
-              <Sparkles size={16} color={colors.flame} strokeWidth={2.2} />
-              <Text style={styles.trustText}>{t("home.trustAi")}</Text>
-            </View>
-            <View style={styles.trustItem}>
-              <Wallet size={16} color={colors.flame} strokeWidth={2.2} />
-              <Text style={styles.trustText}>{t("home.trustWallet")}</Text>
-            </View>
-          </View>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.cityRow}
-          >
-            <Chip
-              label={t("common.all")}
-              selected={selectedCity === "all"}
-              onPress={() => void setSelectedCity("all")}
-              style={styles.cityChip}
-            />
-            {MARKET_CITIES.map((c) => (
-              <Chip
-                key={c}
-                label={c}
-                selected={selectedCity === c}
-                onPress={() => void setSelectedCity(c)}
-                style={styles.cityChip}
-              />
-            ))}
-          </ScrollView>
-
-          <View style={styles.searchCta}>
-            <Text style={styles.searchCtaTitle}>{t("home.findPerfect")}</Text>
-            <TouchableOpacity
-              style={styles.searchBar}
-              onPress={() => goSearch()}
-              activeOpacity={0.9}
-            >
-              <Search size={18} color={colors.inkFaint} strokeWidth={2} />
-              <Text style={styles.searchPlaceholder}>{t("home.searchPlaceholder")}</Text>
-              <TouchableOpacity
-                style={styles.micBtn}
-                onPress={() => router.push("/voice")}
-                hitSlop={6}
-              >
-                <Mic size={16} color={colors.flame} strokeWidth={2.2} />
-              </TouchableOpacity>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.searchSubmit}
-              onPress={() => goSearch({ openResults: "1" })}
-              activeOpacity={0.9}
-            >
-              <Text style={styles.searchSubmitText}>
-                {(t as (key: string, opts?: Record<string, string>) => string)(
-                  "home.searchCars",
-                  { count: inventoryCount.toLocaleString("tr-TR") },
-                )}
-              </Text>
-            </TouchableOpacity>
-
+          <View style={styles.bannerShell}>
             <ScrollView
+              ref={bannerRef}
               horizontal
+              pagingEnabled={false}
+              decelerationRate="fast"
+              snapToInterval={BANNER_W + 10}
+              snapToAlignment="start"
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.budgetRow}
+              onScroll={onBannerScroll}
+              scrollEventThrottle={16}
+              style={styles.bannerScroll}
+              contentContainerStyle={styles.bannerRow}
             >
-              {BUDGET_BANDS.map((band) => (
-                <TouchableOpacity
-                  key={band.maxPrice}
-                  style={styles.budgetChip}
-                  onPress={() =>
-                    goSearch({
-                      maxPrice: String(band.maxPrice),
-                      openResults: "1",
-                    })
-                  }
-                  activeOpacity={0.88}
+              {BANNERS.map((b) => (
+                <Pressable
+                  key={b.key}
+                  style={[styles.heroBanner, { width: BANNER_W }]}
+                  onPress={b.go}
                 >
-                  <Text style={styles.budgetChipText}>{t(band.labelKey)}</Text>
-                </TouchableOpacity>
+                  <OfflineCover uri={b.uri} style={styles.heroImage} />
+                  <LinearGradient
+                    colors={["rgba(12,45,41,0.35)", "rgba(12,45,41,0.88)"]}
+                    start={{ x: 0, y: 0.5 }}
+                    end={{ x: 1, y: 0.5 }}
+                    style={styles.heroGradient}
+                  >
+                    <Text style={styles.heroEyebrow}>{t(b.eyebrowKey)}</Text>
+                    <Text style={styles.heroTitle}>{t(b.titleKey)}</Text>
+                    <Text style={styles.heroSub}>{t(b.subKey)}</Text>
+                  </LinearGradient>
+                </Pressable>
               ))}
             </ScrollView>
-          </View>
-
-          <View style={styles.hub}>
-            <TouchableOpacity
-              style={styles.moreToggle}
-              onPress={() => setMoreOpen((v) => !v)}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.moreToggleText}>{t("hub.moreServices")}</Text>
-              {moreOpen ? (
-                <ChevronUp size={16} color={colors.inkMuted} strokeWidth={2.2} />
-              ) : (
-                <ChevronDown size={16} color={colors.inkMuted} strokeWidth={2.2} />
-              )}
-            </TouchableOpacity>
-
-            {moreOpen ? (
-              <View style={styles.hubMoreGrid}>
-                {HUB_MORE.map((item) => {
-                  const Icon = item.Icon;
-                  return (
-                    <TouchableOpacity
-                      key={item.key}
-                      style={styles.hubMoreTile}
-                      onPress={item.go}
-                      activeOpacity={0.88}
-                    >
-                      <Icon size={16} color={colors.flame} strokeWidth={2.2} />
-                      <Text style={styles.hubMoreLabel}>{t(item.labelKey)}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            ) : null}
-          </View>
-
-          <TouchableOpacity
-            style={styles.aiRow}
-            onPress={() => router.push("/ai-assistant")}
-            activeOpacity={0.9}
-          >
-            <View style={styles.aiIcon}>
-              <Sparkles size={16} color={colors.flame} strokeWidth={2.2} />
-            </View>
-            <View style={styles.flex}>
-              <Text style={styles.aiTitle}>{t("home.aiAssistant")}</Text>
-              <Text style={styles.aiSub}>{t("home.aiAssistantPrompt")}</Text>
-            </View>
-          </TouchableOpacity>
-
-          {liveAuctions.length > 0 ? (
-            <View style={styles.sectionTight}>
-              <SectionHeader
-                title={t("home.auctions")}
-                actionLabel={t("home.seeAll")}
-                onAction={() => router.push("/auctions")}
-              />
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.auctionRow}
-              >
-                {liveAuctions.map((a) => (
-                  <TouchableOpacity
-                    key={a.id}
-                    style={styles.auctionCard}
-                    onPress={() => router.push(`/auction/${a.id}`)}
-                    activeOpacity={0.9}
-                  >
-                    <Image
-                      source={{ uri: a.cover_url }}
-                      style={styles.auctionImage}
-                      resizeMode="cover"
-                    />
-                    <View style={styles.auctionLive}>
-                      <Gavel size={11} color={colors.white} strokeWidth={2.2} />
-                      <Text style={styles.auctionLiveText}>{t("auction.status.live")}</Text>
-                    </View>
-                    <View style={styles.auctionBody}>
-                      <Text style={styles.auctionTitle} numberOfLines={2}>
-                        {a.title}
-                      </Text>
-                      <Text style={styles.auctionBid}>
-                        {formatListing(a.current_bid, a.currency)}
-                      </Text>
-                      <Text style={styles.auctionMeta}>
-                        {a.bid_count} {t("auction.bids")} · {a.city}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          ) : null}
-
-          <View style={styles.section}>
-            <SectionHeader title={t("home.categories")} padded={false} />
-            <View style={styles.catGrid}>
-              {BODY_TYPES.map((b) => (
-                <TouchableOpacity
+            <View style={styles.dots}>
+              {BANNERS.map((b, i) => (
+                <View
                   key={b.key}
-                  style={styles.catTile}
-                  onPress={() =>
-                    router.push({ pathname: "/(tabs)/search", params: { q: b.key } })
-                  }
-                  activeOpacity={0.88}
-                >
-                  <Image source={{ uri: b.image }} style={styles.catImage} />
-                  <View style={styles.catOverlay}>
-                    <Text style={styles.catLabel}>{b.label}</Text>
-                  </View>
-                </TouchableOpacity>
+                  style={[styles.dot, i === bannerIdx && styles.dotOn]}
+                />
               ))}
             </View>
           </View>
 
-          {popularModels.length > 0 ? (
-            <View style={styles.sectionTight}>
-              <SectionHeader title="Popüler modeller" />
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.popularRow}
-              >
-                {popularModels.map((m) => (
-                  <TouchableOpacity
-                    key={m.name}
-                    style={styles.popularCard}
-                    onPress={() =>
-                      router.push({ pathname: "/(tabs)/search", params: { q: m.name } })
-                    }
-                    activeOpacity={0.88}
-                  >
-                    {m.cover_url ? (
-                      <Image source={{ uri: m.cover_url }} style={styles.popularImage} />
-                    ) : (
-                      <View style={[styles.popularImage, styles.popularPh]} />
-                    )}
-                    <Text style={styles.popularCardTitle} numberOfLines={1}>
-                      {m.name}
-                    </Text>
-                    <Text style={styles.popularCardMeta}>{m.count} ilan</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          ) : null}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.circleScroll}
+            contentContainerStyle={styles.circleRow}
+          >
+            {CIRCLES.map((c) => (
+              <Pressable key={c.key} style={styles.circleItem} onPress={c.go}>
+                <View style={styles.circleIcon}>
+                  <c.Icon size={22} color={colors.flame} strokeWidth={2.2} />
+                </View>
+                <Text style={styles.circleLabel} numberOfLines={2}>
+                  {t(c.labelKey)}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
 
-          <View style={styles.sectionTight}>
-            <SectionHeader
-              title={t("home.popularBrands")}
-              actionLabel={t("home.seeAll")}
-              onAction={() => router.push("/(tabs)/search")}
-            />
-            <BrandStrip
-              brands={brands}
-              onSelect={(b) =>
-                router.push({
-                  pathname: "/(tabs)/search",
-                  params: { make: b.name, makeId: String(b.id) },
-                })
-              }
-              limit={20}
-            />
-          </View>
-
-          {storesLoading || featuredDealers.length > 0 ? (
-            <View style={styles.sectionTight}>
-              <SectionHeader
-                title={t("home.featuredDealers")}
-                actionLabel={t("home.seeAll")}
-                onAction={() => router.push("/(tabs)/stores")}
-              />
-              {storesLoading ? (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.dealerRow}
-                >
-                  {[0, 1, 2, 3].map((i) => (
-                    <View key={i} style={styles.dealerCard}>
-                      <Skeleton height={96} rounded="lg" style={styles.dealerSkeletonCover} />
-                      <View style={styles.dealerBody}>
-                        <Skeleton width="75%" height={13} style={styles.dealerSkeletonGap} />
-                        <Skeleton width="45%" height={11} />
-                      </View>
-                    </View>
-                  ))}
-                </ScrollView>
-              ) : (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.dealerRow}
-                >
-                  {featuredDealers.map((store) => {
-                    const responsive = isResponsiveDealer({
-                      verified: store.verified,
-                      rating_avg: store.rating_avg,
-                    });
-                    return (
-                      <TouchableOpacity
-                        key={store.id}
-                        style={styles.dealerCard}
-                        onPress={() => router.push(`/seller/${store.id}`)}
-                        activeOpacity={0.9}
-                      >
-                        <View style={styles.dealerCoverWrap}>
-                          {store.cover_url ? (
-                            <Image
-                              source={{ uri: store.cover_url }}
-                              style={styles.dealerCover}
-                              resizeMode="cover"
-                            />
-                          ) : (
-                            <View style={[styles.dealerCover, styles.dealerCoverFallback]}>
-                              <Store size={24} color={colors.flame} strokeWidth={1.8} />
-                            </View>
-                          )}
-                        </View>
-                        <View style={styles.dealerBody}>
-                          <Text style={styles.dealerName} numberOfLines={1}>
-                            {store.name}
-                          </Text>
-                          <Text style={styles.dealerCity} numberOfLines={1}>
-                            {store.city || "—"}
-                          </Text>
-                          <View style={styles.dealerBadgeRow}>
-                            {store.verified ? (
-                              <Badge
-                                label={t("vehicle.verifiedBadge")}
-                                tone="viridian"
-                                icon={
-                                  <ShieldCheck
-                                    size={11}
-                                    color={colors.viridianDeep}
-                                    strokeWidth={2.5}
-                                  />
-                                }
-                              />
-                            ) : null}
-                            {responsive ? (
-                              <Badge
-                                label={t("vehicle.responsiveBadge")}
-                                tone="mist"
-                                icon={
-                                  <Zap size={11} color={colors.flameDeep} strokeWidth={2.5} />
-                                }
-                              />
-                            ) : null}
-                          </View>
-                        </View>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              )}
-            </View>
-          ) : null}
-
-          <View style={styles.section}>
-            <SectionHeader
-              title={t("home.recentListings")}
-              actionLabel={t("home.seeAll")}
-              onAction={() => router.push("/(tabs)/search")}
-              padded={false}
-            />
-
-            {isLoading || vehicles.length > 0 ? (
-              <RecentTriplesCarousel items={vehicles} loading={isLoading} />
-            ) : (
-              <View style={styles.empty}>
-                <Text style={styles.emptyTitle}>Henüz ilan yok</Text>
-                <TouchableOpacity
-                  style={styles.emptyBtn}
-                  onPress={() => router.push("/(tabs)/sell")}
-                  activeOpacity={0.9}
-                >
-                  <Text style={styles.emptyBtnText}>İlan Ver</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
+          <SuperHomeFeed vehicles={vehicles} compact />
         </View>
       </ScrollView>
     </View>
@@ -657,396 +345,101 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.paper },
-  flex: { flex: 1 },
-  content: { paddingBottom: 48 },
+  root: { flex: 1, backgroundColor: colors.ink },
+  flex: { flex: 1, backgroundColor: colors.white },
+  content: { paddingBottom: space.xxl },
   sheet: {
-    backgroundColor: colors.paper,
+    backgroundColor: colors.white,
     paddingTop: space.md,
+    minHeight: "100%",
   },
-  searchCta: {
-    marginHorizontal: space.xl,
-    marginBottom: space.xl,
-    backgroundColor: colors.ink,
-    borderRadius: radius.lg,
-    padding: space.md,
-    gap: space.sm,
-  },
-  searchCtaTitle: {
-    fontFamily: fonts.displayMed,
-    fontSize: 15,
-    color: colors.white,
-    marginBottom: 2,
-  },
-  cityRow: {
-    gap: 8,
-    paddingHorizontal: space.xl,
-    paddingBottom: space.md,
-  },
-  cityChip: {
-    flexShrink: 0,
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radius.md,
-    paddingHorizontal: space.md,
-    paddingVertical: 12,
-  },
-  searchPlaceholder: {
-    flex: 1,
-    marginLeft: 8,
-    fontFamily: fonts.body,
-    fontSize: 14,
-    color: colors.inkFaint,
-  },
-  micBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.flameSoft,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  searchSubmit: {
-    backgroundColor: colors.flame,
-    borderRadius: radius.md,
-    paddingVertical: 13,
-    alignItems: "center",
-  },
-  searchSubmitText: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 14,
-    color: colors.white,
-  },
-  budgetRow: {
-    gap: 8,
-    paddingTop: 4,
-  },
-  budgetChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: radius.pill,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.22)",
-  },
-  budgetChipText: {
-    fontFamily: fonts.bodyMed,
-    fontSize: 12,
-    color: colors.white,
-  },
-  hub: {
-    marginHorizontal: space.xl,
-    marginBottom: space.xl,
-    gap: space.md,
-  },
-  moreToggle: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 4,
-  },
-  moreToggleText: {
-    fontFamily: fonts.bodyMed,
-    fontSize: 13,
-    color: colors.inkMuted,
-  },
-  hubMoreGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  hubMoreTile: {
-    width: "48%",
-    flexGrow: 1,
-    minWidth: "46%",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: colors.mist,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-  },
-  hubMoreLabel: {
-    flex: 1,
-    fontFamily: fonts.bodyMed,
-    fontSize: 12,
-    color: colors.ink,
-  },
-  aiRow: {
-    marginHorizontal: space.xl,
-    marginBottom: space.xxl,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space.md,
-    backgroundColor: colors.white,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: space.md,
-    ...shadow.soft,
-  },
-  aiIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.flameSoft,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  aiTitle: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 14,
-    color: colors.ink,
-  },
-  aiSub: {
-    fontFamily: fonts.body,
-    fontSize: 12,
-    color: colors.inkFaint,
-    marginTop: 2,
-  },
-  section: { paddingHorizontal: space.xl, marginBottom: space.xxl },
-  sectionTight: { marginBottom: space.xxl },
-  storyRow: {
-    gap: 8,
-    paddingHorizontal: space.xl,
-    paddingBottom: space.md,
-  },
-  storyChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: radius.pill,
-    backgroundColor: colors.ink,
-  },
-  storyChipText: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 12,
-    color: colors.white,
-  },
-  trustRow: {
-    flexDirection: "row",
-    marginHorizontal: space.xl,
-    marginBottom: space.md,
-    gap: 8,
-  },
-  trustItem: {
-    flex: 1,
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: colors.white,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    paddingVertical: 10,
-    paddingHorizontal: 6,
-  },
-  trustText: {
-    fontFamily: fonts.bodyMed,
-    fontSize: 10,
-    color: colors.inkMuted,
-    textAlign: "center",
-  },
-  catGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+  bannerShell: { marginBottom: 4 },
+  bannerScroll: { height: 118 },
+  bannerRow: {
+    paddingHorizontal: space.lg,
     gap: 10,
+    alignItems: "stretch",
   },
-  catTile: {
-    width: "31%",
-    flexGrow: 1,
-    minWidth: "30%",
-    height: 96,
+  heroBanner: {
     borderRadius: radius.lg,
     overflow: "hidden",
-    backgroundColor: colors.mist,
-    borderWidth: 1,
-    borderColor: colors.line,
+    height: 118,
+    backgroundColor: colors.ink,
+    ...shadow.soft,
   },
-  catImage: {
+  heroImage: {
     ...StyleSheet.absoluteFillObject,
     width: "100%",
     height: "100%",
+    borderRadius: 0,
   },
-  catOverlay: {
+  heroGradient: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: "flex-end",
-    padding: 10,
-    backgroundColor: "rgba(10,10,10,0.28)",
-  },
-  catLabel: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 13,
-    color: colors.white,
-  },
-  auctionRow: {
-    paddingHorizontal: space.xl,
-    gap: 12,
-  },
-  auctionCard: {
-    width: 220,
-    backgroundColor: colors.white,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.line,
-    overflow: "hidden",
-    ...shadow.soft,
-  },
-  auctionImage: { width: "100%", height: 120 },
-  auctionLive: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: colors.flame,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: radius.sm,
-  },
-  auctionLiveText: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 10,
-    color: colors.white,
-  },
-  auctionBody: { padding: space.md, gap: 4 },
-  auctionTitle: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 13,
-    color: colors.ink,
-    minHeight: 34,
-  },
-  auctionBid: {
-    fontFamily: fonts.displayMed,
-    fontSize: 15,
-    color: colors.flameDeep,
-  },
-  auctionMeta: {
-    fontFamily: fonts.body,
-    fontSize: 11,
-    color: colors.inkFaint,
-  },
-  popularRow: {
-    paddingHorizontal: space.xl,
-    gap: 10,
-  },
-  popularCard: {
-    width: 168,
-    backgroundColor: colors.white,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.line,
-    overflow: "hidden",
-    ...shadow.soft,
-  },
-  popularImage: {
-    width: "100%",
-    height: 100,
-    backgroundColor: colors.mist,
-  },
-  popularPh: {
-    backgroundColor: colors.line,
-  },
-  popularCardTitle: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 13,
-    color: colors.ink,
-    paddingHorizontal: 10,
-    paddingTop: 8,
-  },
-  popularCardMeta: {
-    fontFamily: fonts.body,
-    fontSize: 11,
-    color: colors.inkFaint,
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-    paddingTop: 2,
-  },
-  dealerRow: {
-    paddingHorizontal: space.xl,
-    gap: 12,
-  },
-  dealerCard: {
-    width: 168,
-    backgroundColor: colors.white,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.line,
-    overflow: "hidden",
-    ...shadow.soft,
-  },
-  dealerCoverWrap: {
-    height: 96,
-    backgroundColor: colors.mist,
-    position: "relative",
-  },
-  dealerCover: { width: "100%", height: "100%" },
-  dealerCoverFallback: {
-    alignItems: "center",
+    paddingHorizontal: space.lg,
+    paddingVertical: 18,
     justifyContent: "center",
   },
-  dealerVerified: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: "rgba(10,10,10,0.72)",
-    alignItems: "center",
-    justifyContent: "center",
+  heroEyebrow: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 11,
+    color: colors.flameMid,
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
+    marginBottom: 4,
   },
-  dealerBody: {
-    paddingHorizontal: space.md,
-    paddingVertical: 10,
-    gap: 3,
+  heroTitle: {
+    fontFamily: fonts.display,
+    fontSize: 20,
+    color: colors.white,
   },
-  dealerBadgeRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 4,
+  heroSub: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: "rgba(255,255,255,0.82)",
     marginTop: 4,
   },
-  dealerName: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 13,
-    color: colors.ink,
+  dots: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 6,
+    marginBottom: space.md,
   },
-  dealerCity: {
-    fontFamily: fonts.body,
-    fontSize: 11,
-    color: colors.inkFaint,
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "rgba(12,45,41,0.18)",
   },
-  dealerSkeletonCover: { borderRadius: 0 },
-  dealerSkeletonGap: { marginBottom: 6 },
-  skeletonList: {
-    gap: 0,
-  },
-  empty: {
-    alignItems: "center",
-    paddingVertical: space.xxl,
-    gap: space.md,
-  },
-  emptyTitle: {
-    fontFamily: fonts.displayMed,
-    fontSize: 16,
-    color: colors.ink,
-  },
-  emptyBtn: {
+  dotOn: {
     backgroundColor: colors.flame,
-    paddingHorizontal: space.xl,
-    paddingVertical: 12,
-    borderRadius: radius.md,
+    width: 16,
   },
-  emptyBtnText: {
+  circleScroll: { maxHeight: 100, marginBottom: space.md },
+  circleRow: {
+    paddingHorizontal: space.lg,
+    gap: 14,
+    alignItems: "flex-start",
+  },
+  circleItem: {
+    width: 70,
+    alignItems: "center",
+    gap: 6,
+  },
+  circleIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: colors.white,
+    borderWidth: 1.5,
+    borderColor: "rgba(243,106,28,0.35)",
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadow.soft,
+  },
+  circleLabel: {
     fontFamily: fonts.bodySemi,
-    fontSize: 14,
-    color: colors.white,
+    fontSize: 11,
+    color: colors.ink,
+    textAlign: "center",
   },
 });

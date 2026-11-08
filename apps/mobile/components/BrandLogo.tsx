@@ -13,43 +13,52 @@ type Props = {
   style?: ViewStyle;
 };
 
-/** Marka logosu — CDN zinciri; hepsi başarısızsa baş harf */
+/** Marka logosu — CDN zinciri; yüklenene kadar / hepsi başarısızsa baş harf (asla boş kutu yok) */
 export function BrandLogo({ name, nameEn, logoUrl, size = 40, style }: Props) {
   const candidates = brandLogoCandidates(name, logoUrl, nameEn);
   const [idx, setIdx] = useState(0);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     setIdx(0);
+    setLoaded(false);
   }, [name, nameEn, logoUrl]);
 
-  const uri = candidates[idx];
+  const uri = candidates[idx] ?? null;
+  const exhausted = !uri;
   const initial = (name || "?").charAt(0).toUpperCase();
-
-  if (!uri) {
-    return (
-      <View
-        style={[
-          styles.fallback,
-          { width: size, height: size, borderRadius: size * 0.28 },
-          style,
-        ]}
-      >
-        <Text style={[styles.initial, { fontSize: size * 0.38 }]}>{initial}</Text>
-      </View>
-    );
-  }
+  const box = { width: size, height: size, borderRadius: size * 0.22 };
+  const showLetter = exhausted || !loaded;
 
   return (
     <View
-      style={[styles.wrap, { width: size, height: size, borderRadius: size * 0.28 }, style]}
+      style={[
+        exhausted ? styles.fallback : styles.wrap,
+        box,
+        style,
+      ]}
     >
-      <Image
-        key={uri}
-        source={{ uri }}
-        style={{ width: size * 0.78, height: size * 0.78 }}
-        resizeMode="contain"
-        onError={() => setIdx((i) => i + 1)}
-      />
+      {showLetter ? (
+        <Text style={[styles.initial, { fontSize: size * 0.4 }]}>{initial}</Text>
+      ) : null}
+      {uri ? (
+        <Image
+          key={uri}
+          source={{ uri }}
+          style={{
+            width: size * 0.72,
+            height: size * 0.72,
+            opacity: loaded ? 1 : 0,
+            position: loaded ? "relative" : "absolute",
+          }}
+          resizeMode="contain"
+          onLoad={() => setLoaded(true)}
+          onError={() => {
+            setLoaded(false);
+            setIdx((i) => i + 1);
+          }}
+        />
+      ) : null}
     </View>
   );
 }
@@ -57,7 +66,7 @@ export function BrandLogo({ name, nameEn, logoUrl, size = 40, style }: Props) {
 const styles = StyleSheet.create({
   wrap: {
     backgroundColor: colors.white,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.line,
     alignItems: "center",
     justifyContent: "center",
@@ -65,7 +74,7 @@ const styles = StyleSheet.create({
   },
   fallback: {
     backgroundColor: colors.flameSoft,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.line,
     alignItems: "center",
     justifyContent: "center",

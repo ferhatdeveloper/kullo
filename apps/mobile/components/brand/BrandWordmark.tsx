@@ -5,9 +5,9 @@ import { colors, fonts } from "../../lib/theme";
 export type BrandScript = "latin" | "arabic" | "kurdish";
 
 const NAMES: Record<BrandScript, string> = {
-  latin: "seyyare",
-  arabic: "سيّارة",
-  kurdish: "سیارە",
+  latin: "kullo",
+  arabic: "كل شيء",
+  kurdish: "هەموو شت",
 };
 
 type Props = {
@@ -26,16 +26,16 @@ export function BrandWordmark({
   tone = "light",
   style,
   nameStyle,
-  menStyle,
 }: Props) {
   const nameColor = tone === "light" ? colors.white : colors.ink;
   const isRtlScript = script === "arabic" || script === "kurdish";
+  const label = NAMES[script];
 
   return (
     <View
       style={[styles.row, isRtlScript && styles.rowRtl, style]}
       accessibilityRole="text"
-      accessibilityLabel={`seyyare.men (${script})`}
+      accessibilityLabel={`kullo (${script})`}
     >
       <Text
         style={[
@@ -45,23 +45,12 @@ export function BrandWordmark({
             color: nameColor,
             lineHeight: size * 1.15,
           },
+          script === "latin" && styles.nameLatin,
           script !== "latin" && styles.nameRtl,
           nameStyle,
         ]}
       >
-        {NAMES[script]}
-      </Text>
-      <Text
-        style={[
-          styles.men,
-          {
-            fontSize: size,
-            lineHeight: size * 1.15,
-          },
-          menStyle,
-        ]}
-      >
-        .men
+        {label}
       </Text>
     </View>
   );
@@ -75,7 +64,6 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
   },
   rowRtl: {
-    // Keep visual order: name then .men (LTR layout for mixed script)
     flexDirection: "row",
   },
   name: {
@@ -83,13 +71,11 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
     flexShrink: 1,
   },
+  nameLatin: {
+    letterSpacing: -0.5,
+  },
   nameRtl: {
     letterSpacing: 0,
     writingDirection: "rtl",
-  },
-  men: {
-    fontFamily: fonts.display,
-    color: colors.flame,
-    letterSpacing: -1,
   },
 });

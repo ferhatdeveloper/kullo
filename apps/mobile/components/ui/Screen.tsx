@@ -17,10 +17,17 @@ interface ScreenProps {
   children: ReactNode;
   edges?: ("top" | "bottom" | "left" | "right")[];
   style?: ViewStyle;
-  /** Sabit logo şeridi — varsayılan açık */
+  /**
+   * AppBar göster — her zaman Market standardı.
+   * false = AppHeader yok (özel header’lı ekranlar).
+   */
   brand?: boolean;
   brandRight?: ReactNode;
   brandBelow?: ReactNode;
+  searchPlaceholder?: string;
+  onSearchPress?: () => void;
+  showBack?: boolean;
+  onBackPress?: () => void;
 }
 
 export function Screen({
@@ -30,6 +37,10 @@ export function Screen({
   brand = true,
   brandRight,
   brandBelow,
+  searchPlaceholder,
+  onSearchPress,
+  showBack,
+  onBackPress,
 }: ScreenProps) {
   const edgesWithoutTop = edges.filter((e) => e !== "top") as ScreenProps["edges"];
   const useBrand = brand;
@@ -37,7 +48,17 @@ export function Screen({
 
   return (
     <View style={[styles.root, style]}>
-      {useBrand ? <AppHeader right={brandRight} below={brandBelow} /> : null}
+      {useBrand ? (
+        <AppHeader
+          variant="market"
+          right={brandRight}
+          below={brandBelow}
+          searchPlaceholder={searchPlaceholder}
+          onSearchPress={onSearchPress}
+          showBack={showBack}
+          onBackPress={onBackPress}
+        />
+      ) : null}
       <SafeAreaView style={styles.screen} edges={safeEdges ?? []}>
         {children}
       </SafeAreaView>
@@ -48,11 +69,13 @@ export function Screen({
 interface HeaderProps {
   title: string;
   subtitle?: string;
-  /** Explicit back handler — also controls whether the back button is shown */
   onBack?: () => void;
   right?: ReactNode;
   large?: boolean;
-  /** Force show/hide back; defaults to true only when onBack is provided */
+  /**
+   * Geri — AppHeader Market’te zaten var; varsayılan gizli.
+   * Yalnız brand={false} özel ekranlarda showBack={true} kullan.
+   */
   showBack?: boolean;
 }
 
@@ -62,9 +85,9 @@ export function ScreenHeader({
   onBack,
   right,
   large,
-  showBack,
+  showBack = false,
 }: HeaderProps) {
-  const backVisible = showBack ?? typeof onBack === "function";
+  const backVisible = showBack;
 
   return (
     <View style={[styles.header, large && styles.headerLarge]}>
@@ -75,7 +98,7 @@ export function ScreenHeader({
             onPress={onBack ?? (() => router.back())}
             hitSlop={10}
           >
-            <ChevronLeft size={22} color={colors.ink} strokeWidth={2} />
+            <ChevronLeft size={20} color={colors.ink} strokeWidth={2} />
           </TouchableOpacity>
         ) : null}
         <View style={styles.headerCenter}>
@@ -104,37 +127,37 @@ const styles = StyleSheet.create({
     backgroundColor: colors.paper,
   },
   header: {
-    paddingHorizontal: space.xl,
-    paddingTop: space.sm,
-    paddingBottom: space.md,
+    paddingHorizontal: space.lg,
+    paddingTop: 4,
+    paddingBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: colors.line,
     backgroundColor: colors.paper,
   },
   headerLarge: {
-    paddingTop: space.lg,
+    paddingTop: space.md,
     borderBottomWidth: 0,
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    minHeight: 44,
+    minHeight: 38,
   },
   backBtn: {
-    width: 40,
-    height: 40,
+    width: 34,
+    height: 34,
     borderRadius: radius.sm,
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.line,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 10,
+    marginRight: 8,
   },
   headerCenter: { flex: 1 },
   title: {
     fontFamily: fonts.displayMed,
-    fontSize: 18,
+    fontSize: 16,
     color: colors.ink,
     letterSpacing: -0.3,
   },

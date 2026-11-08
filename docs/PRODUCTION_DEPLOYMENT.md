@@ -73,7 +73,7 @@ sudo usermod -aG docker $USER
 ```bash
 sudo mkdir -p /opt/seyyare
 cd /opt/seyyare
-sudo git clone https://github.com/ferhatdeveloper/seyyare.men.git .
+sudo git clone https://github.com/ferhatdeveloper/kullo.git .
 sudo chown -R $USER:$USER .
 
 # Production secrets üret
@@ -407,7 +407,7 @@ echo "✓ All smoke tests passed"
 
 ## Destek
 
-- **GitHub Issues**: https://github.com/ferhatdeveloper/seyyare.men/issues
+- **GitHub Issues**: https://github.com/ferhatdeveloper/kullo/issues
 - **Discord**: (henüz kurulmadı)
 - **Email**: support@seyyare.men
 

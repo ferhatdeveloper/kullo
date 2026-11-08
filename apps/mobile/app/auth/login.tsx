@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { BrandMark, BrandWordmark } from "../../components/brand";
+import { BrandMark } from "../../components/brand";
 import { Button } from "../../components/ui/Button";
 import { Field } from "../../components/ui/Field";
 import { api } from "../../lib/api";
@@ -122,7 +122,6 @@ export default function LoginScreen() {
           <SafeAreaView edges={["top"]}>
             <View style={styles.brand}>
               <BrandMark size="lg" style={styles.logo} />
-              <BrandWordmark script="latin" size={32} tone="light" />
             </View>
           </SafeAreaView>
 

@@ -283,14 +283,6 @@ export default function rentalDetailScreen() {
             </Text>
           </View>
           <View style={styles.rateTrioCard}>
-            <Text style={styles.rateTrioLabel}>{t("rentals.perWeek")}</Text>
-            <Text style={styles.rateTrioValue}>
-              {rental.weekly_rate_amount
-                ? formatListing(rental.weekly_rate_amount, rental.daily_rate_currency)
-                : "—"}
-            </Text>
-          </View>
-          <View style={styles.rateTrioCard}>
             <Text style={styles.rateTrioLabel}>{t("rentals.perMonth")}</Text>
             <Text style={styles.rateTrioValue}>
               {rental.monthly_rate_amount
@@ -298,7 +290,20 @@ export default function rentalDetailScreen() {
                 : "—"}
             </Text>
           </View>
+          <View style={styles.rateTrioCard}>
+            <Text style={styles.rateTrioLabel}>{t("rentals.deposit")}</Text>
+            <Text style={styles.rateTrioValue}>
+              {rental.deposit_amount
+                ? formatListing(rental.deposit_amount, rental.daily_rate_currency)
+                : "—"}
+            </Text>
+          </View>
         </View>
+        <Text style={styles.availabilityLine}>
+          {rental.instant_book
+            ? t("rentals.availabilityInstant")
+            : t("rentals.availabilityRequest")}
+        </Text>
 
         {rental.airport_delivery ? (
           <View style={styles.airportCard}>
@@ -722,6 +727,13 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodySemi,
     fontSize: 11,
     color: colors.white,
+  },
+  availabilityLine: {
+    marginHorizontal: space.xl,
+    marginTop: space.sm,
+    fontFamily: fonts.bodyMed,
+    fontSize: 13,
+    color: colors.viridian,
   },
   rateTrio: {
     flexDirection: "row",

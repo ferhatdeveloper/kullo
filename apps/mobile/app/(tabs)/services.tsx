@@ -1,25 +1,6 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
+import { Redirect } from "expo-router";
 
-import { ModeSelect } from "../../components/ModeSelect";
-import { colors } from "../../lib/theme";
-
-/** Alt menü — hizmet seçimi */
-export default function ServicesScreen() {
-  return (
-    <View style={styles.root}>
-      <StatusBar style="light" />
-      <ModeSelect variant="home" style={styles.body} />
-    </View>
-  );
+/** Eski hizmetler sekmesi → tabsız gate */
+export default function ServicesRedirect() {
+  return <Redirect href="/mode-select" />;
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: colors.ink,
-  },
-  body: {
-    flex: 1,
-  },
-});

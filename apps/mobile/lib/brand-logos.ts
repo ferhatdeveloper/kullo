@@ -66,6 +66,39 @@ export function brandLogoUrl(name: string, nameEn?: string | null): string {
   return `${CDN_THUMB}/${slug}.png`;
 }
 
+/** Domain map — Clearbit logo CDN (telefon/CDN kesintisine yedek) */
+const CLEARBIT_DOMAIN: Record<string, string> = {
+  toyota: "toyota.com",
+  kia: "kia.com",
+  haval: "haval.com.cn",
+  bmw: "bmw.com",
+  byd: "byd.com",
+  mazda: "mazda.com",
+  volkswagen: "vw.com",
+  "mercedes-benz": "mercedes-benz.com",
+  audi: "audi.com",
+  ford: "ford.com",
+  honda: "honda.com",
+  hyundai: "hyundai.com",
+  renault: "renault.com",
+  tesla: "tesla.com",
+  peugeot: "peugeot.com",
+  fiat: "fiat.com",
+  opel: "opel.com",
+  nissan: "nissan.com",
+  skoda: "skoda-auto.com",
+  volvo: "volvo.com",
+  geely: "geely.com",
+  chery: "cheryinternational.com",
+  mg: "mg.co.uk",
+  changan: "changan.com.cn",
+  porsche: "porsche.com",
+  "land-rover": "landrover.com",
+  jeep: "jeep.com",
+  chevrolet: "chevrolet.com",
+  omoda: "omoda.com",
+};
+
 /** Ordered candidates for BrandLogo onError chain */
 export function brandLogoCandidates(
   name: string,
@@ -79,6 +112,8 @@ export function brandLogoCandidates(
     list.push(`${CDN_THUMB}/${slug}.png`);
     list.push(`${CDN_OPT}/${slug}.png`);
     list.push(`${CDN_GITHUB}/${slug}.png`);
+    const domain = CLEARBIT_DOMAIN[slug];
+    if (domain) list.push(`https://logo.clearbit.com/${domain}`);
   }
   return [...new Set(list)];
 }

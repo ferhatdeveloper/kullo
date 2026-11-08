@@ -28,7 +28,7 @@ sudo apt install -y certbot
 ```bash
 sudo mkdir -p /opt/seyyare
 cd /opt/seyyare
-sudo git clone https://github.com/ferhatdeveloper/seyyare.men.git .
+sudo git clone https://github.com/ferhatdeveloper/kullo.git .
 sudo chown -R $USER:$USER .
 ```
 

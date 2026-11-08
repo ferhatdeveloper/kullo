@@ -8,6 +8,7 @@ import { VehicleCard, type VehicleListItem } from "../components/VehicleCard";
 import { Button } from "../components/ui/Button";
 import { Screen, ScreenHeader } from "../components/ui/Screen";
 import { api } from "../lib/api";
+import { DEMO_FAVORITES } from "../lib/demo-data";
 import {
   readFavoritesSnapshot,
   writeFavoritesSnapshot,
@@ -16,10 +17,15 @@ import { colors, fonts, radius, shadow, space } from "../lib/theme";
 
 const BORDER_FLAME = "#FFD8B8";
 
+const DEMO_FAV_VEHICLES = DEMO_FAVORITES.flatMap((f) =>
+  f.vehicle ? [f.vehicle as VehicleListItem] : [],
+);
+
 export default function FavoritesScreen() {
   const { t } = useTranslation();
 
-  const { data: vehicles = [], isLoading, refetch, isRefetching } = useQuery({
+  const { data: vehicles = DEMO_FAV_VEHICLES, isLoading, refetch, isRefetching } =
+    useQuery({
     queryKey: ["favorites"],
     queryFn: async () => {
       try {
@@ -35,8 +41,11 @@ export default function FavoritesScreen() {
       } catch {
         /* fall through to snapshot */
       }
-      return (await readFavoritesSnapshot()) ?? [];
+      const snap = await readFavoritesSnapshot();
+      if (snap && snap.length > 0) return snap;
+      return DEMO_FAV_VEHICLES;
     },
+    initialData: DEMO_FAV_VEHICLES,
   });
 
   return (
@@ -77,7 +86,9 @@ export default function FavoritesScreen() {
             label="İlanlara göz at"
             variant="primary"
             style={styles.emptyBtn}
-            onPress={() => router.push("/(tabs)/search")}
+            onPress={() =>
+              router.push({ pathname: "/(tabs)/search", params: { carsPane: "home" } })
+            }
           />
         </View>
       )}

@@ -1,6 +1,6 @@
-# Seyyare.men — Küresel AI-Destekli Araç Platformu
+# Kullo (kullo.berqenas.com) — Küresel AI-Destekli Araç Platformu
 
-Seyyare.men, 5 dilde (Kürtçe Badini/Sorani, Arapça, Türkçe, İngilizce, Farsça) çalışan, AI destekli, mobil öncelikli, araç satış + kiralama platformudur.
+Kullo, 5 dilde (Kürtçe Badini/Sorani, Arapça, Türkçe, İngilizce, Farsça) çalışan, AI destekli, mobil öncelikli, araç satış + kiralama platformudur.
 
 ## Özellikler
 
@@ -50,7 +50,7 @@ React Native (Expo) ─► Nginx ─► PostgREST  ─► PostgreSQL 16 + PostGI
 
 ```bash
 # 1. Repo'yu klonla
-git clone https://github.com/ferhatdeveloper/seyyare.men.git
+git clone https://github.com/ferhatdeveloper/kullo.git
 cd seyyare.men
 
 # 2. Environment dosyasını kopyala

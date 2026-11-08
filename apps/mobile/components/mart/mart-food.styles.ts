@@ -1,0 +1,713 @@
+/**
+ * Food Ana (Yemek) — marketplace home.
+ * IA: Talabat/Foodora checklist · Brand: Kullo flame/ink · paper from theme.
+ * Market tab stays untouched (M10).
+ */
+import { Dimensions, StyleSheet, type ViewStyle } from "react-native";
+
+import { colors, fonts, radius, shadow } from "../../lib/theme";
+
+const { width: W } = Dimensions.get("window");
+
+/** Kullo Food palette — ink/flame + clean paper (no cream/purple AI look) */
+export const FOOD = {
+  flame: colors.flame,
+  flameMid: colors.flameMid,
+  flameDeep: colors.flameDeep,
+  flameSoft: colors.flameSoft,
+  orange: colors.flame,
+  orangeDeep: colors.flameDeep,
+  orangeSoft: colors.flameSoft,
+  /** Soft chip fill — mist, not cream */
+  cream: colors.mist,
+  creamBand: colors.paper,
+  paper: colors.paper,
+  surface: colors.white,
+  ink: colors.ink,
+  inkMuted: colors.inkMuted,
+  inkFaint: colors.inkFaint,
+  line: colors.line,
+  white: colors.white,
+  dealGreen: colors.flame,
+  dealGreenInk: colors.white,
+  star: "#F5A623",
+  cartBadge: "#E23D2F",
+  feeGreen: "#2F8F6B",
+} as const;
+
+export const FOOD_HOME = {
+  hMargin: 16,
+  gridGap: 10,
+  tileRadius: 14,
+  searchRadius: radius.xl,
+  searchHeight: 48,
+  promoHeight: 96,
+  promoRadius: radius.md,
+  brandLogo: 72,
+  brandCardW: 84,
+  brandGap: 12,
+  againSize: 72,
+  againRadius: 16,
+  findCardW: 260,
+  findImg: 68,
+  findRadius: 12,
+  /** Cover ~2:1 — marketplace density, not hero-tall */
+  listCoverH: Math.round((W - 32) * 0.42),
+  listRadius: radius.md,
+  sectionTitleSize: 18,
+  hubLabelSize: 12,
+  sectionGap: 18,
+  nearCardW: Math.min(268, W * 0.72),
+  nearImgH: Math.round(Math.min(268, W * 0.72) * 0.48),
+} as const;
+
+export const FOOD_TILE =
+  (W - FOOD_HOME.hMargin * 2 - FOOD_HOME.gridGap * 3) / 4;
+
+const softShadow: ViewStyle = shadow.soft;
+
+export const foodStyles = StyleSheet.create({
+  list: {
+    paddingBottom: 48,
+    backgroundColor: FOOD.paper,
+  },
+  header: {
+    paddingBottom: 8,
+    backgroundColor: FOOD.paper,
+  },
+
+  /* —— Search —— */
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: FOOD_HOME.hMargin,
+    paddingTop: 12,
+    paddingBottom: 14,
+  },
+  searchHero: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: FOOD.surface,
+    borderRadius: FOOD_HOME.searchRadius,
+    paddingHorizontal: 16,
+    height: FOOD_HOME.searchHeight,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: FOOD.line,
+    ...softShadow,
+  },
+  searchInput: {
+    flex: 1,
+    fontFamily: fonts.body,
+    fontSize: 15,
+    color: FOOD.ink,
+    padding: 0,
+  },
+  cartBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: FOOD.ink,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cartBadge: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    minWidth: 17,
+    height: 17,
+    borderRadius: 9,
+    backgroundColor: FOOD.cartBadge,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+    borderWidth: 1.5,
+    borderColor: FOOD.white,
+  },
+  cartBadgeText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 9,
+    color: FOOD.white,
+  },
+
+  /* —— Cuisine chips (horizontal) —— */
+  chipScroll: {
+    paddingHorizontal: FOOD_HOME.hMargin,
+    gap: 8,
+    paddingBottom: 4,
+    marginBottom: FOOD_HOME.sectionGap - 4,
+  },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: radius.pill,
+    backgroundColor: FOOD.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: FOOD.line,
+  },
+  chipOn: {
+    backgroundColor: FOOD.ink,
+    borderColor: FOOD.ink,
+  },
+  chipMarket: {
+    borderColor: FOOD.flame,
+    backgroundColor: FOOD.flameSoft,
+  },
+  chipText: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 13,
+    color: FOOD.ink,
+  },
+  chipTextOn: {
+    color: FOOD.white,
+    fontFamily: fonts.bodySemi,
+  },
+  chipTextMarket: {
+    color: FOOD.flameDeep,
+    fontFamily: fonts.bodySemi,
+  },
+
+  /* legacy grid aliases (unused after chip migrate; keep for safety) */
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: FOOD_HOME.hMargin,
+    gap: FOOD_HOME.gridGap,
+    marginBottom: FOOD_HOME.sectionGap,
+  },
+  tile: {
+    width: FOOD_TILE,
+    alignItems: "center",
+    gap: 4,
+  },
+  tileIcon: {
+    width: FOOD_TILE,
+    height: FOOD_TILE * 0.88,
+    borderRadius: FOOD_HOME.tileRadius,
+    backgroundColor: FOOD.cream,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tileEmoji: { fontSize: 26 },
+  tileBadge: {
+    position: "absolute",
+    top: 4,
+    left: 4,
+    backgroundColor: FOOD.ink,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  tileBadgeText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 8,
+    color: FOOD.white,
+  },
+  tileLabel: {
+    fontFamily: fonts.bodySemi,
+    fontSize: FOOD_HOME.hubLabelSize,
+    color: FOOD.ink,
+    textAlign: "center",
+  },
+  tileIconOn: {
+    borderWidth: 2,
+    borderColor: FOOD.flame,
+    backgroundColor: FOOD.flameSoft,
+  },
+  tileLabelOn: {
+    color: FOOD.flameDeep,
+  },
+
+  /* —— Single promo banner —— */
+  promoBlock: { marginBottom: FOOD_HOME.sectionGap },
+  promo: {
+    marginHorizontal: FOOD_HOME.hMargin,
+    height: FOOD_HOME.promoHeight,
+    borderRadius: FOOD_HOME.promoRadius,
+    overflow: "hidden",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: FOOD.ink,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+  },
+  promoLeft: {
+    flex: 1,
+    justifyContent: "center",
+    gap: 4,
+  },
+  promoEyebrow: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 11,
+    color: FOOD.flameMid,
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
+  },
+  promoTitle: {
+    fontFamily: fonts.display,
+    fontSize: 22,
+    color: FOOD.white,
+    letterSpacing: -0.3,
+  },
+  promoSub: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    color: "rgba(255,255,255,0.78)",
+  },
+  promoCta: {
+    backgroundColor: FOOD.flame,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: radius.sm,
+  },
+  promoCtaText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 13,
+    color: FOOD.white,
+  },
+  /* kept for unused carousel leftovers */
+  promoRight: { width: 0 },
+  promoEmoji: { fontSize: 0 },
+  dots: { height: 0 },
+  dot: { width: 0, height: 0 },
+  dotOn: { width: 0, height: 0 },
+
+  /* —— Section chrome —— */
+  sectionBlock: { marginBottom: FOOD_HOME.sectionGap },
+  sectionBand: {
+    backgroundColor: FOOD.surface,
+    paddingVertical: 14,
+    marginBottom: 4,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: FOOD.line,
+  },
+  sectionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: FOOD_HOME.hMargin,
+    marginBottom: 12,
+  },
+  section: {
+    fontFamily: fonts.displayMed,
+    fontSize: FOOD_HOME.sectionTitleSize,
+    color: FOOD.ink,
+    letterSpacing: -0.25,
+    flex: 1,
+  },
+  sectionSub: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: FOOD.inkFaint,
+    paddingHorizontal: FOOD_HOME.hMargin,
+    marginTop: -6,
+    marginBottom: 10,
+  },
+  sectionArrow: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: FOOD.cream,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  countHint: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: FOOD.inkFaint,
+    paddingHorizontal: FOOD_HOME.hMargin,
+    marginTop: -6,
+    marginBottom: 10,
+  },
+
+  /* —— Brands —— */
+  brandRow: {
+    paddingHorizontal: FOOD_HOME.hMargin,
+    gap: FOOD_HOME.brandGap,
+  },
+  brandCard: {
+    width: FOOD_HOME.brandCardW,
+    alignItems: "center",
+    gap: 8,
+  },
+  brandLogoWrap: {
+    width: FOOD_HOME.brandLogo,
+    height: FOOD_HOME.brandLogo,
+    borderRadius: 18,
+    backgroundColor: FOOD.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: FOOD.line,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  brandCover: {
+    width: FOOD_HOME.brandLogo,
+    height: FOOD_HOME.brandLogo,
+    borderRadius: 0,
+  },
+  brandMono: {
+    width: FOOD_HOME.brandLogo,
+    height: FOOD_HOME.brandLogo,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: FOOD.cream,
+  },
+  brandMonoText: {
+    fontFamily: fonts.display,
+    fontSize: 22,
+    color: FOOD.ink,
+    letterSpacing: -0.5,
+  },
+  brandHeart: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    zIndex: 2,
+    backgroundColor: "rgba(255,255,255,0.92)",
+    borderRadius: 10,
+    padding: 3,
+  },
+  brandName: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 12,
+    color: FOOD.ink,
+    textAlign: "center",
+    lineHeight: 15,
+    width: FOOD_HOME.brandCardW,
+  },
+
+  /* redeem leftovers (unused) */
+  redeemRow: { paddingHorizontal: FOOD_HOME.hMargin, gap: 8 },
+  redeemCard: {
+    width: 136,
+    height: 84,
+    borderRadius: 12,
+    backgroundColor: FOOD.flameSoft,
+    padding: 10,
+  },
+  redeemPct: {
+    fontFamily: fonts.display,
+    fontSize: 20,
+    color: FOOD.flame,
+  },
+  redeemLabel: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 12,
+    color: FOOD.ink,
+  },
+
+  proBanner: {
+    marginHorizontal: FOOD_HOME.hMargin,
+    marginBottom: FOOD_HOME.sectionGap,
+    borderRadius: 12,
+    backgroundColor: FOOD.ink,
+    minHeight: 64,
+  },
+  proInner: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  proBody: { flex: 1, gap: 2 },
+  proTitle: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 13,
+    color: FOOD.white,
+  },
+  proSub: {
+    fontFamily: fonts.body,
+    fontSize: 11,
+    color: "rgba(255,255,255,0.85)",
+  },
+  proJoin: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 13,
+    color: FOOD.white,
+    textDecorationLine: "underline",
+  },
+  proPill: {
+    marginHorizontal: 16,
+    marginBottom: 12,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  proPillText: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 12,
+    color: FOOD.white,
+    textAlign: "center",
+  },
+
+  /* —— Nearby rail —— */
+  nearRow: { paddingHorizontal: FOOD_HOME.hMargin, gap: 12 },
+  nearCard: {
+    width: FOOD_HOME.nearCardW,
+    backgroundColor: FOOD.surface,
+    borderRadius: FOOD_HOME.findRadius,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: FOOD.line,
+    overflow: "hidden",
+  },
+  nearImgWrap: {
+    width: "100%",
+    height: FOOD_HOME.nearImgH,
+    backgroundColor: FOOD.cream,
+    overflow: "hidden",
+  },
+  nearCover: {
+    width: "100%",
+    height: FOOD_HOME.nearImgH,
+    borderRadius: 0,
+  },
+  nearDeal: {
+    position: "absolute",
+    bottom: 8,
+    left: 8,
+    backgroundColor: FOOD.flame,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  nearDealText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 11,
+    color: FOOD.white,
+  },
+  nearBody: { paddingHorizontal: 12, paddingVertical: 10, gap: 5 },
+  nearName: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 14,
+    color: FOOD.ink,
+  },
+  nearMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    flexWrap: "nowrap",
+  },
+  nearMetaText: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: FOOD.inkMuted,
+  },
+  nearFee: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 12,
+    color: FOOD.feeGreen,
+  },
+
+  /* flash leftovers (unused on Food Ana) */
+  flashHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: FOOD_HOME.hMargin,
+    marginBottom: 2,
+  },
+  flashIcon: {
+    width: 26,
+    height: 26,
+    borderRadius: 7,
+    backgroundColor: FOOD.flame,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  flashTitle: {
+    fontFamily: fonts.display,
+    fontSize: 17,
+    color: FOOD.ink,
+  },
+  flashGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: FOOD_HOME.hMargin,
+    gap: 8,
+  },
+  flashCard: {
+    width: (W - FOOD_HOME.hMargin * 2 - 8) / 2,
+    flexDirection: "row",
+    backgroundColor: FOOD.surface,
+    borderRadius: 11,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: FOOD.line,
+    padding: 7,
+    gap: 7,
+  },
+  flashImgWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 9,
+    overflow: "hidden",
+    backgroundColor: FOOD.cream,
+  },
+  flashImg: { width: 56, height: 56 },
+  flashSave: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: FOOD.flame,
+    paddingVertical: 1,
+    alignItems: "center",
+  },
+  flashSaveText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 9,
+    color: FOOD.white,
+  },
+  flashBody: { flex: 1, justifyContent: "center", gap: 1 },
+  flashName: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 11,
+    color: FOOD.ink,
+  },
+  flashPrice: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 12,
+    color: FOOD.ink,
+  },
+  flashOld: {
+    fontFamily: fonts.body,
+    fontSize: 10,
+    color: FOOD.inkFaint,
+    textDecorationLine: "line-through",
+  },
+
+  /* —— Restaurant list cards —— */
+  card: {
+    marginHorizontal: FOOD_HOME.hMargin,
+    marginBottom: 14,
+    backgroundColor: FOOD.surface,
+    borderRadius: FOOD_HOME.listRadius,
+    overflow: "hidden",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: FOOD.line,
+  },
+  cardClosed: { opacity: 0.6 },
+  coverWrap: {
+    width: "100%",
+    height: FOOD_HOME.listCoverH,
+    backgroundColor: FOOD.cream,
+    overflow: "hidden",
+  },
+  cover: {
+    width: "100%",
+    height: FOOD_HOME.listCoverH,
+    borderRadius: 0,
+  },
+  coverDeal: {
+    position: "absolute",
+    bottom: 10,
+    left: 10,
+    backgroundColor: FOOD.flame,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  coverDealText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 11,
+    color: FOOD.white,
+  },
+  coverHeart: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: "rgba(255,255,255,0.94)",
+    borderRadius: 14,
+    padding: 6,
+  },
+  cardBody: { paddingHorizontal: 14, paddingVertical: 10, gap: 3 },
+  titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  name: {
+    fontFamily: fonts.displayMed,
+    fontSize: 15,
+    color: FOOD.ink,
+    flex: 1,
+    letterSpacing: -0.2,
+  },
+  closed: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 10,
+    color: "#C43C3C",
+    backgroundColor: "#FCECEC",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  cuisine: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    color: FOOD.inkFaint,
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginTop: 4,
+    flexWrap: "nowrap",
+  },
+  ratingPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: FOOD.flame,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+  },
+  ratingText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 11,
+    color: FOOD.white,
+  },
+  metaDot: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: FOOD.inkFaint,
+  },
+  metaMuted: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: FOOD.inkFaint,
+  },
+  metaGap: { width: 2 },
+  meta: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: FOOD.inkMuted,
+  },
+  fee: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 12,
+    color: FOOD.feeGreen,
+    marginTop: 0,
+  },
+  empty: {
+    textAlign: "center",
+    marginTop: 32,
+    fontFamily: fonts.body,
+    color: FOOD.inkFaint,
+    paddingHorizontal: FOOD_HOME.hMargin,
+  },
+  orangeTitle: {
+    fontFamily: fonts.displayMed,
+    fontSize: FOOD_HOME.sectionTitleSize,
+    color: FOOD.flame,
+    letterSpacing: -0.2,
+    flex: 1,
+  },
+});

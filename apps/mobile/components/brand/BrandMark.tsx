@@ -1,53 +1,57 @@
-import { useColorScheme } from "react-native";
-import { Image, type ImageStyle, type StyleProp, StyleSheet } from "react-native";
+import {
+  Image,
+  type ImageStyle,
+  type StyleProp,
+  StyleSheet,
+} from "react-native";
 
-const markDark = require("../../assets/brand/seyyare-mark-dark.png");
-const markLight = require("../../assets/brand/seyyare-mark-light.png");
-const markMonoDark = require("../../assets/brand/seyyare-mark-mono-dark.png");
-const markMonoLight = require("../../assets/brand/seyyare-mark-mono-light.png");
+/** Latin-only lockup (Arapça satır yok) — light = açık zemin için, default = koyu zemin. */
+const logoLightBg = require("../../assets/brand/kullo-lockup-latin-dark.png");
+const logoDarkBg = require("../../assets/brand/kullo-lockup-latin.png");
+
+/** Kaynak PNG en/boy oranı (1024×509). */
+const ASPECT = 1024 / 509;
 
 type Size = "sm" | "md" | "lg" | "xl";
+/** dark = koyu metin (açık header); light = açık metin (koyu header). */
 type Tone = "auto" | "dark" | "light" | "mono-dark" | "mono-light";
 
+/** size = genişlik; yükseklik oranla hesaplanır */
 const SIZES: Record<Size, number> = {
-  sm: 40,
-  md: 56,
-  lg: 80,
-  xl: 104,
+  sm: 72,
+  md: 96,
+  lg: 140,
+  xl: 180,
 };
-
-const SOURCES = {
-  dark: markDark,
-  light: markLight,
-  "mono-dark": markMonoDark,
-  "mono-light": markMonoLight,
-} as const;
 
 type Props = {
   size?: Size | number;
-  /** dark = siyah zemin; light = beyaz zemin; mono-* = tek renk */
+  /** Hero / header — genişlik öncelikli */
+  width?: number;
+  height?: number;
   tone?: Tone;
   style?: StyleProp<ImageStyle>;
 };
 
-/** App mark — S + road pin. Transparent canvas. */
-export function BrandMark({ size = "md", tone = "auto", style }: Props) {
-  const scheme = useColorScheme();
-  const dim = typeof size === "number" ? size : SIZES[size];
-
-  let resolved: keyof typeof SOURCES = "dark";
-  if (tone === "auto") {
-    // App chrome is mostly dark; light screens pass tone="light"
-    resolved = scheme === "light" ? "light" : "dark";
-  } else if (tone === "dark" || tone === "light" || tone === "mono-dark" || tone === "mono-light") {
-    resolved = tone;
-  }
+/** App mark — kullo wordmark + gülümseme (Arapça yok), local PNG. */
+export function BrandMark({
+  size = "md",
+  width,
+  height,
+  tone = "light",
+  style,
+}: Props) {
+  const base = typeof size === "number" ? size : SIZES[size];
+  const w = width ?? (height != null ? Math.round(height * ASPECT) : base);
+  const h = height ?? Math.round(w / ASPECT);
+  /** dark/mono-dark → koyu metin (açık zemin); light/default → açık metin. */
+  const darkGlyph = tone === "dark" || tone === "mono-dark";
 
   return (
     <Image
-      source={SOURCES[resolved]}
-      accessibilityLabel="Seyyare"
-      style={[styles.mark, { width: dim, height: dim }, style]}
+      source={darkGlyph ? logoLightBg : logoDarkBg}
+      accessibilityLabel="kullo"
+      style={[styles.mark, { width: w, height: h }, style]}
       resizeMode="contain"
     />
   );

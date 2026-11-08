@@ -8,18 +8,10 @@ import {
 } from "react-native";
 
 import { BrandMark } from "./BrandMark";
-import { BrandWordmark, type BrandScript } from "./BrandWordmark";
 
 export type SplashLocale = "tr" | "en" | "ar" | "ku";
 
 const LOCALES: SplashLocale[] = ["tr", "en", "ar", "ku"];
-
-const WORDMARK: Record<SplashLocale, BrandScript> = {
-  tr: "latin",
-  en: "latin",
-  ar: "arabic",
-  ku: "kurdish",
-};
 
 const HOLD_MS = 850;
 const FADE_MS = 260;
@@ -32,21 +24,19 @@ type BelowCtx = {
 
 type Props = {
   markSize?: number;
-  wordSize?: number;
   /** loop = services tab; once = splash one full TR→…→TR */
   mode?: "loop" | "once";
   onCycleComplete?: () => void;
-  /** Optional row under wordmark (splash service icons) — shares fade opacity */
+  /** Optional row under mark (splash service icons) — shares fade opacity */
   below?: (ctx: BelowCtx) => ReactNode;
   style?: StyleProp<ViewStyle>;
 };
 
 /**
- * Splash logo lockup: fixed BrandMark + fading multilingual wordmark.
+ * Splash logo lockup: live SVG BrandMark + optional fading below row.
  */
 export function AnimatedBrandLockup({
   markSize = 88,
-  wordSize = 36,
   mode = "loop",
   onCycleComplete,
   below,
@@ -59,6 +49,8 @@ export function AnimatedBrandLockup({
   onCompleteRef.current = onCycleComplete;
 
   useEffect(() => {
+    if (!below && mode !== "once") return;
+
     let cancelled = false;
     let i = 0;
     doneRef.current = false;
@@ -104,20 +96,14 @@ export function AnimatedBrandLockup({
       cancelled = true;
       clearTimeout(t);
     };
-  }, [mode, textOpacity]);
+  }, [below, mode, textOpacity]);
 
   const locale = LOCALES[localeIndex];
-  const script = WORDMARK[locale];
   const rtl = locale === "ar" || locale === "ku";
 
   return (
     <View style={[styles.root, style]}>
-      <BrandMark size={markSize} style={styles.mark} />
-      <View style={[styles.wordSlot, { minHeight: wordSize + 12 }]}>
-        <Animated.View style={{ opacity: textOpacity }}>
-          <BrandWordmark script={script} size={wordSize} tone="light" />
-        </Animated.View>
-      </View>
+      <BrandMark size={markSize} tone="dark" style={styles.mark} />
       {below?.({ locale, opacity: textOpacity, rtl })}
     </View>
   );
@@ -130,10 +116,5 @@ const styles = StyleSheet.create({
   },
   mark: {
     marginBottom: 14,
-  },
-  wordSlot: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
   },
 });

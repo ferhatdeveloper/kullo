@@ -3,7 +3,15 @@ import { create } from "zustand";
 
 const KEY = "seyyare.mode_gate_v3";
 
-export type AppMode = "buy" | "rent" | "ride" | "sell";
+export type AppMode =
+  | "buy"
+  | "rent"
+  | "ride"
+  | "sell"
+  | "realty"
+  | "shop"
+  | "food"
+  | "mart";
 
 type ModeState = {
   hydrated: boolean;

@@ -1,38 +1,40 @@
 {
   "expo": {
-    "name": "Seyyare",
-    "slug": "seyyare",
-    "version": "0.2.1",
+    "name": "Kullo",
+    "slug": "kullo",
+    "version": "0.2.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "seyyare",
+    "scheme": "kullo",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0A0A0A"
+      "backgroundColor": "#0C2D29"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "men.seyyare.app",
+      "bundleIdentifier": "com.berqenas.kullo",
       "infoPlist": {
         "NSCameraUsageDescription": "Araç fotoğrafları çekmek ve AI araç tanıma için kamera erişimi gerekiyor.",
         "NSPhotoLibraryUsageDescription": "Galeri'den araç fotoğrafı seçmek için izin gerekiyor.",
-        "NSLocationWhenInUseUsageDescription": "Yakınınızdaki araçları göstermek için konum kullanılır."
-      }
+        "NSLocationWhenInUseUsageDescription": "Yakınınızdaki araçları göstermek için konum kullanılır.",
+        "CFBundleDisplayName": "Kullo"
+      },
+      "buildNumber": "2"
     },
     "android": {
-      "package": "men.seyyare.app",
+      "package": "com.berqenas.kullo",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0A0A0A"
+        "backgroundColor": "#013C38"
       },
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.ACCESS_FINE_LOCATION"
-      ]
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
+      "versionCode": 2
     },
     "web": {
       "bundler": "metro",
@@ -42,6 +44,12 @@
     "plugins": [
       "expo-router",
       "expo-localization",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "En yakın teslimat adresini seçmek için konum kullanılır."
+        }
+      ],
       [
         "expo-camera",
         {
@@ -62,6 +70,7 @@
       "router": {
         "origin": false
       },
+      "projectDomain": "kullo.berqenas.com",
       "apiUrl": "http://localhost:3000",
       "aiUrl": "http://localhost:4000",
       "authUrl": "http://localhost:5000"

@@ -19,7 +19,6 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Animated,
-  Image,
   Linking,
   StyleSheet,
   Text,
@@ -27,6 +26,8 @@ import {
   View,
 } from "react-native";
 
+import { ListingStatusBadge } from "./ListingStatusBadge";
+import { OfflineCover } from "./OfflineCover";
 import { Badge } from "./ui/Badge";
 import { api } from "../lib/api";
 import { storage } from "../lib/clients";
@@ -121,6 +122,8 @@ export interface VehicleListItem {
   featured?: boolean;
   seller_id?: string | null;
   seller_name?: string | null;
+  /** active | sold | rented | reserved */
+  listing_status?: "active" | "sold" | "rented" | "reserved" | "closed" | null;
 }
 
 interface Props {
@@ -128,8 +131,8 @@ interface Props {
   onFavoriteChange?: (id: string, isFavorite: boolean) => void;
   initialFavorite?: boolean;
   index?: number;
-  /** list = full width marketplace card; featured = horizontal carousel */
-  variant?: "list" | "featured";
+  /** list = stacked Dubicars card; row = IQCars thumb+meta; featured = rail/carousel */
+  variant?: "list" | "row" | "featured";
 }
 
 type SpecItem = { key: string; label: string; Icon: LucideIcon };
@@ -207,6 +210,23 @@ function SpecIconRow({
   );
 }
 
+/** IQCars-style outlined year / km / trim chips (no brand chrome). */
+function SpecChipRow({ labels }: { labels: string[] }) {
+  const chips = labels.filter(Boolean).slice(0, 3);
+  if (chips.length === 0) return null;
+  return (
+    <View style={styles.chipRow}>
+      {chips.map((label) => (
+        <View key={label} style={styles.specChip}>
+          <Text style={styles.specChipText} numberOfLines={1}>
+            {label}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 export function VehicleCard({
   vehicle,
   onFavoriteChange,
@@ -268,6 +288,8 @@ export function VehicleCard({
   const demoSeller =
     vehicle.seller_id != null ? getDemoSeller(String(vehicle.seller_id)) : undefined;
   const ratingAvg = vehicle.seller_rating_avg ?? demoSeller?.rating_avg ?? null;
+  const storeName = vehicle.seller_name ?? demoSeller?.display_name ?? null;
+  const storeId = vehicle.seller_id ?? demoSeller?.user_id ?? null;
   const responsive = isResponsiveDealer({
     verified: isVerified || demoSeller?.verified,
     rating_avg: ratingAvg,
@@ -313,6 +335,15 @@ export function VehicleCard({
     auctionLive || vehicle.featured || isVerified || responsive || goodDeal;
 
   if (variant === "featured") {
+    const metaBits = [
+      vehicle.city,
+      vehicle.body_name ?? vehicle.transmission_name,
+      vehicle.year != null ? String(vehicle.year) : null,
+      vehicle.mileage_km != null
+        ? t("vehicle.mileageShort", { count: Math.round(vehicle.mileage_km / 1000) })
+        : null,
+    ].filter(Boolean) as string[];
+
     return (
       <Animated.View style={{ opacity: fade }}>
         <TouchableOpacity
@@ -323,36 +354,71 @@ export function VehicleCard({
         >
           <View style={styles.featuredImageWrap}>
             {imageUri ? (
-              <Image source={{ uri: imageUri }} style={styles.featuredImage} resizeMode="cover" />
+              <OfflineCover uri={imageUri} label={title} style={styles.featuredImage} />
             ) : (
               <View style={[styles.featuredImage, styles.placeholder]}>
                 <Text style={styles.placeholderText}>{t("vehicle.noPhoto")}</Text>
               </View>
             )}
-            <LinearGradient
-              colors={["transparent", "rgba(10,10,10,0.78)"]}
-              style={styles.featuredGrad}
-            />
-            {showBadges ? <View style={styles.featuredBadgeRow}>{trustBadges}</View> : null}
-            {photoLabel ? (
-              <View style={styles.photoCounter}>
-                <Text style={styles.photoCounterText}>{photoLabel}</Text>
-              </View>
-            ) : null}
-            <Text style={styles.featuredPrice}>{price}</Text>
+            <View style={styles.featuredTopPick}>
+              <Text style={styles.featuredTopPickText}>
+                {t("cars.topPickBadge", { defaultValue: t("vehicle.featuredBadge") })}
+              </Text>
+            </View>
           </View>
           <View style={styles.featuredBody}>
             <Text style={styles.featuredTitle} numberOfLines={1}>
               {title}
             </Text>
-            <SpecIconRow items={specs.slice(0, 3)} compact />
-            {vehicle.city ? (
-              <View style={styles.featuredLoc}>
-                <MapPin size={11} color={colors.inkFaint} strokeWidth={2} />
-                <Text style={styles.featuredMeta} numberOfLines={1}>
-                  {vehicle.city}
-                </Text>
+            <Text style={styles.featuredPrice}>{price}</Text>
+            {metaBits.length > 0 ? (
+              <Text style={styles.featuredMetaLine} numberOfLines={1}>
+                {metaBits.join("  ·  ")}
+              </Text>
+            ) : null}
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  }
+
+  if (variant === "row") {
+    const pipeBits = [
+      vehicle.body_name ?? vehicle.transmission_name ?? vehicle.fuel_name,
+      vehicle.year != null ? String(vehicle.year) : null,
+      vehicle.mileage_km != null
+        ? `${Math.round(vehicle.mileage_km).toLocaleString("tr-TR")} km`
+        : null,
+    ].filter(Boolean) as string[];
+
+    return (
+      <Animated.View style={{ opacity: fade }}>
+        <TouchableOpacity
+          style={styles.rowCard}
+          onPressIn={prefetchDetail}
+          onPress={() => router.push(`/vehicle/${vehicle.id}`)}
+          activeOpacity={0.92}
+        >
+          <View style={styles.rowThumbWrap}>
+            {imageUri ? (
+              <OfflineCover uri={imageUri} label={title} style={styles.rowThumb} />
+            ) : (
+              <View style={[styles.rowThumb, styles.placeholder]}>
+                <Text style={styles.placeholderText}>{t("vehicle.noPhoto")}</Text>
               </View>
+            )}
+          </View>
+          <View style={styles.rowBody}>
+            <Text style={styles.rowTitle} numberOfLines={1}>
+              {title}
+            </Text>
+            <Text style={styles.rowPrice} numberOfLines={1}>
+              {price}
+            </Text>
+            {pipeBits.length > 0 ? (
+              <Text style={styles.rowPipeMeta} numberOfLines={1}>
+                {pipeBits.join("  |  ")}
+              </Text>
             ) : null}
           </View>
         </TouchableOpacity>
@@ -370,7 +436,7 @@ export function VehicleCard({
       >
         <View style={styles.imageWrap}>
           {imageUri ? (
-            <Image source={{ uri: imageUri }} style={styles.image} resizeMode="cover" />
+            <OfflineCover uri={imageUri} label={title} style={styles.image} />
           ) : (
             <View style={[styles.image, styles.placeholder]}>
               <Text style={styles.placeholderText}>{t("vehicle.noPhoto")}</Text>
@@ -383,6 +449,9 @@ export function VehicleCard({
           />
 
           {showBadges ? <View style={styles.badgeRow}>{trustBadges}</View> : null}
+          <View style={styles.statusCorner}>
+            <ListingStatusBadge status={vehicle.listing_status} compact />
+          </View>
 
           {photoLabel ? (
             <View style={[styles.photoCounter, styles.photoCounterList]}>
@@ -401,20 +470,33 @@ export function VehicleCard({
         </View>
 
         <View style={styles.body}>
-          <Text style={styles.price}>{price}</Text>
+          <View style={styles.priceRow}>
+            <View style={styles.priceCol}>
+              <Text style={styles.price}>{price}</Text>
+              <Text style={styles.saleLabel}>{t("cars.salePrice")}</Text>
+            </View>
+            {vehicle.featured ? (
+              <Text style={styles.topPickLabel}>{t("vehicle.featuredBadge")}</Text>
+            ) : null}
+          </View>
 
           <Text style={styles.title} numberOfLines={1}>
-            {title}
+            {makeModel || title}
           </Text>
+          {makeModel && vehicle.title && vehicle.title !== makeModel ? (
+            <Text style={styles.subtitle} numberOfLines={1}>
+              {vehicle.title}
+            </Text>
+          ) : null}
 
-          {vehicle.seller_name && vehicle.seller_id ? (
+          {storeName && storeId ? (
             <TouchableOpacity
-              onPress={() => router.push(`/seller/${vehicle.seller_id}`)}
+              onPress={() => router.push(`/seller/${storeId}`)}
               hitSlop={6}
               style={styles.sellerRow}
             >
               <Text style={styles.storeName} numberOfLines={1}>
-                {vehicle.seller_name}
+                {storeName}
               </Text>
               {isVerified ? (
                 <ShieldCheck size={13} color={colors.flame} strokeWidth={2.4} />
@@ -422,18 +504,16 @@ export function VehicleCard({
             </TouchableOpacity>
           ) : null}
 
-          <SpecIconRow items={specs} />
-
-          <View style={styles.footer}>
-            <View style={styles.locationRow}>
-              <MapPin size={12} color={colors.inkFaint} strokeWidth={2} />
-              <Text style={styles.location} numberOfLines={1}>
-                {[vehicle.city, vehicle.country_code].filter(Boolean).join(", ") || "—"}
-              </Text>
-            </View>
-            {vehicle.created_at ? (
-              <Text style={styles.time}>{timeAgo(vehicle.created_at, t)}</Text>
+          <View style={styles.serpSpecRow}>
+            {vehicle.city ? (
+              <View style={styles.specItem}>
+                <MapPin size={13} color={colors.inkFaint} strokeWidth={2} />
+                <Text style={styles.specText} numberOfLines={1}>
+                  {vehicle.city}
+                </Text>
+              </View>
             ) : null}
+            <SpecIconRow items={specs.slice(0, 3)} />
           </View>
 
           <View style={styles.actions}>
@@ -445,8 +525,10 @@ export function VehicleCard({
               }}
               activeOpacity={0.85}
             >
-              <Phone size={14} color={colors.ink} strokeWidth={2.2} />
-              <Text style={styles.actionText}>{t("vehicle.callSeller")}</Text>
+              <Phone size={14} color={colors.flameDeep} strokeWidth={2.2} />
+              <Text style={[styles.actionText, styles.actionCallText]}>
+                {t("vehicle.callSeller")}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.actionBtn, styles.actionWa]}
@@ -459,8 +541,8 @@ export function VehicleCard({
               }}
               activeOpacity={0.85}
             >
-              <MessageCircle size={14} color={colors.flameDeep} strokeWidth={2.2} />
-              <Text style={[styles.actionText, styles.actionWaText]}>
+              <MessageCircle size={14} color={colors.white} strokeWidth={2.2} />
+              <Text style={[styles.actionText, styles.actionWaSolidText]}>
                 {t("vehicle.whatsappSeller")}
               </Text>
             </TouchableOpacity>
@@ -469,15 +551,6 @@ export function VehicleCard({
       </TouchableOpacity>
     </Animated.View>
   );
-}
-
-function timeAgo(date: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
-  const seconds = (Date.now() - new Date(date).getTime()) / 1000;
-  if (seconds < 60) return t("vehicle.timeJustNow");
-  if (seconds < 3600) return t("vehicle.timeMinutes", { count: Math.floor(seconds / 60) });
-  if (seconds < 86400) return t("vehicle.timeHours", { count: Math.floor(seconds / 3600) });
-  if (seconds < 604800) return t("vehicle.timeDays", { count: Math.floor(seconds / 86400) });
-  return new Date(date).toLocaleDateString();
 }
 
 const styles = StyleSheet.create({
@@ -518,6 +591,11 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 6,
   },
+  statusCorner: {
+    position: "absolute",
+    left: 12,
+    bottom: 12,
+  },
   photoCounter: {
     position: "absolute",
     right: 10,
@@ -529,7 +607,8 @@ const styles = StyleSheet.create({
   },
   photoCounterList: {
     bottom: 10,
-    right: 12,
+    left: 12,
+    right: undefined,
   },
   photoCounterText: {
     color: colors.white,
@@ -542,7 +621,7 @@ const styles = StyleSheet.create({
     top: 12,
     right: 12,
     backgroundColor: colors.white,
-    borderRadius: radius.sm,
+    borderRadius: radius.pill,
     width: 36,
     height: 36,
     alignItems: "center",
@@ -550,11 +629,29 @@ const styles = StyleSheet.create({
     ...shadow.soft,
   },
   body: { paddingHorizontal: space.lg, paddingTop: space.md, paddingBottom: space.lg },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  priceCol: { flexShrink: 1, gap: 2 },
   price: {
     fontSize: 20,
     fontFamily: fonts.display,
     color: colors.ink,
     letterSpacing: -0.5,
+    flexShrink: 1,
+  },
+  saleLabel: {
+    fontFamily: fonts.body,
+    fontSize: 11,
+    color: colors.inkFaint,
+  },
+  topPickLabel: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 13,
+    color: colors.flame,
   },
   title: {
     marginTop: 4,
@@ -562,6 +659,16 @@ const styles = StyleSheet.create({
     fontFamily: fonts.displayMed,
     color: colors.ink,
     letterSpacing: -0.2,
+  },
+  subtitle: {
+    marginTop: 2,
+    fontSize: 13,
+    fontFamily: fonts.body,
+    color: colors.inkFaint,
+  },
+  serpSpecRow: {
+    marginTop: 8,
+    gap: 4,
   },
   sellerRow: {
     marginTop: 4,
@@ -641,75 +748,158 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    paddingVertical: 9,
-    borderRadius: radius.sm,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.line,
-    backgroundColor: colors.paper,
+    paddingVertical: 10,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    borderColor: colors.flame,
+    backgroundColor: colors.white,
   },
   actionWa: {
-    borderColor: "#FFD8B8",
-    backgroundColor: colors.flameSoft,
+    borderColor: colors.flame,
+    backgroundColor: colors.flame,
   },
   actionText: {
     fontFamily: fonts.bodySemi,
     fontSize: 13,
     color: colors.ink,
   },
-  actionWaText: {
+  actionCallText: {
     color: colors.flameDeep,
+  },
+  actionWaSolidText: {
+    color: colors.white,
   },
 
   featured: {
-    width: 236,
+    width: 248,
     marginRight: 12,
     backgroundColor: colors.white,
     borderRadius: radius.lg,
     overflow: "hidden",
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.line,
     ...shadow.soft,
   },
   featuredImageWrap: { position: "relative" },
-  featuredImage: { width: "100%", height: 140 },
-  featuredGrad: {
-    ...StyleSheet.absoluteFillObject,
-    top: 50,
-  },
-  featuredBadgeRow: {
+  featuredImage: { width: "100%", height: 156 },
+  featuredTopPick: {
     position: "absolute",
     top: 10,
     left: 10,
-    right: 10,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 4,
+    backgroundColor: colors.flame,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
   },
-  featuredPrice: {
-    position: "absolute",
-    left: 12,
-    bottom: 10,
-    fontFamily: fonts.display,
-    fontSize: 16,
+  featuredTopPickText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 11,
     color: colors.white,
-    letterSpacing: -0.3,
   },
-  featuredBody: { padding: 12 },
+  featuredBody: { paddingHorizontal: 12, paddingTop: 10, paddingBottom: 12, gap: 2 },
   featuredTitle: {
     fontFamily: fonts.displayMed,
-    fontSize: 14,
+    fontSize: 15,
     color: colors.ink,
+    letterSpacing: -0.2,
   },
-  featuredLoc: {
-    marginTop: 6,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
+  featuredPrice: {
+    marginTop: 2,
+    fontFamily: fonts.display,
+    fontSize: 16,
+    color: colors.ink,
+    letterSpacing: -0.3,
   },
-  featuredMeta: {
+  featuredMetaLine: {
+    marginTop: 4,
     fontFamily: fonts.body,
     fontSize: 12,
     color: colors.inkFaint,
+  },
+
+  rowCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: 312,
+    height: 100,
+    backgroundColor: colors.white,
+    borderRadius: radius.md,
+    overflow: "hidden",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
+  },
+  rowThumbWrap: {
+    width: 108,
+    height: 100,
+    backgroundColor: colors.mist,
+  },
+  rowThumb: { width: 108, height: 100 },
+  rowStatus: {
+    position: "absolute",
+    left: 6,
+    bottom: 6,
+  },
+  rowBody: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    justifyContent: "center",
+    gap: 4,
+    minWidth: 0,
+  },
+  rowTitle: {
+    fontFamily: fonts.displayMed,
+    fontSize: 14,
+    color: colors.ink,
+    letterSpacing: -0.2,
+  },
+  rowPipeMeta: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: colors.inkFaint,
+  },
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 6,
+  },
+  specChip: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
+    borderRadius: radius.sm,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    backgroundColor: colors.paper,
+  },
+  specChipText: {
+    fontSize: 11,
+    fontFamily: fonts.bodyMed,
+    color: colors.inkMuted,
+  },
+  rowFooter: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    marginTop: 8,
+    gap: 8,
+  },
+  rowLoc: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: 3,
+  },
+  rowLocText: {
+    fontSize: 12,
+    fontFamily: fonts.body,
+    color: colors.inkFaint,
     flexShrink: 1,
+  },
+  rowPrice: {
+    fontFamily: fonts.display,
+    fontSize: 15,
+    color: colors.ink,
+    letterSpacing: -0.3,
   },
 });

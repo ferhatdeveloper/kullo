@@ -4,6 +4,7 @@ import {
   Check,
   MapPin,
   Navigation,
+  Package,
   Plane,
   Power,
   Users,
@@ -32,11 +33,13 @@ import {
 } from "../../lib/demo-data";
 import { colors, fonts, radius, shadow, space } from "../../lib/theme";
 
+type DriverRole = "taxi" | "parcel";
 type Filter = "all" | DriverTripKind;
 
 function kindIcon(kind: DriverTripKind) {
   if (kind === "shared") return Users;
   if (kind === "airport") return Plane;
+  if (kind === "parcel") return Package;
   return CarTaxiFront;
 }
 
@@ -44,18 +47,29 @@ export default function DriverDashboardScreen() {
   const { t } = useTranslation();
   const formatListing = useCurrencyStore((s) => s.formatListing);
   const [online, setOnline] = useState(true);
+  const [role, setRole] = useState<DriverRole>("taxi");
   const [filter, setFilter] = useState<Filter>("all");
   const [trips, setTrips] = useState(DEMO_DRIVER_TRIPS);
 
-  const list = useMemo(() => {
-    if (filter === "all") return trips;
-    return trips.filter((x) => x.kind === filter);
-  }, [trips, filter]);
+  const roleTrips = useMemo(() => {
+    if (role === "parcel") return trips.filter((x) => x.kind === "parcel");
+    return trips.filter((x) => x.kind !== "parcel");
+  }, [trips, role]);
 
-  const incoming = trips.filter((x) => x.status === "incoming").length;
+  const list = useMemo(() => {
+    if (filter === "all") return roleTrips;
+    return roleTrips.filter((x) => x.kind === filter);
+  }, [roleTrips, filter]);
+
+  const incoming = roleTrips.filter((x) => x.status === "incoming").length;
 
   const setStatus = (id: string, status: DemoDriverTrip["status"]) => {
     setTrips((prev) => prev.map((x) => (x.id === id ? { ...x, status } : x)));
+  };
+
+  const setRoleAndFilter = (next: DriverRole) => {
+    setRole(next);
+    setFilter("all");
   };
 
   return (
@@ -64,10 +78,48 @@ export default function DriverDashboardScreen() {
         title={t("driver.title")}
         subtitle={t("driver.subtitle")}
         onBack={() => router.back()}
-        right={<CarTaxiFront size={18} color={colors.flame} strokeWidth={2} />}
+        right={
+          role === "parcel" ? (
+            <Package size={18} color={colors.flame} strokeWidth={2} />
+          ) : (
+            <CarTaxiFront size={18} color={colors.flame} strokeWidth={2} />
+          )
+        }
       />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <Text style={styles.roleLabel}>{t("driver.role.label")}</Text>
+        <View style={styles.roleToggle}>
+          <TouchableOpacity
+            style={[styles.roleSeg, role === "taxi" && styles.roleSegOn]}
+            onPress={() => setRoleAndFilter("taxi")}
+            activeOpacity={0.9}
+          >
+            <CarTaxiFront
+              size={15}
+              color={role === "taxi" ? colors.white : colors.ink}
+              strokeWidth={2.2}
+            />
+            <Text style={[styles.roleSegText, role === "taxi" && styles.roleSegTextOn]}>
+              {t("driver.role.taxi")}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.roleSeg, role === "parcel" && styles.roleSegOn]}
+            onPress={() => setRoleAndFilter("parcel")}
+            activeOpacity={0.9}
+          >
+            <Package
+              size={15}
+              color={role === "parcel" ? colors.white : colors.ink}
+              strokeWidth={2.2}
+            />
+            <Text style={[styles.roleSegText, role === "parcel" && styles.roleSegTextOn]}>
+              {t("driver.role.parcel")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <TouchableOpacity
           style={[styles.onlineCard, online ? styles.onlineOn : styles.onlineOff]}
           onPress={() => setOnline((v) => !v)}
@@ -114,21 +166,31 @@ export default function DriverDashboardScreen() {
             selected={filter === "all"}
             onPress={() => setFilter("all")}
           />
-          <Chip
-            label={t("driver.modes.taxi")}
-            selected={filter === "taxi"}
-            onPress={() => setFilter("taxi")}
-          />
-          <Chip
-            label={t("driver.modes.shared")}
-            selected={filter === "shared"}
-            onPress={() => setFilter("shared")}
-          />
-          <Chip
-            label={t("driver.modes.airport")}
-            selected={filter === "airport"}
-            onPress={() => setFilter("airport")}
-          />
+          {role === "taxi" ? (
+            <>
+              <Chip
+                label={t("driver.modes.taxi")}
+                selected={filter === "taxi"}
+                onPress={() => setFilter("taxi")}
+              />
+              <Chip
+                label={t("driver.modes.shared")}
+                selected={filter === "shared"}
+                onPress={() => setFilter("shared")}
+              />
+              <Chip
+                label={t("driver.modes.airport")}
+                selected={filter === "airport"}
+                onPress={() => setFilter("airport")}
+              />
+            </>
+          ) : (
+            <Chip
+              label={t("driver.modes.parcel")}
+              selected={filter === "parcel"}
+              onPress={() => setFilter("parcel")}
+            />
+          )}
         </View>
 
         <Text style={styles.section}>{t("driver.trips")}</Text>
@@ -231,6 +293,36 @@ const styles = StyleSheet.create({
     gap: space.sm,
   },
   flex: { flex: 1 },
+  roleLabel: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 13,
+    color: colors.inkMuted,
+  },
+  roleToggle: {
+    flexDirection: "row",
+    backgroundColor: colors.white,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: "#FFD8B8",
+    padding: 4,
+    ...shadow.soft,
+  },
+  roleSeg: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: radius.sm,
+  },
+  roleSegOn: { backgroundColor: colors.ink },
+  roleSegText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 14,
+    color: colors.ink,
+  },
+  roleSegTextOn: { color: colors.white },
   onlineCard: {
     flexDirection: "row",
     alignItems: "center",

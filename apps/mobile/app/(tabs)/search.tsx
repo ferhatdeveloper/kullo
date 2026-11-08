@@ -1,22 +1,28 @@
 import { FlashList } from "@shopify/flash-list";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { setStatusBarStyle } from "expo-status-bar";
 import {
   Bookmark,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Heart,
+  Info,
+  KeyRound,
   RotateCcw,
+  Search,
   SearchX,
   Share2,
-  SlidersHorizontal,
+  Tag,
+  User,
 } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -29,7 +35,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BrandLogo } from "../../components/BrandLogo";
-import { AppHeader } from "../../components/brand";
+import { CarsShell } from "../../components/CarsShell";
+import { DubicarsHome } from "../../components/cars/DubicarsHome";
 import { VehicleCardSkeleton } from "../../components/Skeleton";
 import { VehicleCard, type VehicleListItem } from "../../components/VehicleCard";
 import { type VehicleFilters } from "../../components/FilterSheet";
@@ -37,6 +44,13 @@ import { Chip } from "../../components/ui/Chip";
 import { api } from "../../lib/api";
 import { withBrandLogos } from "../../lib/brand-logos";
 import { MARKET_CITIES, useCityStore, type SelectedCity } from "../../lib/city-store";
+import {
+  DEMO_BRANDS,
+  DEMO_FAVORITES,
+  DEMO_STORES,
+  DEMO_VEHICLES,
+  withStoreAttribution,
+} from "../../lib/demo-data";
 import {
   readVehiclesSnapshot,
   writeVehiclesSnapshot,
@@ -46,24 +60,21 @@ import {
   savedSearchesStore,
   type SavedSearchParams,
 } from "../../lib/saved-searches-store";
-import { colors, fonts, radius, space } from "../../lib/theme";
+import { useModeStore } from "../../lib/mode-store";
+import { colors, fonts, radius, shadow, space } from "../../lib/theme";
 
+type CarsMode = "home" | "filter" | "results" | "saved" | "more";
 type ConditionKey = "all" | "used" | "new";
-type PriceBand = "under" | "mid" | "over";
-type YearBand = "y2020" | "y2015" | "older";
-
-const YEARS = Array.from({ length: 30 }, (_, i) => 2026 - i);
-const CITIES = [...MARKET_CITIES];
-const PLATE_TYPE_KEYS = [
-  { value: "private", labelKey: "search.platePrivate" },
-  { value: "commercial", labelKey: "search.plateCommercial" },
-  { value: "official", labelKey: "search.plateOfficial" },
-] as const;
-
-/** IQD quick-filter bands (millions). */
-const PRICE_UNDER = 10_000_000;
-const PRICE_MID = 25_000_000;
-const TOP_BRAND_CHIPS = 5;
+type PickerKind =
+  | "model"
+  | "minYear"
+  | "maxYear"
+  | "minPrice"
+  | "maxPrice"
+  | "minMileage"
+  | "maxMileage"
+  | "city"
+  | null;
 
 type RefItem = { id: number; name: string; code?: string };
 type ReferenceData = {
@@ -72,31 +83,24 @@ type ReferenceData = {
   transmission_types?: RefItem[];
 };
 
-type PickerKind =
-  | "model"
-  | "trim"
-  | "minYear"
-  | "maxYear"
-  | "minPrice"
-  | "maxPrice"
-  | "minMileage"
-  | "maxMileage"
-  | "city"
-  | "plateType"
-  | null;
+const YEARS = Array.from({ length: 30 }, (_, i) => 2026 - i);
+const CITIES = [...MARKET_CITIES];
 
 export default function SearchScreen() {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
+  const navigation = useNavigation();
   const params = useLocalSearchParams();
+  const choose = useModeStore((s) => s.choose);
   const storedCity = useCityStore((s) => s.city);
   const setStoredCity = useCityStore((s) => s.setCity);
 
-  const [mode, setMode] = useState<"filter" | "results">("filter");
+  /** Default / first paint = Ana hub — never filter */
+  const [mode, setMode] = useState<CarsMode>("home");
   const [showAllBrands, setShowAllBrands] = useState(false);
+  const [savedTab, setSavedTab] = useState<"ads" | "searches">("ads");
   const [picker, setPicker] = useState<PickerKind>(null);
   const [model, setModel] = useState<string | null>(null);
-  const [trim, setTrim] = useState<string | null>(null);
-  const [plateType, setPlateType] = useState<string | null>(null);
   const [condition, setCondition] = useState<ConditionKey>("all");
   const [selectedMakeId, setSelectedMakeId] = useState<number | null>(
     params.makeId ? Number(params.makeId) : null,
@@ -117,10 +121,49 @@ export default function SearchScreen() {
   useFocusEffect(
     useCallback(() => {
       setStatusBarStyle("dark");
-    }, []),
+      void choose("buy");
+    }, [choose]),
   );
 
+  /** intent/mode=rent → Kirala dikeyine (buy SERP karışmasın) */
   useEffect(() => {
+    const intent = String(params.intent ?? params.mode ?? "");
+    if (intent === "rent") {
+      router.replace({
+        pathname: "/(tabs)/rentals",
+        params: { intent: "rent", rentPane: "home" },
+      });
+    }
+  }, [params.intent, params.mode, router]);
+
+  /** Marketplace Search tab → always Ana hub (not sticky filter) */
+  useEffect(() => {
+    const unsub = navigation.addListener("tabPress" as never, () => {
+      setMode("home");
+      router.setParams({ intent: "buy", carsPane: "home" });
+    });
+    return unsub;
+  }, [navigation, router]);
+
+  useEffect(() => {
+    const pane = String(params.carsPane ?? "");
+    if (pane === "more") {
+      setMode("more");
+      return;
+    }
+    if (pane === "saved") {
+      setMode("saved");
+      return;
+    }
+    if (pane === "home") {
+      setMode("home");
+      return;
+    }
+    if (pane === "search") {
+      setMode("filter");
+      return;
+    }
+
     const hasRouteParams =
       params.makeId != null ||
       params.make != null ||
@@ -150,9 +193,7 @@ export default function SearchScreen() {
       return Number.isFinite(n) ? n : undefined;
     };
 
-    if (params.makeId != null || openResults) {
-      setSelectedMakeId(makeId);
-    }
+    if (params.makeId != null || openResults) setSelectedMakeId(makeId);
     if (condRaw || openResults) setCondition(condRaw ? nextCondition : "all");
 
     setFilters((f) => {
@@ -180,28 +221,19 @@ export default function SearchScreen() {
             ? String(params.city)
             : openResults
               ? undefined
-              : base.city ?? (storedCity !== "all" ? storedCity : undefined),
+              : (base.city ?? (storedCity !== "all" ? storedCity : undefined)),
         sortBy:
           params.sortBy === "price" || params.sortBy === "created_at"
             ? params.sortBy
-            : base.sortBy ?? "created_at",
+            : (base.sortBy ?? "created_at"),
         sortDir:
           params.sortDir === "asc" || params.sortDir === "desc"
             ? params.sortDir
-            : base.sortDir ?? "desc",
+            : (base.sortDir ?? "desc"),
       };
     });
 
-    if (openResults) {
-      setMode("results");
-    }
-
-    if (params.city != null) {
-      const c = String(params.city);
-      void setStoredCity(
-        (MARKET_CITIES as readonly string[]).includes(c) ? (c as SelectedCity) : "all",
-      );
-    }
+    if (openResults) setMode("results");
   }, [
     params.make,
     params.makeId,
@@ -217,7 +249,7 @@ export default function SearchScreen() {
     params.sortBy,
     params.sortDir,
     params.openResults,
-    setStoredCity,
+    params.carsPane,
     storedCity,
   ]);
 
@@ -230,11 +262,17 @@ export default function SearchScreen() {
     staleTime: 60 * 60 * 1000,
   });
 
-  const brands = useMemo(() => withBrandLogos(refs?.brands ?? []), [refs?.brands]);
-  const fuelTypes = refs?.fuel_types ?? [];
-  const transmissionTypes = refs?.transmission_types ?? [];
-  const brandPreview = brands.slice(0, 7);
-  const quickBrands = useMemo(() => brands.slice(0, TOP_BRAND_CHIPS), [brands]);
+  const brands = useMemo(() => {
+    const raw =
+      Array.isArray(refs?.brands) && refs.brands.length > 0 ? refs.brands : DEMO_BRANDS;
+    return withBrandLogos(raw);
+  }, [refs?.brands]);
+
+  useEffect(() => {
+    for (const b of brands.slice(0, 16)) {
+      if (b.logo_url) void Image.prefetch(b.logo_url).catch(() => undefined);
+    }
+  }, [brands]);
 
   const currentSearchParams = useMemo((): SavedSearchParams => {
     const out: SavedSearchParams = {};
@@ -278,38 +316,34 @@ export default function SearchScreen() {
         ),
       });
     } catch {
-      /* user dismissed */
+      /* dismissed */
     }
   };
 
   const queryFilters = useMemo((): VehicleFilters => {
-    const qParts = [filters.q, model, trim].filter(Boolean);
+    const qParts = [filters.q, model].filter(Boolean);
     return {
       ...filters,
       q: qParts.length ? qParts.join(" ") : undefined,
       makeIds: selectedMakeId != null ? [selectedMakeId] : filters.makeIds,
-      condition:
-        condition === "all" ? undefined : condition === "new" ? "new" : "used",
+      condition: condition === "all" ? undefined : condition === "new" ? "new" : "used",
     };
-  }, [filters, model, trim, selectedMakeId, condition]);
+  }, [filters, model, selectedMakeId, condition]);
 
-  const activePriceBand = useMemo((): PriceBand | null => {
-    if (filters.maxPrice === PRICE_UNDER && filters.minPrice == null) return "under";
-    if (filters.minPrice === PRICE_UNDER && filters.maxPrice === PRICE_MID) return "mid";
-    if (filters.minPrice === PRICE_MID && filters.maxPrice == null) return "over";
-    return null;
-  }, [filters.minPrice, filters.maxPrice]);
-
-  const activeYearBand = useMemo((): YearBand | null => {
-    if (filters.minYear === 2020 && filters.maxYear == null) return "y2020";
-    if (filters.minYear === 2015 && filters.maxYear == null) return "y2015";
-    if (filters.maxYear === 2014 && filters.minYear == null) return "older";
-    return null;
-  }, [filters.minYear, filters.maxYear]);
-
-  const isNewestSort =
-    (filters.sortBy ?? "created_at") === "created_at" && (filters.sortDir ?? "desc") === "desc";
-  const isPriceLowSort = filters.sortBy === "price" && filters.sortDir === "asc";
+  const resultsHeading = useMemo(() => {
+    const parts: string[] = [];
+    if (selectedMakeId != null) {
+      const brand = brands.find((b) => b.id === selectedMakeId);
+      if (brand?.name) parts.push(brand.name);
+    } else if (filters.q) {
+      parts.push(filters.q);
+    }
+    if (model) parts.push(model);
+    if (filters.city) parts.push(filters.city);
+    if (condition === "new") parts.push(t("search.conditionNew"));
+    else if (condition === "used") parts.push(t("search.conditionUsed"));
+    return parts.length > 0 ? parts.join(" · ") : t("search.allListings");
+  }, [selectedMakeId, brands, filters.q, filters.city, model, condition, t]);
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["vehicles-iq", queryFilters, i18n.language],
@@ -345,70 +379,73 @@ export default function SearchScreen() {
           return rows;
         }
       } catch {
-        /* fall through to snapshot */
+        /* fall through */
       }
       const snap = await readVehiclesSnapshot();
-      return snap ?? [];
+      if (snap && snap.length > 0) return snap;
+      return DEMO_VEHICLES;
     },
+    initialData: DEMO_VEHICLES,
     staleTime: 20_000,
     placeholderData: keepPreviousData,
   });
 
-  const results = data ?? [];
+  const results = withStoreAttribution(data?.length ? data : DEMO_VEHICLES);
   const count = results.length;
+  const topPicks = useMemo(() => {
+    const featured = results.filter((v) => v.featured);
+    const seen = new Set(featured.map((v) => v.id));
+    const rest = results.filter((v) => !seen.has(v.id));
+    return [...featured, ...rest].slice(0, 8);
+  }, [results]);
+  const featuredDealers = useMemo(() => DEMO_STORES.slice(0, 3), []);
 
-  const resultsHeading = useMemo(() => {
-    const parts: string[] = [];
-    if (selectedMakeId != null) {
-      const brand = brands.find((b) => b.id === selectedMakeId);
-      if (brand?.name) parts.push(brand.name);
-    } else if (filters.q) {
-      parts.push(filters.q);
-    }
-    if (model) parts.push(model);
-    if (filters.city) parts.push(filters.city);
-    if (condition === "new") parts.push(t("search.conditionNew"));
-    else if (condition === "used") parts.push(t("search.conditionUsed"));
-    return parts.length > 0 ? parts.join(" · ") : t("search.allListings");
-  }, [selectedMakeId, brands, filters.q, filters.city, model, condition, t]);
-
-  const toggleFuel = (id: number) => {
-    setFilters((f) => {
-      const current = f.fuelTypeIds ?? [];
-      const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
-      return { ...f, fuelTypeIds: next.length ? next : undefined };
+  /** URL + mode senkron — sticky filter / hub karışmasını önler; her zaman intent=buy */
+  const goHome = useCallback(() => {
+    setMode("home");
+    router.setParams({ intent: "buy", carsPane: "home" });
+  }, [router]);
+  const goSearch = useCallback(() => {
+    setMode("filter");
+    router.setParams({ intent: "buy", carsPane: "search" });
+  }, [router]);
+  /** Öne çıkanlar “Tümü” — filtresiz tüm araç sonuç listesi */
+  const goAllResults = useCallback(() => {
+    setSelectedMakeId(null);
+    setModel(null);
+    setCondition("all");
+    setFilters({
+      sortBy: "created_at",
+      sortDir: "desc",
     });
-  };
+    setMode("results");
+  }, []);
+  const goSaved = useCallback(() => {
+    setMode("saved");
+    router.setParams({ intent: "buy", carsPane: "saved" });
+  }, [router]);
+  const goMore = useCallback(() => {
+    setMode("more");
+    router.setParams({ intent: "buy", carsPane: "more" });
+  }, [router]);
+  const exitCars = useCallback(() => {
+    setMode("home");
+    router.replace("/(tabs)");
+  }, [router]);
 
-  const toggleTransmission = (id: number) => {
-    setFilters((f) => {
-      const current = f.transmissionIds ?? [];
-      const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
-      return { ...f, transmissionIds: next.length ? next : undefined };
-    });
-  };
-
-  const plateTypeLabel = (value: string | null) => {
-    if (!value) return null;
-    const row = PLATE_TYPE_KEYS.find((p) => p.value === value);
-    return row ? t(row.labelKey) : value;
-  };
 
   const reset = () => {
     setSelectedMakeId(null);
     setModel(null);
-    setTrim(null);
-    setPlateType(null);
     setCondition("all");
     setFilters({
       sortBy: "created_at",
       sortDir: "desc",
       city: storedCity !== "all" ? storedCity : undefined,
     });
-    setMode("filter");
   };
 
-  const selectBrand = (id: number) => {
+  const selectBrand = (id: number, openResults = true) => {
     const next = selectedMakeId === id ? null : id;
     setSelectedMakeId(next);
     const brand = brands.find((b) => b.id === next);
@@ -418,40 +455,7 @@ export default function SearchScreen() {
       q: brand?.name,
     }));
     setModel(null);
-    setTrim(null);
-  };
-
-  const setPriceBand = (band: PriceBand) => {
-    setFilters((f) => {
-      const clear = { ...f, minPrice: undefined, maxPrice: undefined };
-      if (activePriceBand === band) return clear;
-      if (band === "under") return { ...f, minPrice: undefined, maxPrice: PRICE_UNDER };
-      if (band === "mid") return { ...f, minPrice: PRICE_UNDER, maxPrice: PRICE_MID };
-      return { ...f, minPrice: PRICE_MID, maxPrice: undefined };
-    });
-  };
-
-  const setYearBand = (band: YearBand) => {
-    setFilters((f) => {
-      const clear = { ...f, minYear: undefined, maxYear: undefined };
-      if (activeYearBand === band) return clear;
-      if (band === "y2020") return { ...f, minYear: 2020, maxYear: undefined };
-      if (band === "y2015") return { ...f, minYear: 2015, maxYear: undefined };
-      return { ...f, minYear: undefined, maxYear: 2014 };
-    });
-  };
-
-  const setSortNewest = () => {
-    setFilters((f) => ({ ...f, sortBy: "created_at", sortDir: "desc" }));
-  };
-
-  const setSortPriceLow = () => {
-    setFilters((f) => {
-      if (f.sortBy === "price" && f.sortDir === "asc") {
-        return { ...f, sortBy: "created_at", sortDir: "desc" };
-      }
-      return { ...f, sortBy: "price", sortDir: "asc" };
-    });
+    if (openResults) setMode("results");
   };
 
   const pickerOptions = useMemo(() => {
@@ -461,18 +465,14 @@ export default function SearchScreen() {
         return YEARS.map(String);
       case "minPrice":
       case "maxPrice":
-        return ["100000", "250000", "500000", "750000", "1000000", "1500000", "2000000", "3000000"];
+        return ["5000000", "10000000", "15000000", "25000000", "40000000", "60000000"];
       case "minMileage":
       case "maxMileage":
         return ["0", "25000", "50000", "75000", "100000", "150000", "200000"];
       case "city":
         return CITIES;
-      case "plateType":
-        return PLATE_TYPE_KEYS.map((p) => p.value);
       case "model":
-        return ["Corolla", "Civic", "3 Series", "A4", "Focus", "Sportage", "Model 3", "T10X"];
-      case "trim":
-        return ["Base", "Comfort", "Premium", "Sport", "Luxury"];
+        return ["Corolla", "Civic", "3 Series", "A4", "Sportage", "Tiguan", "C 200"];
       default:
         return [];
     }
@@ -483,9 +483,6 @@ export default function SearchScreen() {
     switch (picker) {
       case "model":
         setModel(value);
-        break;
-      case "trim":
-        setTrim(value);
         break;
       case "minYear":
         setFilters((f) => ({ ...f, minYear: num }));
@@ -513,9 +510,6 @@ export default function SearchScreen() {
             : "all",
         );
         break;
-      case "plateType":
-        setPlateType(value);
-        break;
     }
     setPicker(null);
   };
@@ -523,427 +517,14 @@ export default function SearchScreen() {
   const formatPrice = (n?: number) =>
     n == null ? null : `${n.toLocaleString("tr-TR")} IQD`;
 
-  if (mode === "results") {
-    return (
-      <View style={styles.resultsRoot}>
-        <AppHeader />
-        <View style={styles.resultsSticky}>
-          <View style={styles.resultsNav}>
-            <TouchableOpacity
-              style={styles.iconHit}
-              onPress={() => setMode("filter")}
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel={t("search.filters")}
-            >
-              <ChevronLeft size={22} color={colors.ink} strokeWidth={2.2} />
-            </TouchableOpacity>
-
-            <View style={styles.resultsNavCenter}>
-              <Text style={styles.resultsHeading} numberOfLines={1}>
-                {resultsHeading}
-              </Text>
-              <Text style={styles.resultsCount}>
-                {isLoading
-                  ? t("search.searching")
-                  : t("search.resultsCount", { count })}
-              </Text>
-            </View>
-
-            <View style={styles.resultsActions}>
-              <TouchableOpacity
-                style={styles.iconHit}
-                onPress={() => void onSaveSearch()}
-                hitSlop={8}
-              >
-                <Bookmark size={19} color={colors.flame} strokeWidth={2.2} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.iconHit}
-                onPress={() => void onShareSearch()}
-                hitSlop={8}
-              >
-                <Share2 size={19} color={colors.ink} strokeWidth={2.2} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.resultsToolbar}>
-            <TouchableOpacity
-              style={styles.filterBtn}
-              onPress={() => setMode("filter")}
-              activeOpacity={0.88}
-            >
-              <SlidersHorizontal size={15} color={colors.ink} strokeWidth={2.2} />
-              <Text style={styles.filterBtnText}>{t("search.filters")}</Text>
-            </TouchableOpacity>
-
-            <View style={styles.sortGroup}>
-              <Chip
-                label={t("search.sortNewest")}
-                selected={isNewestSort}
-                onPress={setSortNewest}
-                style={styles.sortChip}
-              />
-              <Chip
-                label={t("search.sortPriceLow")}
-                selected={isPriceLowSort}
-                onPress={setSortPriceLow}
-                style={styles.sortChip}
-              />
-            </View>
-          </View>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.quickRow}
-            style={styles.quickScroll}
-          >
-            {quickBrands.map((b) => (
-              <Chip
-                key={`make-${b.id}`}
-                label={b.name}
-                selected={selectedMakeId === b.id}
-                onPress={() => selectBrand(b.id)}
-                style={styles.quickChip}
-              />
-            ))}
-
-            {quickBrands.length > 0 ? <View style={styles.chipDivider} /> : null}
-
-            <Chip
-              label={t("search.priceUnder")}
-              selected={activePriceBand === "under"}
-              onPress={() => setPriceBand("under")}
-              style={styles.quickChip}
-            />
-            <Chip
-              label={t("search.priceMid")}
-              selected={activePriceBand === "mid"}
-              onPress={() => setPriceBand("mid")}
-              style={styles.quickChip}
-            />
-            <Chip
-              label={t("search.priceOver")}
-              selected={activePriceBand === "over"}
-              onPress={() => setPriceBand("over")}
-              style={styles.quickChip}
-            />
-          </ScrollView>
-        </View>
-
-        {isLoading ? (
-          <View style={styles.listPad}>
-            <VehicleCardSkeleton />
-            <VehicleCardSkeleton />
-            <VehicleCardSkeleton />
-          </View>
-        ) : (
-          <FlashList
-            data={results}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item, index }) => (
-              <View style={styles.cardWrap}>
-                <VehicleCard vehicle={item} index={index} />
-              </View>
-            )}
-            contentContainerStyle={styles.listPad}
-            style={styles.flex}
-            refreshing={isFetching && !isLoading}
-            onRefresh={() => refetch()}
-            ListEmptyComponent={
-              <View style={styles.emptyWrap}>
-                <View style={styles.emptyIcon}>
-                  <SearchX size={28} color={colors.inkFaint} strokeWidth={1.8} />
-                </View>
-                <Text style={styles.emptyTitle}>{t("search.noResults")}</Text>
-                <Text style={styles.emptyHint}>{t("search.noResultsHint")}</Text>
-                <TouchableOpacity
-                  style={styles.emptyBtn}
-                  onPress={() => setMode("filter")}
-                  activeOpacity={0.88}
-                >
-                  <Text style={styles.emptyBtnText}>{t("search.filters")}</Text>
-                </TouchableOpacity>
-              </View>
-            }
-          />
-        )}
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.root}>
-      <AppHeader />
-      <View style={styles.white}>
-        <View style={styles.topBar}>
-          <Text style={styles.topTitle}>{t("common.filter")}</Text>
-          <TouchableOpacity style={styles.iconHit} onPress={reset} hitSlop={8}>
-            <RotateCcw size={18} color={colors.inkMuted} strokeWidth={2} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView
-        style={styles.flex}
-        contentContainerStyle={styles.form}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Text style={styles.sectionLabel}>{t("search.city")}</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.cityFilterRow}
-        >
-          <Chip
-            label={t("common.all")}
-            selected={!filters.city}
-            onPress={() => {
-              setFilters((f) => ({ ...f, city: undefined }));
-              void setStoredCity("all");
-            }}
-            style={styles.quickChip}
-          />
-          {CITIES.map((c) => (
-            <Chip
-              key={c}
-              label={c}
-              selected={filters.city === c}
-              onPress={() => {
-                const next = filters.city === c ? undefined : c;
-                setFilters((f) => ({ ...f, city: next }));
-                void setStoredCity(next ? (next as SelectedCity) : "all");
-              }}
-              style={styles.quickChip}
-            />
-          ))}
-        </ScrollView>
-
-        <Text style={styles.sectionLabel}>{t("search.brands")}</Text>
-        <View style={styles.brandGrid}>
-          {brandPreview.map((b) => {
-            const active = selectedMakeId === b.id;
-            return (
-              <TouchableOpacity
-                key={b.id}
-                style={[styles.brandCell, active && styles.brandCellActive]}
-                onPress={() => selectBrand(b.id)}
-                activeOpacity={0.85}
-              >
-                <BrandLogo name={b.name} nameEn={b.name_en} logoUrl={b.logo_url} size={42} />
-              </TouchableOpacity>
-            );
-          })}
-          <TouchableOpacity
-            style={styles.brandCell}
-            onPress={() => setShowAllBrands(true)}
-            activeOpacity={0.85}
-          >
-            <ChevronRight size={22} color={colors.inkMuted} strokeWidth={2} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.row2}>
-          <SelectField
-            label={t("search.model")}
-            value={model}
-            onPress={() => setPicker("model")}
-            style={styles.half}
-            allLabel={t("common.all")}
-          />
-          <SelectField
-            label={t("search.trim")}
-            value={trim}
-            onPress={() => setPicker("trim")}
-            style={styles.half}
-            allLabel={t("common.all")}
-          />
-        </View>
-
-        <View style={styles.row2}>
-          <SelectField
-            label={t("search.fromYear")}
-            value={filters.minYear != null ? String(filters.minYear) : null}
-            onPress={() => setPicker("minYear")}
-            style={styles.half}
-            allLabel={t("common.all")}
-          />
-          <SelectField
-            label={t("search.toYear")}
-            value={filters.maxYear != null ? String(filters.maxYear) : null}
-            onPress={() => setPicker("maxYear")}
-            style={styles.half}
-            allLabel={t("common.all")}
-          />
-        </View>
-
-        <View style={styles.row2}>
-          <SelectField
-            label={t("search.minPrice")}
-            value={formatPrice(filters.minPrice)}
-            onPress={() => setPicker("minPrice")}
-            style={styles.half}
-            allLabel={t("common.all")}
-          />
-          <SelectField
-            label={t("search.maxPrice")}
-            value={formatPrice(filters.maxPrice)}
-            onPress={() => setPicker("maxPrice")}
-            style={styles.half}
-            allLabel={t("common.all")}
-          />
-        </View>
-
-        <View style={styles.row2}>
-          <SelectField
-            label={t("search.minMileage")}
-            value={
-              filters.minMileage != null
-                ? `${filters.minMileage.toLocaleString("tr-TR")} ${t("common.km")}`
-                : null
-            }
-            onPress={() => setPicker("minMileage")}
-            style={styles.half}
-            allLabel={t("common.all")}
-          />
-          <SelectField
-            label={t("search.maxMileage")}
-            value={
-              filters.maxMileage != null
-                ? `${filters.maxMileage.toLocaleString("tr-TR")} ${t("common.km")}`
-                : null
-            }
-            onPress={() => setPicker("maxMileage")}
-            style={styles.half}
-            allLabel={t("common.all")}
-          />
-        </View>
-
-        <View style={styles.row2}>
-          <SelectField
-            label={t("search.plateCity")}
-            value={filters.city ?? null}
-            onPress={() => setPicker("city")}
-            style={styles.half}
-            allLabel={t("common.all")}
-          />
-          <SelectField
-            label={t("search.plateType")}
-            value={plateTypeLabel(plateType)}
-            onPress={() => setPicker("plateType")}
-            style={styles.half}
-            allLabel={t("common.all")}
-          />
-        </View>
-
-        <Text style={[styles.sectionLabel, styles.conditionLabel]}>{t("search.condition")}</Text>
-        <View style={styles.conditionRow}>
-          {(
-            [
-              { key: "all" as const, labelKey: "common.all" },
-              { key: "used" as const, labelKey: "search.conditionUsed" },
-              { key: "new" as const, labelKey: "search.conditionNew" },
-            ] as const
-          ).map((c) => {
-            const active = condition === c.key;
-            return (
-              <TouchableOpacity
-                key={c.key}
-                style={[styles.conditionChip, active && styles.conditionChipActive]}
-                onPress={() => setCondition(c.key)}
-                activeOpacity={0.88}
-              >
-                <Text style={[styles.conditionText, active && styles.conditionTextActive]}>
-                  {t(c.labelKey)}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        {fuelTypes.length > 0 ? (
-          <>
-            <Text style={[styles.sectionLabel, styles.conditionLabel]}>{t("search.fuel")}</Text>
-            <View style={styles.conditionRow}>
-              {fuelTypes.map((ft) => {
-                const active = filters.fuelTypeIds?.includes(ft.id) ?? false;
-                return (
-                  <TouchableOpacity
-                    key={ft.id}
-                    style={[styles.conditionChip, active && styles.conditionChipActive]}
-                    onPress={() => toggleFuel(ft.id)}
-                    activeOpacity={0.88}
-                  >
-                    <Text style={[styles.conditionText, active && styles.conditionTextActive]}>
-                      {ft.name}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </>
-        ) : null}
-
-        {transmissionTypes.length > 0 ? (
-          <>
-            <Text style={[styles.sectionLabel, styles.conditionLabel]}>
-              {t("search.transmission")}
-            </Text>
-            <View style={styles.conditionRow}>
-              {transmissionTypes.map((tr) => {
-                const active = filters.transmissionIds?.includes(tr.id) ?? false;
-                return (
-                  <TouchableOpacity
-                    key={tr.id}
-                    style={[styles.conditionChip, active && styles.conditionChipActive]}
-                    onPress={() => toggleTransmission(tr.id)}
-                    activeOpacity={0.88}
-                  >
-                    <Text style={[styles.conditionText, active && styles.conditionTextActive]}>
-                      {tr.name}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </>
-        ) : null}
-
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
-
-      <SafeAreaView edges={["bottom"]} style={styles.footerSafe}>
-        <View style={styles.footer}>
-          <TouchableOpacity onPress={reset} hitSlop={8}>
-            <Text style={styles.resetLink}>{t("search.reset")}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.showBtn}
-            activeOpacity={0.9}
-            onPress={() => setMode("results")}
-          >
-            {isFetching ? (
-              <ActivityIndicator color={colors.white} />
-            ) : (
-              <Text style={styles.showBtnText}>
-                {t("search.showCars", { count })}
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-
-
-      {/* All brands sheet */}
+  const searchSheets = (
+    <>
       <Modal visible={showAllBrands} animationType="slide" presentationStyle="pageSheet">
         <SafeAreaView style={styles.modal} edges={["top", "bottom"]}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{t("search.make")}</Text>
             <TouchableOpacity onPress={() => setShowAllBrands(false)}>
-              <Text style={styles.modalDone}>{t("common.done") ?? "Tamam"}</Text>
+              <Text style={styles.modalDone}>{t("common.done")}</Text>
             </TouchableOpacity>
           </View>
           <ScrollView contentContainerStyle={styles.allBrands}>
@@ -954,11 +535,16 @@ export default function SearchScreen() {
                   key={b.id}
                   style={[styles.allBrandCell, active && styles.brandCellActive]}
                   onPress={() => {
-                    selectBrand(b.id);
+                    selectBrand(b.id, mode === "home" || mode === "results");
                     setShowAllBrands(false);
                   }}
                 >
-                  <BrandLogo name={b.name} nameEn={b.name_en} logoUrl={b.logo_url} size={44} />
+                  <BrandLogo
+                    name={b.name}
+                    nameEn={b.name_en ?? b.name}
+                    logoUrl={b.logo_url}
+                    size={44}
+                  />
                   <Text style={styles.allBrandName} numberOfLines={1}>
                     {b.name}
                   </Text>
@@ -969,7 +555,6 @@ export default function SearchScreen() {
         </SafeAreaView>
       </Modal>
 
-      {/* Value picker */}
       <Modal visible={picker != null} transparent animationType="fade">
         <Pressable style={styles.pickerBackdrop} onPress={() => setPicker(null)}>
           <Pressable style={styles.pickerSheet} onPress={(e) => e.stopPropagation()}>
@@ -980,16 +565,17 @@ export default function SearchScreen() {
                 onPress={() => {
                   if (!picker) return;
                   if (picker === "model") setModel(null);
-                  else if (picker === "trim") setTrim(null);
-                  else if (picker === "plateType") setPlateType(null);
                   else if (picker === "city") {
                     setFilters((f) => ({ ...f, city: undefined }));
                     void setStoredCity("all");
-                  }
-                  else if (picker === "minYear") setFilters((f) => ({ ...f, minYear: undefined }));
-                  else if (picker === "maxYear") setFilters((f) => ({ ...f, maxYear: undefined }));
-                  else if (picker === "minPrice") setFilters((f) => ({ ...f, minPrice: undefined }));
-                  else if (picker === "maxPrice") setFilters((f) => ({ ...f, maxPrice: undefined }));
+                  } else if (picker === "minYear")
+                    setFilters((f) => ({ ...f, minYear: undefined }));
+                  else if (picker === "maxYear")
+                    setFilters((f) => ({ ...f, maxYear: undefined }));
+                  else if (picker === "minPrice")
+                    setFilters((f) => ({ ...f, minPrice: undefined }));
+                  else if (picker === "maxPrice")
+                    setFilters((f) => ({ ...f, maxPrice: undefined }));
                   else if (picker === "minMileage")
                     setFilters((f) => ({ ...f, minMileage: undefined }));
                   else if (picker === "maxMileage")
@@ -1010,12 +596,7 @@ export default function SearchScreen() {
                       ? `${Number(opt).toLocaleString("tr-TR")} IQD`
                       : picker === "minMileage" || picker === "maxMileage"
                         ? `${Number(opt).toLocaleString("tr-TR")} ${t("common.km")}`
-                        : picker === "plateType"
-                          ? t(
-                              PLATE_TYPE_KEYS.find((p) => p.value === opt)?.labelKey ??
-                                "common.all",
-                            )
-                          : opt}
+                        : opt}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -1023,7 +604,499 @@ export default function SearchScreen() {
           </Pressable>
         </Pressable>
       </Modal>
-    </View>
+    </>
+  );
+
+  if (mode === "more") {
+    return (
+      <CarsShell
+        active="more"
+        onHome={goHome}
+        onSearch={goSearch}
+        onSaved={goSaved}
+        onMore={goMore}
+        onExit={exitCars}
+      >
+        <ScrollView
+          style={styles.flex}
+          contentContainerStyle={styles.morePad}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.moreLoginCard}>
+            <Text style={styles.moreLoginText}>{t("cars.moreLogin")}</Text>
+            <TouchableOpacity
+              style={styles.moreLoginBtn}
+              activeOpacity={0.9}
+              onPress={() => router.push("/auth/login")}
+            >
+              <Text style={styles.moreLoginBtnText}>{t("cars.moreLoginCta")}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.moreSection}>{t("cars.moreServices")}</Text>
+          <View style={styles.moreGroup}>
+            <MoreRow
+              icon={<KeyRound size={18} color={colors.ink} strokeWidth={2.2} />}
+              label={t("cars.moreRent")}
+              onPress={() => router.push("/cars/rent")}
+            />
+          </View>
+
+          <Text style={styles.moreSection}>{t("cars.moreExplore")}</Text>
+          <View style={styles.moreGroup}>
+            <MoreRow
+              icon={<Bookmark size={18} color={colors.flame} strokeWidth={2.2} />}
+              label={t("cars.moreSavedSearches")}
+              onPress={() => router.push("/saved-searches")}
+            />
+            <MoreRow
+              icon={<Heart size={18} color={colors.flame} strokeWidth={2.2} />}
+              label={t("cars.moreFavorites")}
+              onPress={() => setMode("saved")}
+            />
+            <MoreRow
+              icon={<Search size={18} color={colors.ink} strokeWidth={2.2} />}
+              label={t("cars.navSearch")}
+              onPress={goSearch}
+            />
+          </View>
+
+          <Text style={styles.moreSection}>{t("cars.moreSupport")}</Text>
+          <View style={styles.moreGroup}>
+            <MoreRow
+              icon={<User size={18} color={colors.ink} strokeWidth={2.2} />}
+              label={t("cars.moreProfile")}
+              onPress={() => router.replace("/(tabs)/profile")}
+            />
+            <MoreRow
+              icon={<Info size={18} color={colors.ink} strokeWidth={2.2} />}
+              label={t("cars.moreContact")}
+              onPress={() => router.push("/about")}
+            />
+          </View>
+        </ScrollView>
+      </CarsShell>
+    );
+  }
+
+  if (mode === "saved") {
+    return (
+      <CarsShell
+        active="saved"
+        title={t("cars.navSaved")}
+        onHome={goHome}
+        onSearch={goSearch}
+        onSaved={goSaved}
+        onMore={goMore}
+        onExit={exitCars}
+      >
+        <View style={styles.savedTabs}>
+          <TouchableOpacity
+            style={[styles.savedTab, savedTab === "ads" && styles.savedTabOn]}
+            onPress={() => setSavedTab("ads")}
+          >
+            <Text style={[styles.savedTabText, savedTab === "ads" && styles.savedTabTextOn]}>
+              {t("cars.savedAds")}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.savedTab, savedTab === "searches" && styles.savedTabOn]}
+            onPress={() => setSavedTab("searches")}
+          >
+            <Text
+              style={[styles.savedTabText, savedTab === "searches" && styles.savedTabTextOn]}
+            >
+              {t("cars.savedSearches")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {savedTab === "ads" ? (
+          <FlashList
+            data={DEMO_FAVORITES.map((f) => f.vehicle)}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item, index }) => (
+              <View style={styles.cardWrap}>
+                <VehicleCard vehicle={item} index={index} variant="list" />
+              </View>
+            )}
+            contentContainerStyle={styles.listPad}
+            ListEmptyComponent={
+              <View style={styles.emptyWrap}>
+                <Heart size={28} color={colors.inkFaint} strokeWidth={1.8} />
+                <Text style={styles.emptyTitle}>{t("cars.savedEmptyAds")}</Text>
+              </View>
+            }
+          />
+        ) : (
+          <ScrollView contentContainerStyle={styles.morePad}>
+            <TouchableOpacity
+              style={styles.savedSearchCard}
+              onPress={() => router.push("/saved-searches")}
+              activeOpacity={0.88}
+            >
+              <Bookmark size={18} color={colors.flame} strokeWidth={2.2} />
+              <Text style={styles.savedSearchText}>{t("cars.moreSavedSearches")}</Text>
+              <ChevronRight size={18} color={colors.inkFaint} strokeWidth={2} />
+            </TouchableOpacity>
+          </ScrollView>
+        )}
+      </CarsShell>
+    );
+  }
+
+  if (mode === "filter") {
+    return (
+      <CarsShell
+        active="search"
+        title={t("common.filter")}
+        hideSubHeader
+        onHome={goHome}
+        onSearch={goSearch}
+        onSaved={goSaved}
+        onMore={goMore}
+        onExit={exitCars}
+      >
+        <View style={styles.filterRoot}>
+          <View style={styles.topBar}>
+            <Text style={styles.topTitle}>{t("common.filter")}</Text>
+            <TouchableOpacity style={styles.iconHit} onPress={reset} hitSlop={8}>
+              <RotateCcw size={18} color={colors.inkMuted} strokeWidth={2} />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView
+            style={styles.flex}
+            contentContainerStyle={styles.form}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <Text style={styles.sectionLabel}>{t("search.city")}</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.cityFilterRow}
+            >
+              <Chip
+                label={t("common.all")}
+                selected={!filters.city}
+                onPress={() => {
+                  setFilters((f) => ({ ...f, city: undefined }));
+                  void setStoredCity("all");
+                }}
+                style={styles.quickChip}
+              />
+              {CITIES.map((c) => (
+                <Chip
+                  key={c}
+                  label={c}
+                  selected={filters.city === c}
+                  onPress={() => {
+                    const next = filters.city === c ? undefined : c;
+                    setFilters((f) => ({ ...f, city: next }));
+                    void setStoredCity(next ? (next as SelectedCity) : "all");
+                  }}
+                  style={styles.quickChip}
+                />
+              ))}
+            </ScrollView>
+
+            <Text style={styles.sectionLabel}>{t("search.brands")}</Text>
+            <View style={styles.brandGrid}>
+              {brands.slice(0, 8).map((b) => {
+                const active = selectedMakeId === b.id;
+                return (
+                  <TouchableOpacity
+                    key={b.id}
+                    style={[styles.brandCell, active && styles.brandCellActive]}
+                    onPress={() => selectBrand(b.id, false)}
+                    activeOpacity={0.85}
+                  >
+                    <BrandLogo
+                      name={b.name}
+                      nameEn={b.name_en ?? b.name}
+                      logoUrl={b.logo_url}
+                      size={40}
+                    />
+                    <Text
+                      style={[styles.brandCellName, active && styles.brandCellNameOn]}
+                      numberOfLines={1}
+                    >
+                      {b.name}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+              <TouchableOpacity
+                style={styles.brandCell}
+                onPress={() => setShowAllBrands(true)}
+                activeOpacity={0.85}
+              >
+                <ChevronRight size={22} color={colors.inkMuted} strokeWidth={2} />
+                <Text style={styles.brandCellName}>{t("common.all")}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.row2}>
+              <SelectField
+                label={t("search.model")}
+                value={model}
+                onPress={() => setPicker("model")}
+                style={styles.half}
+                allLabel={t("common.all")}
+              />
+              <SelectField
+                label={t("search.city")}
+                value={filters.city ?? null}
+                onPress={() => setPicker("city")}
+                style={styles.half}
+                allLabel={t("common.all")}
+              />
+            </View>
+            <View style={styles.row2}>
+              <SelectField
+                label={t("search.fromYear")}
+                value={filters.minYear != null ? String(filters.minYear) : null}
+                onPress={() => setPicker("minYear")}
+                style={styles.half}
+                allLabel={t("common.all")}
+              />
+              <SelectField
+                label={t("search.toYear")}
+                value={filters.maxYear != null ? String(filters.maxYear) : null}
+                onPress={() => setPicker("maxYear")}
+                style={styles.half}
+                allLabel={t("common.all")}
+              />
+            </View>
+            <View style={styles.row2}>
+              <SelectField
+                label={t("search.minPrice")}
+                value={formatPrice(filters.minPrice)}
+                onPress={() => setPicker("minPrice")}
+                style={styles.half}
+                allLabel={t("common.all")}
+              />
+              <SelectField
+                label={t("search.maxPrice")}
+                value={formatPrice(filters.maxPrice)}
+                onPress={() => setPicker("maxPrice")}
+                style={styles.half}
+                allLabel={t("common.all")}
+              />
+            </View>
+            <View style={styles.row2}>
+              <SelectField
+                label={t("search.minMileage")}
+                value={
+                  filters.minMileage != null
+                    ? `${filters.minMileage.toLocaleString("tr-TR")} ${t("common.km")}`
+                    : null
+                }
+                onPress={() => setPicker("minMileage")}
+                style={styles.half}
+                allLabel={t("common.all")}
+              />
+              <SelectField
+                label={t("search.maxMileage")}
+                value={
+                  filters.maxMileage != null
+                    ? `${filters.maxMileage.toLocaleString("tr-TR")} ${t("common.km")}`
+                    : null
+                }
+                onPress={() => setPicker("maxMileage")}
+                style={styles.half}
+                allLabel={t("common.all")}
+              />
+            </View>
+
+            <Text style={[styles.sectionLabel, styles.conditionLabel]}>{t("search.condition")}</Text>
+            <View style={styles.conditionRow}>
+              {(
+                [
+                  { key: "all" as const, labelKey: "common.all" },
+                  { key: "used" as const, labelKey: "search.conditionUsed" },
+                  { key: "new" as const, labelKey: "search.conditionNew" },
+                ] as const
+              ).map((c) => {
+                const active = condition === c.key;
+                return (
+                  <TouchableOpacity
+                    key={c.key}
+                    style={[styles.conditionChip, active && styles.conditionChipActive]}
+                    onPress={() => setCondition(c.key)}
+                    activeOpacity={0.88}
+                  >
+                    <Text style={[styles.conditionText, active && styles.conditionTextActive]}>
+                      {t(c.labelKey)}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <View style={styles.bottomSpacer} />
+          </ScrollView>
+
+          <View style={styles.filterFooter}>
+            <TouchableOpacity onPress={reset} hitSlop={8}>
+              <Text style={styles.resetLink}>{t("search.reset")}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.showBtn}
+              activeOpacity={0.9}
+              onPress={() => setMode("results")}
+            >
+              {isFetching ? (
+                <ActivityIndicator color={colors.white} />
+              ) : (
+                <Text style={styles.showBtnText}>{t("search.showCars", { count })}</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+        {searchSheets}
+      </CarsShell>
+    );
+  }
+
+  if (mode === "results") {
+    return (
+      <CarsShell
+        active="search"
+        hideSubHeader
+        onHome={goHome}
+        onSearch={goSearch}
+        onSaved={goSaved}
+        onMore={goMore}
+        onExit={exitCars}
+      >
+        <View style={styles.resultsRoot}>
+          <View style={styles.resultsSticky}>
+            <View style={styles.resultsNav}>
+              <TouchableOpacity
+                style={styles.iconHit}
+                onPress={goSearch}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={t("search.filters")}
+              >
+                <ChevronLeft size={22} color={colors.ink} strokeWidth={2.2} />
+              </TouchableOpacity>
+
+              <View style={styles.resultsNavCenter}>
+                <Text style={styles.resultsHeading} numberOfLines={1}>
+                  {resultsHeading}
+                </Text>
+                <Text style={styles.resultsCountLine}>
+                  {isLoading
+                    ? t("search.searching")
+                    : t("search.resultsCount", { count })}
+                </Text>
+              </View>
+
+              <View style={styles.resultsActions}>
+                <TouchableOpacity
+                  style={styles.iconHit}
+                  onPress={() => void onSaveSearch()}
+                  hitSlop={8}
+                >
+                  <Bookmark size={19} color={colors.flame} strokeWidth={2.2} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.iconHit}
+                  onPress={() => void onShareSearch()}
+                  hitSlop={8}
+                >
+                  <Share2 size={19} color={colors.ink} strokeWidth={2.2} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+
+          {isLoading && results.length === 0 ? (
+            <View style={styles.listPad}>
+              <VehicleCardSkeleton />
+              <VehicleCardSkeleton />
+              <VehicleCardSkeleton />
+            </View>
+          ) : (
+            <FlashList
+              data={results}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item, index }) => (
+                <View style={styles.cardWrap}>
+                  <VehicleCard vehicle={item} index={index} />
+                </View>
+              )}
+              contentContainerStyle={styles.listPad}
+              style={styles.flex}
+              refreshing={isFetching && !isLoading}
+              onRefresh={() => refetch()}
+              ListEmptyComponent={
+                <View style={styles.emptyWrap}>
+                  <View style={styles.emptyIcon}>
+                    <SearchX size={28} color={colors.inkFaint} strokeWidth={1.8} />
+                  </View>
+                  <Text style={styles.emptyTitle}>{t("search.noResults")}</Text>
+                  <Text style={styles.emptyHint}>{t("search.noResultsHint")}</Text>
+                  <TouchableOpacity
+                    style={styles.emptyBtn}
+                    onPress={goSearch}
+                    activeOpacity={0.88}
+                  >
+                    <Text style={styles.emptyBtnText}>{t("search.filters")}</Text>
+                  </TouchableOpacity>
+                </View>
+              }
+            />
+          )}
+        </View>
+        {searchSheets}
+      </CarsShell>
+    );
+  }
+
+  /* —— HOME hub — dedicated DubicarsHome (not filter) —— */
+  return (
+    <CarsShell
+      active="home"
+      hideSubHeader
+      onHome={goHome}
+      onSearch={goSearch}
+      onSaved={goSaved}
+      onMore={goMore}
+      onExit={exitCars}
+    >
+      <DubicarsHome
+        count={Math.max(count, DEMO_VEHICLES.length)}
+        loading={isFetching}
+        topPicks={topPicks}
+        dealers={featuredDealers}
+        catalog={results}
+        onSearch={goSearch}
+        onSeeAllPicks={goAllResults}
+      />
+      {searchSheets}
+    </CarsShell>
+  );
+}
+
+
+function MoreRow({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: ReactNode;
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity style={styles.moreRow} onPress={onPress} activeOpacity={0.85}>
+      <View style={styles.moreRowIcon}>{icon}</View>
+      <Text style={styles.moreRowLabel}>{label}</Text>
+      <ChevronRight size={18} color={colors.inkFaint} strokeWidth={2} />
+    </TouchableOpacity>
   );
 }
 
@@ -1054,9 +1127,219 @@ function SelectField({
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.white },
-  white: { backgroundColor: colors.white },
   flex: { flex: 1 },
+  homePad: {
+    paddingBottom: space.xl,
+    backgroundColor: colors.white,
+  },
+  hero: {
+    marginHorizontal: space.lg,
+    marginTop: space.sm,
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    minHeight: 280,
+    padding: space.lg,
+    justifyContent: "flex-end",
+    gap: space.md,
+  },
+  heroImage: { borderRadius: radius.lg },
+  heroScrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(12,45,41,0.45)",
+  },
+  heroTitle: {
+    fontFamily: fonts.displayMed,
+    fontSize: 22,
+    color: colors.white,
+    letterSpacing: -0.4,
+    lineHeight: 28,
+  },
+  heroSearch: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: colors.mist,
+    borderRadius: radius.md,
+    paddingHorizontal: space.md,
+    paddingVertical: 13,
+  },
+  heroSearchText: {
+    flex: 1,
+    fontFamily: fonts.body,
+    fontSize: 15,
+    color: colors.inkFaint,
+  },
+  heroCta: {
+    backgroundColor: colors.flame,
+    borderRadius: radius.md,
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 50,
+  },
+  heroCtaText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 15,
+    color: colors.white,
+  },
+  sectionHead: {
+    fontFamily: fonts.displayMed,
+    fontSize: 17,
+    color: colors.ink,
+    marginTop: space.xl,
+    marginBottom: space.md,
+    marginHorizontal: space.lg,
+    letterSpacing: -0.2,
+  },
+  sectionHeadTight: {
+    fontFamily: fonts.displayMed,
+    fontSize: 17,
+    color: colors.ink,
+    letterSpacing: -0.2,
+  },
+  bandPad: {
+    marginTop: space.lg,
+    paddingTop: space.md,
+    backgroundColor: colors.paper,
+    marginHorizontal: 0,
+    paddingHorizontal: space.lg,
+    marginBottom: 0,
+    paddingBottom: space.md,
+  },
+  railHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginHorizontal: space.lg,
+    marginTop: space.xl,
+    marginBottom: space.md,
+  },
+  seeAll: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 14,
+    color: colors.flame,
+  },
+  servicesRail: {
+    paddingHorizontal: space.lg,
+    gap: 12,
+  },
+  serviceCard: {
+    width: 220,
+    borderRadius: radius.md,
+    overflow: "hidden",
+    backgroundColor: colors.white,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
+    ...shadow.soft,
+  },
+  serviceImage: {
+    width: "100%",
+    height: 110,
+    backgroundColor: colors.mist,
+  },
+  serviceBody: {
+    padding: space.md,
+    backgroundColor: colors.paper,
+    gap: 4,
+    minHeight: 78,
+  },
+  serviceTitle: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 15,
+    color: colors.ink,
+  },
+  serviceHint: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: colors.inkFaint,
+    lineHeight: 16,
+  },
+  topPicksPad: {
+    paddingHorizontal: space.lg,
+    gap: 12,
+    paddingBottom: space.sm,
+  },
+  dealerBlock: {
+    backgroundColor: colors.paper,
+    paddingBottom: space.md,
+    marginBottom: space.sm,
+  },
+  dealerHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: space.lg,
+    paddingVertical: space.sm,
+  },
+  dealerAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: colors.brandSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dealerInitial: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 16,
+    color: colors.ink,
+  },
+  dealerMeta: { flex: 1, minWidth: 0 },
+  dealerName: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 15,
+    color: colors.ink,
+  },
+  dealerLoc: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
+  dealerCity: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: colors.inkFaint,
+  },
+  brandRailScroll: { maxHeight: 96 },
+  brandRail: {
+    paddingHorizontal: space.lg,
+    paddingBottom: space.md,
+    gap: 12,
+    alignItems: "flex-start",
+  },
+  brandRailCell: {
+    width: 72,
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 2,
+  },
+  brandRailCellOn: {
+    opacity: 1,
+  },
+  brandRailName: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 11,
+    color: colors.inkMuted,
+    textAlign: "center",
+    maxWidth: 72,
+  },
+  brandRailNameOn: {
+    fontFamily: fonts.bodySemi,
+    color: colors.flameDeep,
+  },
+  brandRailMore: {
+    width: 56,
+    height: 72,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
+    backgroundColor: colors.mist,
+  },
+  brandRailMoreText: {
+    fontFamily: fonts.body,
+    fontSize: 10,
+    color: colors.inkMuted,
+  },
+  filterRoot: { flex: 1, backgroundColor: colors.white },
   topBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -1085,140 +1368,10 @@ const styles = StyleSheet.create({
     paddingBottom: space.lg,
     backgroundColor: colors.white,
   },
-  sectionLabel: {
-    fontFamily: fonts.body,
-    fontSize: 13,
-    color: colors.inkFaint,
-    marginBottom: space.sm,
-  },
-  cityFilterRow: {
-    gap: 8,
-    marginBottom: space.xl,
-    paddingRight: space.sm,
-  },
-  brandGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    marginBottom: space.xl,
-  },
-  brandCell: {
-    width: "22%",
-    aspectRatio: 1,
-    minWidth: 70,
-    flexGrow: 1,
-    maxWidth: "24%",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.line,
-    backgroundColor: colors.white,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  brandCellActive: {
-    borderColor: colors.ink,
-    backgroundColor: colors.mist,
-  },
-  row2: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: space.md,
-  },
-  half: { flex: 1 },
-  fieldLabel: {
-    fontFamily: fonts.body,
-    fontSize: 12,
-    color: colors.inkFaint,
-    marginBottom: 6,
-  },
-  selectBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: 10,
-    backgroundColor: colors.white,
-    paddingHorizontal: 12,
-    paddingVertical: 13,
-    minHeight: 48,
-  },
-  selectValue: {
-    flex: 1,
-    fontFamily: fonts.body,
-    fontSize: 14,
-    color: colors.ink,
-    marginRight: 6,
-  },
-  selectPlaceholder: {
-    color: colors.inkFaint,
-  },
   conditionLabel: { marginTop: space.sm },
-  conditionRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  conditionChip: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.line,
-    backgroundColor: colors.white,
-  },
-  conditionChipActive: {
-    backgroundColor: colors.ink,
-    borderColor: colors.ink,
-  },
-  conditionText: {
-    fontFamily: fonts.bodyMed,
-    fontSize: 14,
-    color: colors.ink,
-  },
-  conditionTextActive: {
-    color: colors.white,
-    fontFamily: fonts.bodySemi,
-  },
   bottomSpacer: { height: 24 },
-  footerSafe: {
-    backgroundColor: colors.white,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.line,
-  },
-  footer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: space.xl,
-    paddingVertical: space.md,
-    gap: space.lg,
-  },
-  resetLink: {
-    fontFamily: fonts.body,
-    fontSize: 15,
-    color: colors.ink,
-    textDecorationLine: "underline",
-  },
-  showBtn: {
-    flex: 1,
-    backgroundColor: colors.ink,
-    borderRadius: 12,
-    paddingVertical: 15,
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 52,
-  },
-  showBtnText: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 15,
-    color: colors.white,
-  },
-
-  /* —— Results mode (marketplace) —— */
-  resultsRoot: {
-    flex: 1,
-    backgroundColor: colors.paper,
-  },
+  resultsRoot: { flex: 1, backgroundColor: colors.paper },
+  quickChip: { flexShrink: 0, paddingHorizontal: 12, paddingVertical: 8 },
   resultsSticky: {
     backgroundColor: colors.white,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -1233,89 +1386,26 @@ const styles = StyleSheet.create({
     paddingBottom: space.sm,
     gap: 4,
   },
-  resultsNavCenter: {
-    flex: 1,
-    minWidth: 0,
-    paddingHorizontal: 4,
-  },
+  resultsNavCenter: { flex: 1, minWidth: 0, paddingHorizontal: 4 },
   resultsHeading: {
     fontFamily: fonts.displayMed,
     fontSize: 16,
     color: colors.ink,
     letterSpacing: -0.2,
   },
-  resultsCount: {
+  resultsCountLine: {
     marginTop: 2,
     fontFamily: fonts.body,
     fontSize: 12,
     color: colors.inkFaint,
   },
-  resultsActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 0,
-  },
-  resultsToolbar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: space.lg,
-    paddingBottom: space.sm,
-    gap: space.md,
-  },
-  filterBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: radius.sm,
-    backgroundColor: colors.mist,
-  },
-  filterBtnText: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 13,
-    color: colors.ink,
-  },
-  sortGroup: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    flexShrink: 1,
-  },
-  sortChip: {
-    flexShrink: 0,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-  },
-  quickScroll: {
-    maxHeight: 48,
-  },
-  quickRow: {
-    paddingHorizontal: space.lg,
-    paddingBottom: space.md,
-    gap: 8,
-    alignItems: "center",
-  },
-  quickChip: {
-    flexShrink: 0,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  chipDivider: {
-    width: 1,
-    height: 22,
-    backgroundColor: colors.line,
-    marginHorizontal: 2,
-  },
+  resultsActions: { flexDirection: "row", alignItems: "center" },
   listPad: {
     paddingHorizontal: space.lg,
     paddingTop: space.md,
     paddingBottom: space.section,
   },
-  cardWrap: {
-    marginBottom: space.md,
-  },
+  cardWrap: { marginBottom: space.md },
   emptyWrap: {
     alignItems: "center",
     justifyContent: "center",
@@ -1359,15 +1449,127 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.white,
   },
-
+  savedTabs: {
+    flexDirection: "row",
+    marginHorizontal: space.lg,
+    marginTop: space.sm,
+    marginBottom: space.md,
+    backgroundColor: colors.mist,
+    borderRadius: radius.md,
+    padding: 4,
+  },
+  savedTab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  savedTabOn: { backgroundColor: colors.white, ...shadow.soft },
+  savedTabText: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 14,
+    color: colors.inkFaint,
+  },
+  savedTabTextOn: {
+    fontFamily: fonts.bodySemi,
+    color: colors.ink,
+  },
+  savedSearchCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: colors.white,
+    borderRadius: radius.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
+    padding: space.lg,
+  },
+  savedSearchText: {
+    flex: 1,
+    fontFamily: fonts.bodySemi,
+    fontSize: 15,
+    color: colors.ink,
+  },
+  morePad: {
+    paddingHorizontal: space.lg,
+    paddingTop: space.md,
+    paddingBottom: space.xxl,
+    gap: space.sm,
+  },
+  moreLoginCard: {
+    backgroundColor: colors.white,
+    borderRadius: radius.lg,
+    padding: space.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
+    gap: space.md,
+    marginBottom: space.md,
+  },
+  moreLoginText: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 15,
+    color: colors.ink,
+    lineHeight: 22,
+  },
+  moreLoginBtn: {
+    backgroundColor: colors.flame,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  moreLoginBtnText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 15,
+    color: colors.white,
+  },
+  moreSection: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 12,
+    color: colors.inkFaint,
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    marginTop: space.md,
+    marginBottom: space.xs,
+    marginHorizontal: 4,
+  },
+  moreGroup: {
+    backgroundColor: colors.white,
+    borderRadius: radius.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
+    overflow: "hidden",
+  },
+  moreRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: space.md,
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.line,
+  },
+  moreRowIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: colors.mist,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  moreRowLabel: {
+    flex: 1,
+    fontFamily: fonts.bodyMed,
+    fontSize: 15,
+    color: colors.ink,
+  },
   modal: { flex: 1, backgroundColor: colors.white },
   modalHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: space.xl,
-    paddingVertical: space.lg,
-    borderBottomWidth: 1,
+    paddingHorizontal: space.lg,
+    paddingVertical: space.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.line,
   },
   modalTitle: {
@@ -1380,30 +1582,162 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.flame,
   },
-  allBrands: {
+  filterPad: {
+    paddingHorizontal: space.lg,
+    paddingTop: space.md,
+    paddingBottom: space.xxl,
+  },
+  filterFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: space.xl,
+    paddingVertical: space.md,
+    gap: space.lg,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.line,
+  },
+  resetLink: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 14,
+    color: colors.inkMuted,
+  },
+  showBtn: {
+    flex: 1,
+    backgroundColor: colors.ink,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  showBtnText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 15,
+    color: colors.white,
+  },
+  sectionLabel: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    color: colors.inkFaint,
+    marginBottom: space.sm,
+  },
+  cityFilterRow: {
+    gap: 8,
+    marginBottom: space.xl,
+    paddingRight: space.sm,
+  },
+  brandGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
-    padding: space.xl,
+    marginBottom: space.xl,
   },
-  allBrandCell: {
+  brandCell: {
     width: "22%",
+    minWidth: 72,
     flexGrow: 1,
     maxWidth: "24%",
-    aspectRatio: 0.9,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.white,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    gap: 6,
+  },
+  brandCellActive: {
+    borderColor: colors.flame,
+    backgroundColor: colors.flameSoft,
+  },
+  brandCellName: {
+    fontFamily: fonts.body,
+    fontSize: 11,
+    color: colors.inkMuted,
+    textAlign: "center",
+  },
+  brandCellNameOn: {
+    fontFamily: fonts.bodySemi,
+    color: colors.flameDeep,
+  },
+  allBrands: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: space.lg,
+    gap: 12,
+  },
+  allBrandCell: {
+    width: "30%",
+    flexGrow: 1,
+    maxWidth: "32%",
     borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.line,
     alignItems: "center",
-    justifyContent: "center",
+    paddingVertical: 12,
     gap: 6,
-    padding: 8,
   },
   allBrandName: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 12,
+    color: colors.ink,
+  },
+  row2: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: space.md,
+  },
+  half: { flex: 1 },
+  fieldLabel: {
     fontFamily: fonts.body,
-    fontSize: 10,
-    color: colors.inkMuted,
-    textAlign: "center",
+    fontSize: 12,
+    color: colors.inkFaint,
+    marginBottom: 6,
+  },
+  selectBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: 10,
+    backgroundColor: colors.white,
+    paddingHorizontal: 12,
+    paddingVertical: 13,
+    minHeight: 48,
+  },
+  selectValue: {
+    flex: 1,
+    fontFamily: fonts.body,
+    fontSize: 14,
+    color: colors.ink,
+    marginRight: 6,
+  },
+  selectPlaceholder: { color: colors.inkFaint },
+  conditionRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  conditionChip: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.white,
+  },
+  conditionChipActive: {
+    backgroundColor: colors.ink,
+    borderColor: colors.ink,
+  },
+  conditionText: {
+    fontFamily: fonts.bodyMed,
+    fontSize: 14,
+    color: colors.ink,
+  },
+  conditionTextActive: {
+    color: colors.white,
+    fontFamily: fonts.bodySemi,
   },
   pickerBackdrop: {
     flex: 1,
@@ -1421,16 +1755,14 @@ const styles = StyleSheet.create({
     fontFamily: fonts.displayMed,
     fontSize: 16,
     color: colors.ink,
-    paddingHorizontal: space.xl,
-    paddingTop: space.xl,
-    paddingBottom: space.md,
+    padding: space.lg,
   },
-  pickerList: { paddingHorizontal: space.lg },
+  pickerList: { maxHeight: 320 },
   pickerItem: {
+    paddingHorizontal: space.lg,
     paddingVertical: 14,
-    paddingHorizontal: space.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.line,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.line,
   },
   pickerItemText: {
     fontFamily: fonts.body,

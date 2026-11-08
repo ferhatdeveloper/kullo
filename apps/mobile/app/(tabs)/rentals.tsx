@@ -1,19 +1,23 @@
 import { FlashList } from "@shopify/flash-list";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { router, useFocusEffect } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { setStatusBarStyle } from "expo-status-bar";
 import {
   Calendar,
+  CalendarCheck,
+  Info,
+  KeyRound,
   MapPin,
   Plane,
   Sparkles,
   ChevronRight,
   Globe2,
+  Heart,
+  User,
 } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -22,16 +26,20 @@ import {
   View,
 } from "react-native";
 
+import { OfflineCover } from "../../components/OfflineCover";
+import { RentalsShell, type RentalsPane } from "../../components/RentalsShell";
 import { VehicleCardSkeleton } from "../../components/Skeleton";
 import { Badge } from "../../components/ui/Badge";
 import { Chip } from "../../components/ui/Chip";
-import { Screen, ScreenHeader } from "../../components/ui/Screen";
 import { api } from "../../lib/api";
 import { MARKET_CITIES, useCityStore, type SelectedCity } from "../../lib/city-store";
 import { storage } from "../../lib/clients";
 import { useCurrencyStore } from "../../lib/currency-store";
+import { DEMO_RENTALS } from "../../lib/demo-data";
 import { chauffeurDailyFee } from "../../lib/marketplace-heuristics";
+import { useModeStore } from "../../lib/mode-store";
 import { colors, fonts, radius, shadow, space } from "../../lib/theme";
+import { CARS_BUY_HREF } from "../../lib/cars-routes";
 
 const BORDER_FLAME = "#FFD8B8";
 
@@ -55,6 +63,8 @@ const CITY_SHORT: Record<string, string> = {
   Mosul: "Mosul",
   Kirkuk: "Kirkuk",
 };
+
+type RatePeriod = "daily" | "monthly";
 
 interface Rental {
   id: string;
@@ -82,20 +92,44 @@ interface Rental {
 
 export default function RentalsScreen() {
   const { t, i18n } = useTranslation();
+  const params = useLocalSearchParams();
+  const choose = useModeStore((s) => s.choose);
   const storedCity = useCityStore((s) => s.city);
   const setStoredCity = useCityStore((s) => s.setCity);
+  const [pane, setPane] = useState<RentalsPane>("home");
   const [city, setCity] = useState<string | "all">(
     storedCity !== "all" ? storedCity : "all",
   );
   const [withDriver, setWithDriver] = useState(false);
+  const [ratePeriod, setRatePeriod] = useState<RatePeriod>("daily");
+  const [instantOnly, setInstantOnly] = useState(false);
   const formatListing = useCurrencyStore((s) => s.formatListing);
 
   useFocusEffect(
     useCallback(() => {
-      setStatusBarStyle("light");
+      setStatusBarStyle("dark");
       setCity(storedCity !== "all" ? storedCity : "all");
-    }, [storedCity]),
+      void choose("rent");
+    }, [storedCity, choose]),
   );
+
+  useEffect(() => {
+    const raw = String(params.rentPane ?? params.carsPane ?? "");
+    if (raw === "search" || raw === "book" || raw === "saved" || raw === "more" || raw === "home") {
+      setPane(raw);
+    }
+  }, [params.rentPane, params.carsPane]);
+
+  /** intent/mode=buy → satın alma dikeyine yönlendir (karışmasın) */
+  useEffect(() => {
+    const intent = String(params.intent ?? params.mode ?? "rent");
+    if (intent === "buy") {
+      router.replace({
+        pathname: "/(tabs)/search",
+        params: { intent: "buy", carsPane: "home" },
+      });
+    }
+  }, [params.intent, params.mode]);
 
   const selectCity = useCallback(
     (next: string | "all") => {
@@ -111,44 +145,95 @@ export default function RentalsScreen() {
     [setStoredCity],
   );
 
+  const goHome = useCallback(() => {
+    setPane("home");
+    router.setParams({ intent: "rent", rentPane: "home" });
+  }, []);
+  const goSearch = useCallback(() => {
+    setPane("search");
+    router.setParams({ intent: "rent", rentPane: "search" });
+  }, []);
+  const goBook = useCallback(() => {
+    setPane("book");
+    router.setParams({ intent: "rent", rentPane: "book" });
+  }, []);
+  const goSaved = useCallback(() => {
+    setPane("saved");
+    router.setParams({ intent: "rent", rentPane: "saved" });
+  }, []);
+  const goMore = useCallback(() => {
+    setPane("more");
+    router.setParams({ intent: "rent", rentPane: "more" });
+  }, []);
+
   const { data, isLoading } = useQuery({
     queryKey: ["rentals", i18n.language],
     queryFn: () =>
       api.get(
         "/rentals?status=eq.active&select=*,vehicle:vehicles(id,title_original,year,media:vehicle_media(url,is_cover))&order=created_at.desc&limit=30",
       ),
+    initialData: DEMO_RENTALS as unknown as Rental[],
     placeholderData: keepPreviousData,
   });
 
+  const catalog = useMemo(() => {
+    const apiList = (data as Rental[] | undefined) ?? [];
+    return apiList.length ? apiList : (DEMO_RENTALS as unknown as Rental[]);
+  }, [data]);
+
   const rentals = useMemo(() => {
-    const list = (data as Rental[] | undefined) ?? [];
-    if (city === "all") return list;
-    return list.filter(
-      (r) => (r.city ?? "").toLowerCase() === city.toLowerCase(),
-    );
-  }, [data, city]);
+    let list = catalog;
+    if (city !== "all") {
+      list = list.filter((r) => (r.city ?? "").toLowerCase() === city.toLowerCase());
+    }
+    if (instantOnly) {
+      list = list.filter((r) => r.instant_book);
+    }
+    return list;
+  }, [catalog, city, instantOnly]);
 
   const cityCounts = useMemo(() => {
-    const list = (data as Rental[] | undefined) ?? [];
     const map: Record<string, number> = {};
-    for (const r of list) {
+    for (const r of catalog) {
       const key = (r.city ?? "").trim();
       if (!key) continue;
       map[key] = (map[key] ?? 0) + 1;
     }
     return map;
-  }, [data]);
+  }, [catalog]);
 
-  const listHeader = (
+  const filterHeader = (
     <View>
-      <View style={styles.hint}>
-        <Sparkles size={14} color={colors.flame} />
-        <Text style={styles.hintText}>
-          {t("rentals.dynamicPricing")}: Talep, sezon ve tatil günlerine göre fiyat değişir
-        </Text>
-      </View>
-      <View style={styles.familyHint}>
-        <Text style={styles.familyHintText}>{t("rentals.familyHint")}</Text>
+      {pane === "home" ? (
+        <>
+          <View style={styles.hint}>
+            <Sparkles size={14} color={colors.flame} />
+            <Text style={styles.hintText}>
+              {t("rentals.dynamicPricing")}: {t("rentals.dynamicPricingHint")}
+            </Text>
+          </View>
+          <View style={styles.familyHint}>
+            <Text style={styles.familyHintText}>{t("rentals.familyHint")}</Text>
+          </View>
+        </>
+      ) : null}
+
+      <View style={styles.rateRow}>
+        <Chip
+          label={t("rentals.perDay")}
+          selected={ratePeriod === "daily"}
+          onPress={() => setRatePeriod("daily")}
+        />
+        <Chip
+          label={t("rentals.perMonth")}
+          selected={ratePeriod === "monthly"}
+          onPress={() => setRatePeriod("monthly")}
+        />
+        <Chip
+          label={t("rentals.instantBook")}
+          selected={instantOnly}
+          onPress={() => setInstantOnly((v) => !v)}
+        />
       </View>
 
       <View style={styles.citySection}>
@@ -185,7 +270,7 @@ export default function RentalsScreen() {
             <Text
               style={[styles.cityTileMeta, city === "all" && styles.cityTileMetaOn]}
             >
-              {(data as Rental[] | undefined)?.length ?? 0}
+              {catalog.length}
             </Text>
           </Pressable>
 
@@ -240,21 +325,145 @@ export default function RentalsScreen() {
           })}
         </Text>
       </View>
+
+      <Text style={styles.resultsCount}>
+        {t("rentals.resultsCount", { count: rentals.length })}
+      </Text>
     </View>
   );
 
+  if (pane === "more") {
+    return (
+      <RentalsShell
+        active="more"
+        onHome={goHome}
+        onSearch={goSearch}
+        onBook={goBook}
+        onSaved={goSaved}
+        onMore={goMore}
+      >
+        <ScrollView
+          style={styles.listFlex}
+          contentContainerStyle={styles.morePad}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.moreSection}>{t("rentals.moreExplore")}</Text>
+          <View style={styles.moreGroup}>
+            <MoreRow
+              icon={<KeyRound size={18} color={colors.flame} strokeWidth={2.2} />}
+              label={t("rentals.navSearch")}
+              onPress={goSearch}
+            />
+            <MoreRow
+              icon={<CalendarCheck size={18} color={colors.flame} strokeWidth={2.2} />}
+              label={t("rentals.navBook")}
+              onPress={goBook}
+            />
+            <MoreRow
+              icon={<Heart size={18} color={colors.flame} strokeWidth={2.2} />}
+              label={t("rentals.navSaved")}
+              onPress={goSaved}
+            />
+            <MoreRow
+              icon={<Sparkles size={18} color={colors.ink} strokeWidth={2.2} />}
+              label={t("rentals.moreBuy")}
+              onPress={() => router.push(CARS_BUY_HREF)}
+            />
+          </View>
+          <Text style={styles.moreSection}>{t("rentals.moreSupport")}</Text>
+          <View style={styles.moreGroup}>
+            <MoreRow
+              icon={<User size={18} color={colors.ink} strokeWidth={2.2} />}
+              label={t("cars.moreProfile")}
+              onPress={() => router.replace("/(tabs)/profile")}
+            />
+            <MoreRow
+              icon={<Info size={18} color={colors.ink} strokeWidth={2.2} />}
+              label={t("cars.moreContact")}
+              onPress={() => router.push("/about")}
+            />
+          </View>
+        </ScrollView>
+      </RentalsShell>
+    );
+  }
+
+  if (pane === "saved") {
+    return (
+      <RentalsShell
+        active="saved"
+        title={t("rentals.navSaved")}
+        onHome={goHome}
+        onSearch={goSearch}
+        onBook={goBook}
+        onSaved={goSaved}
+        onMore={goMore}
+      >
+        <View style={styles.empty}>
+          <View style={styles.emptyIconWrap}>
+            <Heart size={36} color={colors.flame} strokeWidth={1.8} />
+          </View>
+          <Text style={styles.emptyTitle}>{t("rentals.savedEmpty")}</Text>
+          <Text style={styles.emptySub}>{t("rentals.savedEmptySub")}</Text>
+          <TouchableOpacity style={styles.emptyCta} onPress={goSearch} activeOpacity={0.9}>
+            <Text style={styles.emptyCtaText}>{t("rentals.browseCta")}</Text>
+          </TouchableOpacity>
+        </View>
+      </RentalsShell>
+    );
+  }
+
+  if (pane === "book") {
+    return (
+      <RentalsShell
+        active="book"
+        title={t("rentals.navBook")}
+        onHome={goHome}
+        onSearch={goSearch}
+        onBook={goBook}
+        onSaved={goSaved}
+        onMore={goMore}
+      >
+        <View style={styles.empty}>
+          <View style={styles.emptyIconWrap}>
+            <CalendarCheck size={36} color={colors.flame} strokeWidth={1.8} />
+          </View>
+          <Text style={styles.emptyTitle}>{t("rentals.bookEmpty")}</Text>
+          <Text style={styles.emptySub}>{t("rentals.bookEmptySub")}</Text>
+          <TouchableOpacity style={styles.emptyCta} onPress={goSearch} activeOpacity={0.9}>
+            <Text style={styles.emptyCtaText}>{t("rentals.browseCta")}</Text>
+          </TouchableOpacity>
+        </View>
+      </RentalsShell>
+    );
+  }
+
+  const shellActive: RentalsPane = pane === "search" ? "search" : "home";
+
   return (
-    <Screen edges={["top"]}>
-      <ScreenHeader title={t("rentals.title")} large />
+    <RentalsShell
+      active={shellActive}
+      title={pane === "search" ? t("rentals.navSearch") : t("rentals.title")}
+      hideSubHeader={pane === "home"}
+      onHome={goHome}
+      onSearch={goSearch}
+      onBook={goBook}
+      onSaved={goSaved}
+      onMore={goMore}
+    >
       <FlashList
-        data={isLoading ? [] : rentals}
+        data={rentals}
         keyExtractor={(r) => r.id}
         renderItem={({ item }) => (
-          <RentalCard rental={item} withDriverPreferred={withDriver} />
+          <RentalCard
+            rental={item}
+            withDriverPreferred={withDriver}
+            ratePeriod={ratePeriod}
+          />
         )}
-        ListHeaderComponent={listHeader}
+        ListHeaderComponent={filterHeader}
         ListEmptyComponent={
-          isLoading ? (
+          isLoading && rentals.length === 0 ? (
             <View style={styles.skeletonWrap}>
               <VehicleCardSkeleton />
               <VehicleCardSkeleton />
@@ -273,24 +482,57 @@ export default function RentalsScreen() {
         contentContainerStyle={styles.list}
         style={styles.listFlex}
       />
-    </Screen>
+    </RentalsShell>
+  );
+}
+
+function MoreRow({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: ReactNode;
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity style={styles.moreRow} onPress={onPress} activeOpacity={0.88}>
+      <View style={styles.moreRowIcon}>{icon}</View>
+      <Text style={styles.moreRowLabel}>{label}</Text>
+      <ChevronRight size={16} color={colors.inkFaint} strokeWidth={2.2} />
+    </TouchableOpacity>
   );
 }
 
 function RentalCard({
   rental,
   withDriverPreferred,
+  ratePeriod,
 }: {
   rental: Rental;
   withDriverPreferred: boolean;
+  ratePeriod: RatePeriod;
 }) {
   const { t } = useTranslation();
   const formatListing = useCurrencyStore((s) => s.formatListing);
   const cover = rental.vehicle?.cover_url;
-  const dailyRate = formatListing(rental.daily_rate_amount, rental.daily_rate_currency);
+  const showMonthly = ratePeriod === "monthly" && rental.monthly_rate_amount != null;
+  const primaryAmount = showMonthly
+    ? rental.monthly_rate_amount!
+    : rental.daily_rate_amount;
+  const primaryLabel = showMonthly ? t("rentals.perMonth") : t("rentals.perDay");
+  const primaryRate = formatListing(primaryAmount, rental.daily_rate_currency);
+  const depositLabel =
+    rental.deposit_amount != null
+      ? formatListing(rental.deposit_amount, rental.daily_rate_currency)
+      : null;
   const chauffeurFee = chauffeurDailyFee(rental.daily_rate_amount);
   const chauffeurFeeLabel = formatListing(chauffeurFee, rental.daily_rate_currency);
   const showAirport = Boolean(rental.airport_delivery);
+  const available =
+    rental.instant_book
+      ? t("rentals.availabilityInstant")
+      : t("rentals.availabilityRequest");
 
   return (
     <TouchableOpacity
@@ -300,6 +542,7 @@ function RentalCard({
           pathname: "/rental/[id]",
           params: {
             id: rental.id,
+            intent: "rent",
             ...(withDriverPreferred ? { withDriver: "1" } : {}),
           },
         })
@@ -308,14 +551,14 @@ function RentalCard({
     >
       <View>
         {cover ? (
-          <Image
-            source={{ uri: cover.startsWith("http") ? cover : `${storage.url}/${cover}` }}
+          <OfflineCover
+            uri={cover.startsWith("http") ? cover : `${storage.url}/${cover}`}
+            label={rental.vehicle?.title_original ?? t("rentals.title")}
             style={styles.coverImg}
-            resizeMode="cover"
           />
         ) : (
           <View style={styles.coverPlaceholder}>
-            <Text style={styles.coverPlaceholderText}>Fotoğraf yok</Text>
+            <Text style={styles.coverPlaceholderText}>{t("vehicle.noPhoto")}</Text>
           </View>
         )}
 
@@ -327,7 +570,7 @@ function RentalCard({
         ) : (
           <View style={styles.badgeDaily}>
             <Calendar size={12} color={colors.white} />
-            <Text style={styles.badgeDailyText}>{t("rentals.perDay")}</Text>
+            <Text style={styles.badgeDailyText}>{primaryLabel}</Text>
           </View>
         )}
 
@@ -340,7 +583,7 @@ function RentalCard({
 
       <View style={styles.cardBody}>
         <Text style={styles.cardTitle} numberOfLines={1}>
-          {rental.vehicle?.title_original ?? "Araç"}{" "}
+          {rental.vehicle?.title_original ?? t("vehicle.fallbackTitle")}{" "}
           {rental.vehicle?.year ? `(${rental.vehicle.year})` : ""}
         </Text>
 
@@ -350,6 +593,14 @@ function RentalCard({
             {[rental.city, rental.country_code].filter(Boolean).join(", ") || "—"}
           </Text>
         </View>
+
+        <Text style={styles.availability}>{available}</Text>
+
+        {depositLabel ? (
+          <Text style={styles.deposit}>
+            {t("rentals.deposit")}: {depositLabel}
+          </Text>
+        ) : null}
 
         <View style={styles.packageChipWrap}>
           <Badge
@@ -362,8 +613,14 @@ function RentalCard({
 
         <View style={styles.footer}>
           <View>
-            <Text style={styles.price}>{dailyRate}</Text>
-            <Text style={styles.perDay}>{t("rentals.perDay")}</Text>
+            <Text style={styles.price}>{primaryRate}</Text>
+            <Text style={styles.perDay}>{primaryLabel}</Text>
+            {!showMonthly && rental.monthly_rate_amount != null ? (
+              <Text style={styles.altRate}>
+                {formatListing(rental.monthly_rate_amount, rental.daily_rate_currency)}{" "}
+                {t("rentals.perMonth")}
+              </Text>
+            ) : null}
           </View>
           <View style={styles.arrowBtn}>
             <ChevronRight size={20} color={colors.white} />
@@ -409,6 +666,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.inkMuted,
     lineHeight: 17,
+  },
+  rateRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    paddingHorizontal: space.lg,
+    paddingBottom: space.sm,
   },
   citySection: {
     marginBottom: space.sm,
@@ -480,7 +744,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     paddingHorizontal: space.lg,
-    paddingBottom: space.md,
+    paddingBottom: space.sm,
   },
   packageHint: {
     flex: 1,
@@ -488,10 +752,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.inkMuted,
   },
+  resultsCount: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 13,
+    color: colors.inkMuted,
+    paddingHorizontal: space.lg,
+    paddingBottom: space.md,
+  },
   packageChipWrap: {
     marginTop: 10,
   },
-  center: { flex: 1, alignItems: "center", justifyContent: "center" },
   listFlex: { flex: 1 },
   list: { paddingBottom: 40 },
   skeletonWrap: {
@@ -532,6 +802,18 @@ const styles = StyleSheet.create({
     marginTop: space.sm,
     lineHeight: 21,
     maxWidth: 280,
+  },
+  emptyCta: {
+    marginTop: space.lg,
+    backgroundColor: colors.flame,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: radius.pill,
+  },
+  emptyCtaText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 14,
+    color: colors.white,
   },
   card: {
     backgroundColor: colors.white,
@@ -614,6 +896,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.inkFaint,
   },
+  availability: {
+    marginTop: 6,
+    fontFamily: fonts.bodyMed,
+    fontSize: 12,
+    color: colors.viridian,
+  },
+  deposit: {
+    marginTop: 4,
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: colors.inkMuted,
+  },
   footer: {
     flexDirection: "row",
     alignItems: "center",
@@ -635,6 +929,12 @@ const styles = StyleSheet.create({
     color: colors.inkFaint,
     marginTop: 2,
   },
+  altRate: {
+    fontFamily: fonts.body,
+    fontSize: 11,
+    color: colors.inkMuted,
+    marginTop: 2,
+  },
   arrowBtn: {
     width: 40,
     height: 40,
@@ -642,5 +942,47 @@ const styles = StyleSheet.create({
     backgroundColor: colors.flame,
     alignItems: "center",
     justifyContent: "center",
+  },
+  morePad: {
+    paddingHorizontal: space.lg,
+    paddingBottom: space.xxl,
+    gap: space.md,
+  },
+  moreSection: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 12,
+    color: colors.inkMuted,
+    letterSpacing: 0.3,
+    marginTop: space.sm,
+  },
+  moreGroup: {
+    backgroundColor: colors.white,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.line,
+    overflow: "hidden",
+  },
+  moreRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.line,
+  },
+  moreRowIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: colors.flameSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  moreRowLabel: {
+    flex: 1,
+    fontFamily: fonts.bodySemi,
+    fontSize: 15,
+    color: colors.ink,
   },
 });

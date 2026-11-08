@@ -403,12 +403,12 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
   reset: { fontFamily: fonts.bodySemi, fontSize: 13, color: colors.flame },
-  section: { marginBottom: space.xxl },
+  section: { marginBottom: space.xxl + 4 },
   sectionTitle: {
     fontFamily: fonts.bodySemi,
     fontSize: 11,
     color: colors.inkFaint,
-    marginBottom: space.md,
+    marginBottom: space.md + 2,
     textTransform: "uppercase",
     letterSpacing: 0.55,
   },
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodySemi,
     color: colors.flameDeep,
   },
-  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
+  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: space.sm + 2 },
   chip: {
     paddingHorizontal: space.md,
     paddingVertical: 9,

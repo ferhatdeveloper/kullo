@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { BrandMark, BrandWordmark } from "../components/brand";
+import { BrandMark } from "../components/brand";
 import { Button } from "../components/ui/Button";
 import { colors, fonts, radius, shadow, space } from "../lib/theme";
 
@@ -66,7 +66,6 @@ export default function AboutScreen() {
         >
           <View style={styles.brand}>
             <BrandMark size="lg" style={styles.logo} />
-            <BrandWordmark script="latin" size={34} tone="light" />
             <Text style={styles.tagline}>{t("app.tagline")}</Text>
           </View>
 

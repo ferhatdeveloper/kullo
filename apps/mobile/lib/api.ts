@@ -2,9 +2,12 @@ import { postgrest, authClient, aiClient } from "./clients";
 import { auth } from "./auth";
 import {
   DEMO_FAVORITES,
+  DEMO_GOODS,
   DEMO_MESSAGES,
+  DEMO_REALTY,
   DEMO_REFERENCE,
   DEMO_RENTALS,
+  DEMO_RESTAURANTS,
   DEMO_SELLER,
   DEMO_STORES,
   DEMO_VEHICLES,
@@ -142,6 +145,9 @@ async function refreshAccessToken(): Promise<string | null> {
   return refreshInFlight;
 }
 
+/** Demo fallback açıkken ağ hang → hızlı seed'e düş (sonsuz spinner yok). */
+const DEMO_FETCH_MS = 4_000;
+
 async function fetchWithAuth(
   url: string,
   init: RequestInit = {},
@@ -154,7 +160,20 @@ async function fetchWithAuth(
     headers.set("Content-Type", "application/json");
   }
 
-  const res = await fetch(url, { ...init, headers });
+  const timeoutMs = USE_DEMO_FALLBACK && !init.signal ? DEMO_FETCH_MS : 0;
+  const controller = timeoutMs > 0 ? new AbortController() : null;
+  const timer =
+    controller != null ? setTimeout(() => controller.abort(), timeoutMs) : null;
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...init,
+      headers,
+      signal: controller?.signal ?? init.signal,
+    });
+  } finally {
+    if (timer != null) clearTimeout(timer);
+  }
 
   if (res.status === 401 && !retried) {
     const newToken = await refreshAccessToken();
@@ -252,7 +271,10 @@ async function rpcWithDemoFallback<T>(
       USE_DEMO_FALLBACK &&
       Array.isArray(data) &&
       data.length === 0 &&
-      (name === "search_vehicles" || name === "list_live_auctions")
+      (name === "search_vehicles" ||
+        name === "list_live_auctions" ||
+        name === "list_stores" ||
+        name === "list_active_listings_feed")
     ) {
       return demo();
     }
@@ -345,8 +367,84 @@ export const api = {
     if (name === "search_vehicles") {
       return rpcWithDemoFallback(name, args, () => filterDemoVehicles(args) as T);
     }
+    if (name === "search_listings") {
+      return rpcWithDemoFallback(name, args, () => {
+        const vertical = String(args.p_vertical ?? "");
+        const city = args.p_city ? String(args.p_city) : null;
+        const q = args.q ? String(args.q).toLowerCase() : "";
+        if (vertical === "realty") {
+          return DEMO_REALTY.filter((r) => {
+            if (city && r.city.toLowerCase() !== city.toLowerCase()) return false;
+            if (q && !`${r.title} ${r.description}`.toLowerCase().includes(q)) return false;
+            return true;
+          }).map((r) => ({
+            id: r.id,
+            vertical: "realty",
+            category_slug: r.property_type,
+            title: r.title,
+            description: r.description,
+            price_amount: r.price_amount,
+            price_currency: r.price_currency,
+            city: r.city,
+            cover_url: r.cover_url,
+            featured: r.featured ?? false,
+            attrs: r,
+            created_at: new Date().toISOString(),
+            rank: 0,
+          })) as T;
+        }
+        if (vertical === "goods") {
+          return DEMO_GOODS.filter((g) => {
+            if (city && g.city.toLowerCase() !== city.toLowerCase()) return false;
+            if (q && !`${g.title} ${g.brand}`.toLowerCase().includes(q)) return false;
+            return true;
+          }).map((g) => ({
+            id: g.id,
+            vertical: "goods",
+            category_slug: "giyim",
+            title: g.title,
+            description: g.description,
+            price_amount: g.price_amount,
+            price_currency: g.price_currency,
+            city: g.city,
+            cover_url: g.cover_url,
+            featured: g.featured ?? false,
+            attrs: g,
+            created_at: new Date().toISOString(),
+            rank: 0,
+          })) as T;
+        }
+        return [] as T;
+      });
+    }
+    if (name === "search_restaurants") {
+      return rpcWithDemoFallback(name, args, () => {
+        const city = args.p_city ? String(args.p_city) : null;
+        const q = args.q ? String(args.q).toLowerCase() : "";
+        return DEMO_RESTAURANTS.filter((r) => {
+          if (city && r.city.toLowerCase() !== city.toLowerCase()) return false;
+          if (q && !`${r.name} ${r.cuisine}`.toLowerCase().includes(q)) return false;
+          return true;
+        }) as T;
+      });
+    }
+    if (name === "list_categories") {
+      return rpcWithDemoFallback(name, args, () =>
+        [
+          { id: 1, parent_id: null, slug: "vasita", vertical: "vehicle", name: "Vasıta", sort_order: 10 },
+          { id: 2, parent_id: null, slug: "emlak", vertical: "realty", name: "Emlak", sort_order: 20 },
+          { id: 3, parent_id: null, slug: "alisveris", vertical: "goods", name: "Alışveriş", sort_order: 30 },
+        ] as T,
+      );
+    }
     if (name === "list_reference_data") {
-      return rpcWithDemoFallback(name, args, () => DEMO_REFERENCE as T);
+      return rpcWithDemoFallback(name, args, () => DEMO_REFERENCE as T).then((data) => {
+        if (!USE_DEMO_FALLBACK) return data;
+        const ref = data as { brands?: unknown[] } | null;
+        const brands = Array.isArray(ref?.brands) ? ref.brands : [];
+        if (brands.length === 0) return DEMO_REFERENCE as T;
+        return data;
+      });
     }
     if (name === "list_stores") {
       return rpcWithDemoFallback(name, args, () =>
