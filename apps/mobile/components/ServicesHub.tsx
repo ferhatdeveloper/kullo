@@ -17,6 +17,7 @@ import {
   ShoppingBasket,
   Stethoscope,
   Store,
+  Truck,
   Users,
   UtensilsCrossed,
   Warehouse,
@@ -242,7 +243,7 @@ export function ServicesHub() {
     [realty.length, goods.length, openRestaurants, foodCartCount, marketCartCount],
   );
 
-  /** Yolculuk & bakım — Rehber önde; açık artırma / cüzdan-pay yok; dens kart. */
+  /** Yolculuk & bakım — Rehber + Yüküm var önde; dens kart. */
   const mobility: ServiceItem[] = [
     {
       key: "guide",
@@ -250,6 +251,16 @@ export function ServicesHub() {
       titleKey: "hub.guide",
       hintKey: "modeSelect.hintGuide",
       go: () => router.push("/guide"),
+      accent: colors.flame,
+      soft: colors.flameSoft,
+      featured: true,
+    },
+    {
+      key: "freight",
+      Icon: Truck,
+      titleKey: "hub.freight",
+      hintKey: "modeSelect.hintFreight",
+      go: () => router.push("/freight"),
       accent: colors.flame,
       soft: colors.flameSoft,
       featured: true,
@@ -378,7 +389,7 @@ export function ServicesHub() {
                   item={item}
                   title={t(item.titleKey)}
                   hint={t(item.hintKey)}
-                  emphasize={item.key === "guide"}
+                  emphasize={item.key === "guide" || item.key === "freight"}
                   onPress={() => void openService(item)}
                 />
               ))}

@@ -27,6 +27,7 @@ import { useCurrencyStore } from "../lib/currency-store";
 import { useLocalePrefsStore } from "../lib/locale-prefs-store";
 import { useApiBaseStore } from "../lib/api-base-store";
 import { useDriverStore } from "../lib/driver-store";
+import { usePartnerStore } from "../lib/partner-store";
 import { useFoodCartStore } from "../lib/food-cart-store";
 import { useHotelsInventory } from "../lib/hotels-inventory-store";
 import { useMarketplaceStore } from "../lib/marketplace-store";
@@ -60,6 +61,7 @@ export default function RootLayout() {
   const hydrateCity = useCityStore((s) => s.hydrate);
   const hydrateApiBase = useApiBaseStore((s) => s.hydrate);
   const hydrateDriver = useDriverStore((s) => s.hydrate);
+  const hydratePartner = usePartnerStore((s) => s.hydrate);
   const hydrateFoodCart = useFoodCartStore((s) => s.hydrate);
   const hydrateMarketplace = useMarketplaceStore((s) => s.hydrate);
   const hydrateHotelsInventory = useHotelsInventory((s) => s.hydrate);
@@ -75,6 +77,7 @@ export default function RootLayout() {
     void hydrateCity();
     void hydrateApiBase();
     void hydrateDriver();
+    void hydratePartner();
     void hydrateFoodCart();
     void hydrateMarketplace();
     void hydrateHotelsInventory();
@@ -88,6 +91,7 @@ export default function RootLayout() {
     hydrateCity,
     hydrateApiBase,
     hydrateDriver,
+    hydratePartner,
     hydrateFoodCart,
     hydrateMarketplace,
     hydrateHotelsInventory,
@@ -178,9 +182,8 @@ export default function RootLayout() {
             <Stack.Screen name="shop-sell" options={{ headerShown: false }} />
             <Stack.Screen name="food/[id]" options={{ headerShown: false }} />
             <Stack.Screen name="food-cart" options={{ headerShown: false }} />
-            <Stack.Screen name="partner/index" options={{ headerShown: false }} />
-            <Stack.Screen name="partner/contract" options={{ headerShown: false }} />
-            <Stack.Screen name="driver/index" options={{ headerShown: false }} />
+            <Stack.Screen name="partner" options={{ headerShown: false }} />
+            <Stack.Screen name="driver" options={{ headerShown: false }} />
             <Stack.Screen name="voice" options={{ headerShown: false }} />
             <Stack.Screen name="agents" options={{ headerShown: false }} />
             <Stack.Screen name="favorites" options={{ headerShown: false }} />

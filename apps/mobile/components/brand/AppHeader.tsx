@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   localeNativeName,
+  resolveLocale,
   supportedLocales,
   type LocaleCode,
 } from "../../lib/locales";
@@ -51,8 +52,8 @@ const LOCALE_SHORT: Record<LocaleCode, string> = {
   en: "EN",
   ar: "AR",
   fa: "FA",
-  "ku-bad": "KU",
-  "ku-sor": "کورد",
+  "ku-bad": "Bad",
+  "ku-sor": "Sor",
 };
 
 type Props = {
@@ -128,9 +129,7 @@ export function AppHeader({
     addresses.find((a) => a.id === selectedId)?.city ??
     addresses[0]?.city ??
     "Erbil";
-  const currentLocale = (supportedLocales.includes(i18n.language as LocaleCode)
-    ? i18n.language
-    : "tr") as LocaleCode;
+  const currentLocale = resolveLocale(i18n.language);
   const isBrand = variant === "brand";
   /** Hizmetler logo — ekran genişliğinin ~26%’i, 72–110 arası; oran sabit */
   const brandLogoW = useMemo(() => {

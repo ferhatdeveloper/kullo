@@ -137,7 +137,7 @@ export default function TaxiHubScreen() {
       return;
     }
     if (next === "account") {
-      router.push("/driver");
+      router.push("/partner/driver");
       return;
     }
     if (next === "activity") {
@@ -151,7 +151,7 @@ export default function TaxiHubScreen() {
       return;
     }
     if (key === "connect") {
-      router.push("/driver");
+      router.push("/partner/driver");
       return;
     }
     openBook("passenger", "city");

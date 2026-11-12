@@ -139,7 +139,6 @@ export default function CareerHomeScreen() {
   const homeDiscovery = (
     <CareerHomeFeed
       lang={lang}
-      onSearchQuery={runSearch}
       onSeeAllJobs={() => {
         setFilters({ ...DEFAULT_CAREER_FILTERS });
         setDraftQ("");
@@ -164,84 +163,35 @@ export default function CareerHomeScreen() {
         >
           <Text style={styles.backText}>{t("career.backHome")}</Text>
         </Pressable>
-        <View style={styles.resultsSearch}>
-          <Search size={14} color={colors.inkFaint} strokeWidth={2} />
-          <TextInput
-            value={draftQ}
-            onChangeText={setDraftQ}
-            onSubmitEditing={() => runSearch(draftQ)}
-            placeholder={t("career.searchPlaceholder")}
-            placeholderTextColor={colors.inkFaint}
-            style={styles.resultsInput}
-            returnKeyType="search"
-          />
-          <Text style={styles.resultsCount}>
-            {t("career.resultCount", { count: jobs.length })}
-          </Text>
+        <View style={styles.resultsSearchRow}>
+          <View style={styles.resultsSearch}>
+            <Search size={14} color={colors.inkFaint} strokeWidth={2} />
+            <TextInput
+              value={draftQ}
+              onChangeText={setDraftQ}
+              onSubmitEditing={() => runSearch(draftQ)}
+              placeholder={t("career.searchPlaceholder")}
+              placeholderTextColor={colors.inkFaint}
+              style={styles.resultsInput}
+              returnKeyType="search"
+            />
+            <Text style={styles.resultsCount}>
+              {t("career.resultCount", { count: jobs.length })}
+            </Text>
+          </View>
+          <Pressable
+            style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnOn]}
+            onPress={() => setSheetOpen(true)}
+            accessibilityLabel={t("career.filtersTitle")}
+          >
+            <SlidersHorizontal
+              size={16}
+              color={activeFilterCount > 0 ? colors.white : colors.flame}
+              strokeWidth={2.2}
+            />
+          </Pressable>
         </View>
       </View>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.quickChips}
-      >
-        <Pressable
-          style={[styles.quickChip, activeFilterCount > 0 && styles.quickChipOn]}
-          onPress={() => setSheetOpen(true)}
-        >
-          <SlidersHorizontal
-            size={14}
-            color={activeFilterCount > 0 ? colors.white : colors.ink}
-            strokeWidth={2.2}
-          />
-        </Pressable>
-        <Pressable
-          style={[styles.quickChip, filters.city && styles.quickChipOn]}
-          onPress={() => setSheetOpen(true)}
-        >
-          <Text
-            style={[
-              styles.quickChipText,
-              filters.city && styles.quickChipTextOn,
-            ]}
-          >
-            {filters.city
-              ? t(CAREER_CITY_LABEL_KEY[filters.city])
-              : t("career.chipLocation")}
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[styles.quickChip, filters.workModel && styles.quickChipOn]}
-          onPress={() => setSheetOpen(true)}
-        >
-          <Text
-            style={[
-              styles.quickChipText,
-              filters.workModel && styles.quickChipTextOn,
-            ]}
-          >
-            {filters.workModel
-              ? t(`career.workModel.${filters.workModel}`)
-              : t("career.chipWorkPref")}
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[styles.quickChip, filters.category && styles.quickChipOn]}
-          onPress={() => setSheetOpen(true)}
-        >
-          <Text
-            style={[
-              styles.quickChipText,
-              filters.category && styles.quickChipTextOn,
-            ]}
-          >
-            {filters.category
-              ? t(`career.category.${filters.category}`)
-              : t("career.chipPosition")}
-          </Text>
-        </Pressable>
-      </ScrollView>
 
       <FlatList
         data={jobs}
@@ -297,11 +247,7 @@ export default function CareerHomeScreen() {
 
       {myTop === "listings" ? (
         <>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.myChips}
-          >
+          <View style={styles.mySubTabs}>
             {(
               [
                 ["viewed", "career.myJobs.viewed"],
@@ -311,20 +257,21 @@ export default function CareerHomeScreen() {
             ).map(([key, labelKey]) => (
               <Pressable
                 key={key}
-                style={[styles.myChip, myChip === key && styles.myChipOn]}
+                style={styles.mySubTab}
                 onPress={() => setMyChip(key)}
               >
                 <Text
                   style={[
-                    styles.myChipText,
-                    myChip === key && styles.myChipTextOn,
+                    styles.mySubTabText,
+                    myChip === key && styles.mySubTabTextOn,
                   ]}
                 >
                   {t(labelKey)}
                 </Text>
+                {myChip === key ? <View style={styles.myTopUnderline} /> : null}
               </Pressable>
             ))}
-          </ScrollView>
+          </View>
 
           {myJobsList.length === 0 ? (
             <View style={styles.emptyState}>
@@ -563,24 +510,6 @@ const styles = StyleSheet.create({
     marginHorizontal: space.lg,
     marginBottom: 8,
   },
-  chipRail: {
-    paddingHorizontal: space.lg,
-    gap: 8,
-    paddingBottom: 18,
-  },
-  popChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.line,
-    backgroundColor: colors.white,
-  },
-  popChipText: {
-    fontFamily: fonts.body,
-    fontSize: 13,
-    color: colors.ink,
-  },
   sectionHead: {
     flexDirection: "row",
     alignItems: "center",
@@ -721,7 +650,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.flame,
   },
+  resultsSearchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   resultsSearch: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
@@ -744,31 +679,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.inkFaint,
   },
-  quickChips: {
-    paddingHorizontal: space.lg,
-    gap: 8,
-    paddingBottom: 8,
-  },
-  quickChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: radius.pill,
+  filterBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: colors.line,
     backgroundColor: colors.white,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  quickChipOn: {
-    backgroundColor: colors.ink,
-    borderColor: colors.ink,
+  filterBtnOn: {
+    backgroundColor: colors.flame,
+    borderColor: colors.flame,
   },
-  quickChipText: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 12,
-    color: colors.ink,
-  },
-  quickChipTextOn: { color: colors.white },
   listPad: {
     paddingHorizontal: space.lg,
     paddingBottom: 72,
@@ -823,31 +747,26 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: colors.ink,
   },
-  myChips: {
-    paddingHorizontal: space.lg,
-    gap: 8,
+  mySubTabs: {
+    flexDirection: "row",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.line,
+    paddingHorizontal: space.sm,
+  },
+  mySubTab: {
+    flex: 1,
+    alignItems: "center",
     paddingVertical: 12,
+    position: "relative",
   },
-  myChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.line,
-    backgroundColor: colors.white,
-  },
-  myChipOn: {
-    borderColor: colors.flame,
-    backgroundColor: colors.flameSoft,
-  },
-  myChipText: {
-    fontFamily: fonts.body,
+  mySubTabText: {
+    fontFamily: fonts.bodyMed,
     fontSize: 13,
-    color: colors.inkMuted,
+    color: colors.inkFaint,
   },
-  myChipTextOn: {
+  mySubTabTextOn: {
     fontFamily: fonts.bodySemi,
-    color: colors.flameDeep,
+    color: colors.ink,
   },
   emptyState: {
     flex: 1,

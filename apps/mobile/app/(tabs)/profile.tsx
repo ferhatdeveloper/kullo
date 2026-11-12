@@ -3,7 +3,6 @@ import { StatusBar, setStatusBarStyle } from "expo-status-bar";
 import {
   Bell,
   Bookmark,
-  CarTaxiFront,
   ChevronRight,
   Cpu,
   Droplets,
@@ -45,15 +44,20 @@ import {
   useCurrencyStore,
 } from "../../lib/currency-store";
 import { iqdPerUsd } from "../../lib/hatwan-rates";
-import { localeNativeName, supportedLocales, type LocaleCode } from "../../lib/locales";
+import {
+  localeNativeName,
+  resolveLocale,
+  supportedLocales,
+  type LocaleCode,
+} from "../../lib/locales";
 import { useLocalePrefsStore } from "../../lib/locale-prefs-store";
 import { colors, fonts, radius, shadow, space } from "../../lib/theme";
 
 export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
   const [user, setUser] = useState<StoredUser | null>(null);
-  const [currentLocale, setCurrentLocale] = useState<LocaleCode>(
-    i18n.language as LocaleCode,
+  const [currentLocale, setCurrentLocale] = useState<LocaleCode>(() =>
+    resolveLocale(i18n.language),
   );
   const displayCurrency = useCurrencyStore((s) => s.display);
   const setDisplayCurrency = useCurrencyStore((s) => s.setDisplay);
@@ -317,7 +321,7 @@ export default function ProfileScreen() {
         <View style={styles.menu}>
           <MenuItem
             icon={<Store size={20} color={colors.flame} strokeWidth={2} />}
-            label={t("partner.title")}
+            label={t("partner.hubEntry")}
             onPress={() => router.push("/partner")}
           />
           <MenuItem
@@ -333,13 +337,8 @@ export default function ProfileScreen() {
           <MenuItem
             icon={<Share2 size={20} color={colors.flame} strokeWidth={2} />}
             label={t("hub.socialAgency")}
-            onPress={() => router.push("/social-agency")}
-          />
-          <MenuItem
-            icon={<CarTaxiFront size={20} color={colors.flame} strokeWidth={2} />}
-            label={t("driver.title")}
             last
-            onPress={() => router.push("/driver")}
+            onPress={() => router.push("/social-agency")}
           />
         </View>
 

@@ -349,7 +349,7 @@ export default function TaxiBookScreen() {
             <View style={styles.flex} />
             <TouchableOpacity
               style={[styles.roundBtn, styles.menuBtn]}
-              onPress={() => router.push("/driver")}
+              onPress={() => router.push("/partner/driver")}
               hitSlop={10}
             >
               <Menu size={18} color={colors.white} strokeWidth={2.2} />
@@ -389,7 +389,7 @@ export default function TaxiBookScreen() {
             </View>
             <TouchableOpacity
               style={[styles.roundBtn, styles.menuBtn]}
-              onPress={() => router.push("/driver")}
+              onPress={() => router.push("/partner/driver")}
               hitSlop={10}
             >
               <Menu size={18} color={colors.white} strokeWidth={2.2} />
@@ -703,7 +703,7 @@ export default function TaxiBookScreen() {
             />
             <TouchableOpacity
               style={styles.driverLink}
-              onPress={() => router.push("/driver")}
+              onPress={() => router.push("/partner/driver")}
             >
               <Text style={styles.driverLinkText}>{t("ride.openDriver")}</Text>
             </TouchableOpacity>

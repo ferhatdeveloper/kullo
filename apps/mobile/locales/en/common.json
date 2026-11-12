@@ -345,7 +345,8 @@
     "wholesale": "Wholesale",
     "trades": "Trade jobs",
     "career": "Career",
-    "travel": "Travel"
+    "travel": "Travel",
+    "freight": "I have a load"
   },
   "modeSelect": {
     "title": "What do you need?",
@@ -382,7 +383,8 @@
     "hintWholesale": "Company product request · wholesale bid · Kullo commission",
     "hintTrades": "Find craftsmen, get bids",
     "hintCareer": "Browse jobs, apply with a CV summary, see matches",
-    "hintTravel": "Flights, coaches and private cars — cross-border transfer"
+    "hintTravel": "Flights, coaches and private cars — cross-border transfer",
+    "hintFreight": "Find or post freight loads"
   },
   "b2b": {
     "title": "Wholesale",
@@ -1270,7 +1272,9 @@
     "contractPreview": "Text preview",
     "createContract": "Create contract",
     "contractCreatedTitle": "Contract created",
-    "contractCreatedBody": "{{type}} · {{lang}} · {{amount}} (demo)"
+    "contractCreatedBody": "{{type}} · {{lang}} · {{amount}} (demo)",
+    "hubEntry": "Kullo Partner",
+    "hubEntryHint": "Merchant · Driver"
   },
   "driver": {
     "title": "Driver panel",
@@ -1412,8 +1416,16 @@
     }
   },
   "freight": {
-    "title": "Load Board",
-    "subtitle": "Find and post freight loads",
+    "title": "Title",
+    "hubTitle": "I have a load",
+    "subtitle": "Find or post freight — shipper and carrier board",
+    "findLoad": "Find loads",
+    "postAd": "Post a load",
+    "openLoads": "Open loads",
+    "filtersTitle": "Load filters",
+    "filterCategory": "Category",
+    "resetFilters": "Reset",
+    "applyFilters": "Apply",
     "searchPlaceholder": "Search loads, cities...",
     "allCategories": "All",
     "availableLoads": "{{count}} loads available",
@@ -1445,7 +1457,6 @@
     "bidAcceptedBody": "The carrier has been notified.",
     "createLoad": "Post Load",
     "loadInfo": "Load Information",
-    "title": "Title",
     "titlePlaceholder": "e.g. Construction Materials - Cement",
     "description": "Description",
     "descriptionPlaceholder": "Additional details about the cargo...",
@@ -2139,5 +2150,96 @@
   },
   "header": {
     "localeCurrency": "Language & currency"
+  },
+  "partnerHub": {
+    "brand": "Kullo Partner",
+    "live": "Live",
+    "switchRole": "Switch role",
+    "exitConsumer": "Back to consumer app",
+    "courierSoon": "Soon — mode inside Partner",
+    "roleSelect": {
+      "title": "How do you work?",
+      "subtitle": "One Partner. Merchant, driver, or (later) courier — same login, same wallet.",
+      "footnote": "MVP: taxi driver + food merchant. Market and courier next."
+    },
+    "roles": {
+      "merchant": {
+        "title": "Merchant",
+        "body": "Food kitchen — accept, prep, hand off. Market coming soon."
+      },
+      "driver": {
+        "title": "Driver",
+        "body": "Taxi, shared and airport trips. Go online, take jobs."
+      },
+      "courier": {
+        "title": "Courier",
+        "body": "Food / market / parcel delivery. May split to its own app later."
+      }
+    },
+    "nav": {
+      "live": "Live",
+      "trips": "Trips",
+      "earnings": "Earnings",
+      "more": "More",
+      "kitchen": "Kitchen",
+      "menu": "Menu"
+    },
+    "driver": {
+      "title": "Driver",
+      "subtitle": "Taxi · live requests",
+      "incoming": "Incoming",
+      "noTrips": "No requests right now",
+      "filterTitle": "Trip type",
+      "filterHint": "No chip rows — pick in one sheet",
+      "filterAllHint": "Taxi + shared + airport",
+      "listingsLegacy": "Listings / rental panel"
+    },
+    "merchant": {
+      "title": "Kitchen",
+      "subtitle": "Food merchant · order queue",
+      "open": "Open",
+      "closed": "Closed",
+      "openHint": "Receiving new orders",
+      "closedHint": "Orders paused",
+      "goOpen": "Open the restaurant to see orders",
+      "noOrders": "No active orders",
+      "queue": "Order queue",
+      "menuTitle": "Menu stock",
+      "reject": "Reject",
+      "listingsLegacy": "Listings / rental panel",
+      "verticalTitle": "Merchant vertical",
+      "verticalHint": "MVP: food. Market is phase 2.",
+      "vertical": {
+        "food": "Food",
+        "foodHint": "Restaurant kitchen panel",
+        "market": "Market",
+        "marketSoon": "Phase 2 — soon"
+      },
+      "filterTitle": "Queue filter",
+      "filter": {
+        "active": "Active",
+        "all": "All",
+        "done": "Done"
+      },
+      "stats": {
+        "orders": "Orders",
+        "revenue": "Revenue",
+        "prep": "Prep"
+      },
+      "status": {
+        "new": "New",
+        "accepted": "Accepted",
+        "preparing": "Preparing",
+        "ready": "Ready",
+        "handed": "Handed off",
+        "cancelled": "Cancelled"
+      },
+      "advance": {
+        "accepted": "Accept",
+        "preparing": "Start prep",
+        "ready": "Mark ready",
+        "handed": "Hand to courier"
+      }
+    }
   }
 }

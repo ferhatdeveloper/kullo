@@ -352,7 +352,8 @@
     "wholesale": "Toptancı",
     "trades": "Usta iş",
     "career": "Kariyer",
-    "travel": "Seyahat"
+    "travel": "Seyahat",
+    "freight": "Yüküm var"
   },
   "modeSelect": {
     "title": "Ne yapmak istersin?",
@@ -389,7 +390,8 @@
     "hintWholesale": "Firma ürün talebi · toptancı fiyat teklifi · Kullo komisyon",
     "hintTrades": "Usta bul, işe teklif al",
     "hintCareer": "İş ilanı ara, CV özeti ile başvur, eşleşmeleri gör",
-    "hintTravel": "Uçak, otobüs ve özel araç — ülkeler arası transfer"
+    "hintTravel": "Uçak, otobüs ve özel araç — ülkeler arası transfer",
+    "hintFreight": "Yük bul veya ilan ver"
   },
   "b2b": {
     "title": "Toptancı",
@@ -1276,7 +1278,9 @@
     "contractPreview": "Metin önizleme",
     "createContract": "Kontrat oluştur",
     "contractCreatedTitle": "Kontrat oluşturuldu",
-    "contractCreatedBody": "{{type}} · {{lang}} · {{amount}} (demo)"
+    "contractCreatedBody": "{{type}} · {{lang}} · {{amount}} (demo)",
+    "hubEntry": "Kullo Partner",
+    "hubEntryHint": "Merchant · Sürücü"
   },
   "driver": {
     "title": "Sürücü paneli",
@@ -1418,8 +1422,16 @@
     }
   },
   "freight": {
-    "title": "Yük Panosu",
-    "subtitle": "Yük bul ve ilan ver",
+    "title": "Başlık",
+    "hubTitle": "Yüküm var",
+    "subtitle": "Yük bul veya ilan ver — nakliyeci ve yük sahibi alanı",
+    "findLoad": "Yük bul",
+    "postAd": "İlan ver",
+    "openLoads": "Açık yükler",
+    "filtersTitle": "Yük filtreleri",
+    "filterCategory": "Kategori",
+    "resetFilters": "Sıfırla",
+    "applyFilters": "Uygula",
     "searchPlaceholder": "Yük, şehir ara...",
     "allCategories": "Tümü",
     "availableLoads": "{{count}} yük mevcut",
@@ -2175,5 +2187,96 @@
   },
   "header": {
     "localeCurrency": "Dil ve para birimi"
+  },
+  "partnerHub": {
+    "brand": "Kullo Partner",
+    "live": "Canlı",
+    "switchRole": "Rol değiştir",
+    "exitConsumer": "Tüketici uygulamaya dön",
+    "courierSoon": "Yakında — Partner içinde mod",
+    "roleSelect": {
+      "title": "Nasıl çalışıyorsun?",
+      "subtitle": "Tek Partner. Merchant, sürücü veya (ileride) kurye — aynı giriş, aynı cüzdan.",
+      "footnote": "MVP: taksi sürücü + yemek merchant. Market ve kurye sonraki faz."
+    },
+    "roles": {
+      "merchant": {
+        "title": "Merchant",
+        "body": "Yemek mutfağı — sipariş kabul, hazırla, teslim et. Market yakında."
+      },
+      "driver": {
+        "title": "Sürücü",
+        "body": "Taksi, paylaşımlı ve havalimanı seferleri. Online ol, talep al."
+      },
+      "courier": {
+        "title": "Kurye",
+        "body": "Yemek / market / paket teslimatı. Hacim gelince ayrı app olabilir."
+      }
+    },
+    "nav": {
+      "live": "Canlı",
+      "trips": "Sefer",
+      "earnings": "Kazanç",
+      "more": "Diğer",
+      "kitchen": "Mutfak",
+      "menu": "Menü"
+    },
+    "driver": {
+      "title": "Sürücü",
+      "subtitle": "Taksi · canlı talep",
+      "incoming": "Gelen talepler",
+      "noTrips": "Şu an talep yok",
+      "filterTitle": "Sefer tipi",
+      "filterHint": "Chip yok — tek sheet’ten seç",
+      "filterAllHint": "Taksi + paylaşımlı + havalimanı",
+      "listingsLegacy": "İlan / kiralama paneli"
+    },
+    "merchant": {
+      "title": "Mutfak",
+      "subtitle": "Yemek merchant · sipariş kuyruğu",
+      "open": "Açık",
+      "closed": "Kapalı",
+      "openHint": "Yeni sipariş alıyorsun",
+      "closedHint": "Siparişler kapalı",
+      "goOpen": "Sipariş görmek için restoranı aç",
+      "noOrders": "Aktif sipariş yok",
+      "queue": "Sipariş kuyruğu",
+      "menuTitle": "Menü stok",
+      "reject": "Reddet",
+      "listingsLegacy": "İlan / kiralama paneli",
+      "verticalTitle": "Merchant dikeyi",
+      "verticalHint": "MVP: yemek. Market sonraki faz.",
+      "vertical": {
+        "food": "Yemek",
+        "foodHint": "Restoran mutfak paneli",
+        "market": "Market",
+        "marketSoon": "Faz 2 — yakında"
+      },
+      "filterTitle": "Kuyruk filtresi",
+      "filter": {
+        "active": "Aktif",
+        "all": "Tümü",
+        "done": "Biten"
+      },
+      "stats": {
+        "orders": "Sipariş",
+        "revenue": "Ciro",
+        "prep": "Hazırlık"
+      },
+      "status": {
+        "new": "Yeni",
+        "accepted": "Kabul",
+        "preparing": "Hazırlanıyor",
+        "ready": "Hazır",
+        "handed": "Teslim",
+        "cancelled": "İptal"
+      },
+      "advance": {
+        "accepted": "Kabul et",
+        "preparing": "Hazırla",
+        "ready": "Hazır",
+        "handed": "Kuryeye ver"
+      }
+    }
   }
 }

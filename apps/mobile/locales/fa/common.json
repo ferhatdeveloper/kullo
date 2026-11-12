@@ -257,7 +257,16 @@
     "boost": "برجسته کردن",
     "realty": "املاک",
     "shop": "خرید",
-    "food": "غذا"
+    "food": "غذا",
+    "freight": "بار دارم",
+    "market": "مارکت",
+    "hotels": "هتل‌ها",
+    "health": "سلامت",
+    "wholesale": "عمده‌فروشی",
+    "trades": "خدمات فنی",
+    "career": "شغل",
+    "travel": "سفر",
+    "fashion": "مد"
   },
   "modeSelect": {
     "title": "چه کاری می‌خواهی؟",
@@ -285,7 +294,16 @@
     "changeMode": "تغییر انتخاب سرویس",
     "hintRealty": "مسکن، زمین، مغازه — فروش / اجاره",
     "hintShop": "پوشاک و ویترین فروشگاه",
-    "hintFood": "منو، سبد، تحویل درب منزل"
+    "hintFood": "منو، سبد، تحویل درب منزل",
+    "hintFreight": "بار پیدا کن یا آگهی بگذار",
+    "hintTaxi": "داخل شهر · همین حالا تماس",
+    "hintMarket": "قفسه مارکت، سبد، تحویل درب منزل",
+    "hintHotels": "اربیل، عنکاوا، سلیمانیه، دهوک — جستجو و رزرو",
+    "hintHealth": "پزشک یا کلینیک — ویدیو، تلفن یا پیام",
+    "hintWholesale": "درخواست شرکت · پیشنهاد عمده · کمیسیون کولو",
+    "hintTrades": "استادکار پیدا کن، پیشنهاد بگیر",
+    "hintCareer": "آگهی شغل ببین، با خلاصه رزومه درخواست بده",
+    "hintTravel": "پرواز، اتوبوس و خودروی خصوصی — انتقال مرزی"
   },
   "ride": {
     "modes": {
@@ -736,8 +754,16 @@
     }
   },
   "freight": {
-    "title": "تابلو بار",
-    "subtitle": "بار پیدا کنید و آگهی بدهید",
+    "title": "عنوان",
+    "hubTitle": "بار دارم",
+    "subtitle": "بار پیدا کن یا آگهی بگذار",
+    "findLoad": "بار پیدا کن",
+    "postAd": "آگهی بگذار",
+    "openLoads": "بارهای باز",
+    "filtersTitle": "فیلتر بار",
+    "filterCategory": "دسته‌بندی",
+    "resetFilters": "بازنشانی",
+    "applyFilters": "اعمال",
     "searchPlaceholder": "جستجوی بار، شهر...",
     "allCategories": "همه",
     "availableLoads": "{{count}} بار موجود",
@@ -834,5 +860,96 @@
     "distance": "مسافت",
     "consumption": "مصرف",
     "suggestedPrice": "قیمت پیشنهادی"
+  },
+  "partnerHub": {
+    "brand": "Kullo Partner",
+    "live": "Live",
+    "switchRole": "Switch role",
+    "exitConsumer": "Back to consumer app",
+    "courierSoon": "Soon — mode inside Partner",
+    "roleSelect": {
+      "title": "How do you work?",
+      "subtitle": "One Partner. Merchant, driver, or (later) courier — same login, same wallet.",
+      "footnote": "MVP: taxi driver + food merchant. Market and courier next."
+    },
+    "roles": {
+      "merchant": {
+        "title": "Merchant",
+        "body": "Food kitchen — accept, prep, hand off. Market coming soon."
+      },
+      "driver": {
+        "title": "Driver",
+        "body": "Taxi, shared and airport trips. Go online, take jobs."
+      },
+      "courier": {
+        "title": "Courier",
+        "body": "Food / market / parcel delivery. May split to its own app later."
+      }
+    },
+    "nav": {
+      "live": "Live",
+      "trips": "Trips",
+      "earnings": "Earnings",
+      "more": "More",
+      "kitchen": "Kitchen",
+      "menu": "Menu"
+    },
+    "driver": {
+      "title": "Driver",
+      "subtitle": "Taxi · live requests",
+      "incoming": "Incoming",
+      "noTrips": "No requests right now",
+      "filterTitle": "Trip type",
+      "filterHint": "No chip rows — pick in one sheet",
+      "filterAllHint": "Taxi + shared + airport",
+      "listingsLegacy": "Listings / rental panel"
+    },
+    "merchant": {
+      "title": "Kitchen",
+      "subtitle": "Food merchant · order queue",
+      "open": "Open",
+      "closed": "Closed",
+      "openHint": "Receiving new orders",
+      "closedHint": "Orders paused",
+      "goOpen": "Open the restaurant to see orders",
+      "noOrders": "No active orders",
+      "queue": "Order queue",
+      "menuTitle": "Menu stock",
+      "reject": "Reject",
+      "listingsLegacy": "Listings / rental panel",
+      "verticalTitle": "Merchant vertical",
+      "verticalHint": "MVP: food. Market is phase 2.",
+      "vertical": {
+        "food": "Food",
+        "foodHint": "Restaurant kitchen panel",
+        "market": "Market",
+        "marketSoon": "Phase 2 — soon"
+      },
+      "filterTitle": "Queue filter",
+      "filter": {
+        "active": "Active",
+        "all": "All",
+        "done": "Done"
+      },
+      "stats": {
+        "orders": "Orders",
+        "revenue": "Revenue",
+        "prep": "Prep"
+      },
+      "status": {
+        "new": "New",
+        "accepted": "Accepted",
+        "preparing": "Preparing",
+        "ready": "Ready",
+        "handed": "Handed off",
+        "cancelled": "Cancelled"
+      },
+      "advance": {
+        "accepted": "Accept",
+        "preparing": "Start prep",
+        "ready": "Mark ready",
+        "handed": "Hand to courier"
+      }
+    }
   }
 }

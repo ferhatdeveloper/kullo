@@ -257,7 +257,18 @@
     "boost": "بیکە پێشەوە",
     "realty": "خانوو",
     "shop": "کڕین",
-    "food": "خواردن"
+    "food": "خواردن",
+    "freight": "باری من هەیە",
+    "market": "مارکێت",
+    "mart": "Kullo Mart",
+    "flowers": "گوڵ",
+    "hotels": "هۆتێل",
+    "health": "تەندروستی",
+    "wholesale": "کۆمەڵفرۆشی",
+    "trades": "کاری پیشەیی",
+    "career": "کار",
+    "travel": "گەشت",
+    "fashion": "مۆدە"
   },
   "modeSelect": {
     "title": "چی دەتەوێت؟",
@@ -285,7 +296,17 @@
     "changeMode": "هەڵبژاردنی خزمەتگوزاری بگۆڕە",
     "hintRealty": "نیشتەجێ، زەوی، دووکان — فرۆشتن / کرێ",
     "hintShop": "جلوبەرگ و فرۆشگا",
-    "hintFood": "مینیو، سەبەتە، گەیاندن"
+    "hintFood": "مینیو، سەبەتە، گەیاندن",
+    "hintFreight": "بار بدۆزەوە یان ئاگاداری دابنێ",
+    "hintTaxi": "ناو شار · ئێستا داوا بکە",
+    "hintMarket": "ڕیزی مارکێت، سەبەتە، گەیاندن",
+    "hintMart": "ڕیزی مارکێت، سەبەتە، بگاتە دەرگا",
+    "hintHotels": "هەولێر، عەنکاوا، سلێمانی، دهۆک — بگەڕێ و حجز بکە",
+    "hintHealth": "دکتۆر یان کلینیک — ڤیدیۆ، تەلەفۆن یان پەیام",
+    "hintWholesale": "داواکاری کۆمپانیا · پێشنیازی کۆمەڵ · کۆمیسیۆنی کولو",
+    "hintTrades": "پیشەوەر بدۆزەوە، پێشنیاز وەربگرە",
+    "hintCareer": "کار بگەڕێ، بە پوختەی CV داواکاری بکە",
+    "hintTravel": "فڕۆکە، پاس و ئۆتۆمبێلی تایبەت — گواستنەوەی سنوور"
   },
   "ride": {
     "modes": {
@@ -736,8 +757,16 @@
     }
   },
   "freight": {
-    "title": "تەختەی بار",
-    "subtitle": "بار بدۆزەرەوە و ڕیکلام بدە",
+    "title": "سەردێڕ",
+    "hubTitle": "باری من هەیە",
+    "subtitle": "بار بدۆزەوە یان ئاگاداری دابنێ",
+    "findLoad": "بار بدۆزەوە",
+    "postAd": "ئاگاداری دابنێ",
+    "openLoads": "بارە کراوەکان",
+    "filtersTitle": "فلتەری بار",
+    "filterCategory": "پۆل",
+    "resetFilters": "ڕیسێت",
+    "applyFilters": "جێبەجێکردن",
     "searchPlaceholder": "گەڕان بە بار، شار...",
     "allCategories": "هەموو",
     "availableLoads": "{{count}} بار بەردەستە",
@@ -834,5 +863,99 @@
     "distance": "مەودا",
     "consumption": "خەرجی",
     "suggestedPrice": "نرخی پێشنیارکراو"
+  },
+  "header": {
+    "localeCurrency": "زمان و یەکەی پارە"
+  },
+  "partnerHub": {
+    "brand": "Kullo Partner",
+    "live": "Live",
+    "switchRole": "Switch role",
+    "exitConsumer": "Back to consumer app",
+    "courierSoon": "Soon — mode inside Partner",
+    "roleSelect": {
+      "title": "How do you work?",
+      "subtitle": "One Partner. Merchant, driver, or (later) courier — same login, same wallet.",
+      "footnote": "MVP: taxi driver + food merchant. Market and courier next."
+    },
+    "roles": {
+      "merchant": {
+        "title": "Merchant",
+        "body": "Food kitchen — accept, prep, hand off. Market coming soon."
+      },
+      "driver": {
+        "title": "Driver",
+        "body": "Taxi, shared and airport trips. Go online, take jobs."
+      },
+      "courier": {
+        "title": "Courier",
+        "body": "Food / market / parcel delivery. May split to its own app later."
+      }
+    },
+    "nav": {
+      "live": "Live",
+      "trips": "Trips",
+      "earnings": "Earnings",
+      "more": "More",
+      "kitchen": "Kitchen",
+      "menu": "Menu"
+    },
+    "driver": {
+      "title": "Driver",
+      "subtitle": "Taxi · live requests",
+      "incoming": "Incoming",
+      "noTrips": "No requests right now",
+      "filterTitle": "Trip type",
+      "filterHint": "No chip rows — pick in one sheet",
+      "filterAllHint": "Taxi + shared + airport",
+      "listingsLegacy": "Listings / rental panel"
+    },
+    "merchant": {
+      "title": "Kitchen",
+      "subtitle": "Food merchant · order queue",
+      "open": "Open",
+      "closed": "Closed",
+      "openHint": "Receiving new orders",
+      "closedHint": "Orders paused",
+      "goOpen": "Open the restaurant to see orders",
+      "noOrders": "No active orders",
+      "queue": "Order queue",
+      "menuTitle": "Menu stock",
+      "reject": "Reject",
+      "listingsLegacy": "Listings / rental panel",
+      "verticalTitle": "Merchant vertical",
+      "verticalHint": "MVP: food. Market is phase 2.",
+      "vertical": {
+        "food": "Food",
+        "foodHint": "Restaurant kitchen panel",
+        "market": "Market",
+        "marketSoon": "Phase 2 — soon"
+      },
+      "filterTitle": "Queue filter",
+      "filter": {
+        "active": "Active",
+        "all": "All",
+        "done": "Done"
+      },
+      "stats": {
+        "orders": "Orders",
+        "revenue": "Revenue",
+        "prep": "Prep"
+      },
+      "status": {
+        "new": "New",
+        "accepted": "Accepted",
+        "preparing": "Preparing",
+        "ready": "Ready",
+        "handed": "Handed off",
+        "cancelled": "Cancelled"
+      },
+      "advance": {
+        "accepted": "Accept",
+        "preparing": "Start prep",
+        "ready": "Mark ready",
+        "handed": "Hand to courier"
+      }
+    }
   }
 }

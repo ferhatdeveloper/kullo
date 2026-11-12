@@ -2,7 +2,6 @@ import {
   Briefcase,
   CalendarDays,
   ChevronRight,
-  Clock,
   FileText,
   Sparkles,
   Wallet,
@@ -14,7 +13,6 @@ import {
   CAREER_CITY_LABEL_KEY,
   featuredJobs,
   jobTitle,
-  RECENT_SEARCHES,
   type DemoJob,
 } from "../lib/career-catalog";
 import { colors, fonts } from "../lib/theme";
@@ -22,7 +20,6 @@ import { JobCard } from "./JobCard";
 
 type Props = {
   lang: "tr" | "en";
-  onSearchQuery: (q: string) => void;
   onSeeAllJobs: () => void;
   onOpenJob: (id: string) => void;
   onCreateAlarm: () => void;
@@ -32,10 +29,10 @@ type Props = {
 /**
  * Kariyer ana sayfa gövde — AppBar Market’te (logo yok).
  * Spacing/tipografi kariyer.net home’a kilitli; ink+flame renk.
+ * Filtre chip rayı yok — arama/filtre AppHeader + CareerFilterSheet.
  */
 export function CareerHomeFeed({
   lang,
-  onSearchQuery,
   onSeeAllJobs,
   onOpenJob,
   onCreateAlarm,
@@ -50,29 +47,6 @@ export function CareerHomeFeed({
       style={styles.root}
       contentContainerStyle={styles.scroll}
     >
-      {/* Son Aramalar — saat ikonu + pill chip’ler */}
-      <View style={styles.recentHead}>
-        <Clock size={14} color={colors.inkMuted} strokeWidth={2} />
-        <Text style={styles.recentLabel}>{t("career.recentSearches")}</Text>
-      </View>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.chipRail}
-      >
-        {RECENT_SEARCHES.map((p) => (
-          <Pressable
-            key={p.id}
-            style={styles.chip}
-            onPress={() => onSearchQuery(p.q)}
-          >
-            <Text style={styles.chipText}>{t(p.labelKey)}</Text>
-          </Pressable>
-        ))}
-      </ScrollView>
-
-      <View style={styles.band} />
-
       {/* Benzer dens ray */}
       <View style={styles.sectionHead}>
         <Text style={styles.sectionTitle} numberOfLines={2}>
@@ -168,36 +142,6 @@ const H_PAD = 16;
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.white },
   scroll: { paddingTop: 10, paddingBottom: 20 },
-  recentHead: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: H_PAD,
-    marginBottom: 8,
-  },
-  recentLabel: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 13,
-    color: "#1A1A1A",
-  },
-  chipRail: {
-    paddingHorizontal: H_PAD,
-    gap: 8,
-    paddingBottom: 12,
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#D6D6D6",
-    backgroundColor: colors.white,
-  },
-  chipText: {
-    fontFamily: fonts.body,
-    fontSize: 13,
-    color: "#1A1A1A",
-  },
   /** kariyer.net bölüm ayırıcı — ince gri bant */
   band: {
     height: 8,

@@ -11,7 +11,7 @@ import { useCurrencyStore } from "./currency-store";
 import i18n from "./i18n";
 import {
   defaultLocale,
-  supportedLocales,
+  resolveLocale,
   type LocaleCode,
 } from "./locales";
 
@@ -24,9 +24,7 @@ type Persisted = {
 };
 
 function parseLang(raw: unknown): LocaleCode {
-  if (typeof raw === "string" && supportedLocales.includes(raw as LocaleCode)) {
-    return raw as LocaleCode;
-  }
+  if (typeof raw === "string") return resolveLocale(raw);
   return defaultLocale;
 }
 
@@ -77,10 +75,15 @@ export const useLocalePrefsStore = create<LocalePrefsState>((set, get) => ({
   },
 
   setLang: async (lang) => {
-    set({ lang });
-    void i18n.changeLanguage(lang);
+    const code = resolveLocale(lang);
+    set({ lang: code });
+    await i18n.changeLanguage(code);
+    // i18next ara sıra ku-BAD üretir; resolve edilmiş kodla yeniden hizala.
+    if (resolveLocale(i18n.language) !== code) {
+      await i18n.changeLanguage(code);
+    }
     const { countryCode } = get();
-    await persist({ lang, countryCode });
+    await persist({ lang: code, countryCode });
   },
 
   setCountryCode: async (code, opts) => {

@@ -18,6 +18,7 @@ import {
 } from "../lib/countries";
 import {
   localeNativeName,
+  resolveLocale,
   supportedLocales,
   type LocaleCode,
 } from "../lib/locales";
@@ -29,8 +30,8 @@ const LOCALE_SHORT: Record<LocaleCode, string> = {
   en: "EN",
   ar: "AR",
   fa: "FA",
-  "ku-bad": "KU",
-  "ku-sor": "کورد",
+  "ku-bad": "Bad",
+  "ku-sor": "Sor",
 };
 
 type Props = {
@@ -50,11 +51,7 @@ export function LocalePrefsModal({ visible, onClose }: Props) {
   const setLang = useLocalePrefsStore((s) => s.setLang);
   const setCountryCode = useLocalePrefsStore((s) => s.setCountryCode);
 
-  const currentLocale = (
-    supportedLocales.includes(i18n.language as LocaleCode)
-      ? i18n.language
-      : lang
-  ) as LocaleCode;
+  const currentLocale = resolveLocale(i18n.language || lang);
 
   const labelLang = currentLocale.startsWith("tr") ? "tr" : "en";
 
