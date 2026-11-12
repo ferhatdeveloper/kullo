@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "Kullo Partner",
+    "slug": "kullo-partner",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "kullopartner",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0C2D29"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.berqenas.kullo.partner",
+      "infoPlist": {
+        "CFBundleDisplayName": "Kullo Partner",
+        "NSLocationWhenInUseUsageDescription": "Canl\u0131 sefer ve teslimat i\u00e7in konum kullan\u0131l\u0131r."
+      },
+      "buildNumber": "1"
+    },
+    "android": {
+      "package": "com.berqenas.kullo.partner",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0C2D29"
+      },
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
+      "versionCode": 1
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "./plugins/withMonorepoRoot.js"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      }
+    }
+  }
+}

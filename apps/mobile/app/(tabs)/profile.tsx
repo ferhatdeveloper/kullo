@@ -24,6 +24,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
+  Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -126,7 +127,11 @@ export default function ProfileScreen() {
                   {user.email ?? user.phone}
                 </Text>
                 <Badge
-                  label={user.role === "dealer" ? "Dealer" : "User"}
+                  label={
+                    user.role === "dealer"
+                      ? t("profile.roleDealer")
+                      : t("profile.roleUser")
+                  }
                   tone={user.role === "dealer" ? "viridian" : "mist"}
                   style={styles.roleBadge}
                 />
@@ -134,10 +139,8 @@ export default function ProfileScreen() {
             </View>
           ) : (
             <View style={styles.guestCard}>
-              <Text style={styles.guestTitle}>Giriş yap, favorilerini kaydet</Text>
-              <Text style={styles.guestSub}>
-                İlanlarını takip et, aramalarını sakla.
-              </Text>
+              <Text style={styles.guestTitle}>{t("profile.guestTitle")}</Text>
+              <Text style={styles.guestSub}>{t("profile.guestSub")}</Text>
               <View style={styles.guestActions}>
                 <Button
                   label={t("auth.login")}
@@ -322,7 +325,19 @@ export default function ProfileScreen() {
           <MenuItem
             icon={<Store size={20} color={colors.flame} strokeWidth={2} />}
             label={t("partner.hubEntry")}
-            onPress={() => router.push("/partner")}
+            onPress={() => {
+              void (async () => {
+                try {
+                  // Ayrı Partner APK (com.berqenas.kullo.partner)
+                  await Linking.openURL("kullopartner://");
+                } catch {
+                  Alert.alert(
+                    t("partner.hubEntry"),
+                    t("partner.hubAppMissing"),
+                  );
+                }
+              })();
+            }}
           />
           <MenuItem
             icon={<Hotel size={20} color={colors.flame} strokeWidth={2} />}
@@ -348,7 +363,7 @@ export default function ProfileScreen() {
         <View style={styles.menu}>
           <MenuItem
             icon={<Cpu size={20} color={colors.viridian} strokeWidth={2} />}
-            label="Agent Inspector"
+            label={t("profile.agentInspector")}
             accent
             onPress={() => router.push("/agents")}
           />

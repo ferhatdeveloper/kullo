@@ -278,7 +278,35 @@
     "apiAddressHint": "Tunnel / soft-live gateway. Edit and tap Save to apply.",
     "apiAddressPlaceholder": "https://….trycloudflare.com",
     "apiAddressReset": "Reset to default",
-    "apiAddressSaved": "API address updated"
+    "apiAddressSaved": "API address updated",
+    "guestTitle": "Sign in to save favorites",
+    "guestSub": "Track listings and keep your searches.",
+    "roleDealer": "Dealer",
+    "roleUser": "User",
+    "agentInspector": "Agent Inspector",
+    "favoritesEmpty": "No favorites yet",
+    "favoritesEmptySub": "Tap the heart on listings you like; come back here anytime.",
+    "favoritesBrowse": "Browse listings",
+    "notificationsClear": "Clear",
+    "notificationsClearA11y": "Clear all",
+    "notificationsCount": "{{count}} notifications",
+    "notificationsEmpty": "No notifications",
+    "notificationsEmptySub": "Price drops, messages, and rental updates show up here.",
+    "notificationsLoadDemo": "Load demo notifications",
+    "savedSearchesCount": "{{count}} saved",
+    "savedSearchesEmpty": "No saved searches",
+    "savedSearchesEmptySub": "Save a search from results; reopen the same filters in one tap.",
+    "savedSearchesGo": "Go to search",
+    "savedSearchesDeleteTitle": "Delete?",
+    "savedSearchesDeleteBody": "\"{{title}}\" will be removed from saved searches.",
+    "aboutBody": "Kullo is a safe mobility marketplace for vehicle sales, rentals, and soon taxi — in one app.",
+    "aboutSell": "Sell",
+    "aboutSellHint": "Buy · sell",
+    "aboutRent": "Rentals",
+    "aboutRentHint": "Daily · long-term",
+    "aboutTaxi": "Taxi",
+    "aboutTaxiHint": "Coming soon",
+    "versionLabel": "Version {{version}}"
   },
   "common": {
     "loading": "Loading...",
@@ -705,7 +733,8 @@
       "city": "City",
       "cityPh": "Erbil",
       "note": "Note (optional)",
-      "notePh": "Short motivation…"
+      "notePh": "Short motivation…",
+      "headlineCandidate": "{{title}} candidate"
     },
     "cities": {
       "all": "All",
@@ -1024,7 +1053,14 @@
     "profile": "My account",
     "profileHint": "Profile and settings",
     "fashion": "Fashion / clothing",
-    "fashionHint": "C2C shopping storefront"
+    "fashionHint": "C2C shopping storefront",
+    "careClean": "Care & clean",
+    "yourCart": "Your cart",
+    "onlyOnKullo": "Only on Kullo",
+    "upTo30Off": "Up to 30% off",
+    "proOffers": "pro offers",
+    "upTo": "Up to",
+    "percentOff50": "50% off"
   },
   "ride": {
     "hub": {
@@ -1216,6 +1252,12 @@
       "sedan": "Sedan",
       "suv": "SUV",
       "van": "Van / pickup"
+    },
+    "slots": {
+      "today1400": "Today · 14:00",
+      "today1700": "Today · 17:00",
+      "tomorrow1000": "Tomorrow · 10:00",
+      "tomorrow1600": "Tomorrow · 16:00"
     }
   },
   "partner": {
@@ -1274,7 +1316,8 @@
     "contractCreatedTitle": "Contract created",
     "contractCreatedBody": "{{type}} · {{lang}} · {{amount}} (demo)",
     "hubEntry": "Kullo Partner",
-    "hubEntryHint": "Merchant · Driver"
+    "hubEntryHint": "Merchant · Driver",
+    "hubAppMissing": "Kullo Partner app is not installed. Install the separate APK."
   },
   "driver": {
     "title": "Driver panel",
@@ -1316,7 +1359,25 @@
   },
   "guide": {
     "subtitle": "Car guides and local news",
-    "demoNote": "Demo content — editorial CMS later."
+    "demoNote": "Demo content — editorial CMS later.",
+    "articles": {
+      "usedChecklist": {
+        "title": "Used-car checklist in Erbil",
+        "meta": "Guide · 6 min"
+      },
+      "hatwan": {
+        "title": "Hatwan rate: IQD/USD weekly digest",
+        "meta": "News · Today"
+      },
+      "airportTaxi": {
+        "title": "Airport transfer vs city taxi",
+        "meta": "Guide · 4 min"
+      },
+      "toggChina": {
+        "title": "Togg and Chinese brands in Kurdistan",
+        "meta": "News · Yesterday"
+      }
+    }
   },
   "wallet": {
     "subtitle": "Balance and payment methods",
@@ -1324,9 +1385,9 @@
     "demoBalance": "Demo balance · no real payments",
     "topUp": "Top up",
     "topUpPackages": "Quick top-up",
-    "topUpDoneTitle": "Balance added",
+    "topUpDoneTitle": "Balance topped up",
     "topUpDoneBody": "{{amount}} · {{method}} (demo)",
-    "listingFeeNote": "Listing fee: {{fee}} — cannot publish without balance",
+    "listingFeeNote": "Listing fee: {{fee}} — you can’t list with insufficient balance",
     "payMethod": "Payment method",
     "selected": "Selected method",
     "lastTopUp": "Last top-up",
@@ -1351,7 +1412,8 @@
       "stripe": "Stripe (Visa/MC)",
       "applePay": "Apple Pay",
       "googlePay": "Google Pay"
-    }
+    },
+    "title": "Wallet"
   },
   "currency": {
     "label": "Currency",
@@ -1517,6 +1579,26 @@
       "inTransit": "In Transit",
       "delivered": "Delivered",
       "cancelled": "Cancelled"
+    },
+    "minutesAgo": "{{count}} min ago",
+    "defaultShipper": "Shipper",
+    "demo": {
+      "load1Title": "Construction materials - Cement",
+      "load1Description": "20 tons cement, palletized",
+      "load2Title": "Cold chain - Produce",
+      "load2Description": "Fresh fruit and vegetables, reefer required",
+      "load3Title": "Furniture move",
+      "load3Description": "Household goods and furniture, careful handling",
+      "load4Title": "Agriculture - Wheat",
+      "load4Description": "25 tons wheat, silo truck preferred",
+      "load5Title": "Machinery equipment",
+      "load5Description": "CNC machine, lowboy required",
+      "bid1Carrier": "Fast Freight",
+      "bid1Msg": "Suitable truck available, ready to start.",
+      "bid2Carrier": "Safe Haul",
+      "bid2Msg": "10 years experience, insured transport.",
+      "reqReefer": "Reefer",
+      "reqDriver": "Experienced driver"
     }
   },
   "pricing": {
@@ -1730,7 +1812,11 @@
       "upcoming": "Upcoming",
       "sold_out": "Sold out",
       "constructing": "Constructing"
-    }
+    },
+    "aiSuggest1": "3+1 apartment for sale in Erbil",
+    "aiSuggest2": "2-bed rental in Baghdad",
+    "aiSuggest3": "Villa with pool in Shaqlawa",
+    "aiSuggest4": "Office under 100 m²"
   },
   "shop": {
     "title": "Shopping",
@@ -1941,7 +2027,50 @@
     "viewItems": "View items",
     "voucherBank": "50% off with bank cards",
     "minSpend": "Min spend IQD 12000",
-    "moreInfo": "More info"
+    "moreInfo": "More info",
+    "orderingEyebrow": "Food",
+    "orderingTitle": "Find your favorite flavors",
+    "orderingOpen": "Go to menu →",
+    "cravingPizza": "Pizza",
+    "cravingBurger": "Burger",
+    "cravingSushi": "Sushi",
+    "cravingGrill": "Grill",
+    "cravingChicken": "Chicken",
+    "cravingPasta": "Pasta",
+    "cravingCoffee": "Coffee",
+    "cravingDessert": "Dessert",
+    "cravingLocal": "Local",
+    "dishShawarma": "Shawarma wrap",
+    "cuisineFastFood": "Fast Food",
+    "cuisineGrills": "Grills",
+    "cuisineBurgers": "Burgers",
+    "cuisineSandwiches": "Sandwiches",
+    "cuisineKebab": "Kebab",
+    "cuisineShawarma": "Shawarma",
+    "cuisineSushi": "Sushi",
+    "tabAll": "All",
+    "tabFood": "Food",
+    "tabGroceries": "Groceries",
+    "tabStores": "Stores",
+    "tabHealth": "Health+",
+    "dishPepperoni": "Pepperoni pizza",
+    "dishSmashBurger": "Smash burger",
+    "dishSalmonRoll": "Salmon roll",
+    "dishAdana": "Adana kebab",
+    "dishCrispy": "Crispy bucket",
+    "dishCarbonara": "Carbonara",
+    "dishFlatWhite": "Flat white",
+    "savePercent": "Save {{n}}%",
+    "promo1Title": "Flash Sale",
+    "promo1Sub": "50% off + IQD 500 delivery",
+    "promo2Title": "Chicken Fries",
+    "promo2Sub": "Limited time deal",
+    "promo3Title": "Best sellers",
+    "promo3Sub": "30% off · Pro +10%",
+    "promo4Title": "Order & Win",
+    "promo4Sub": "Daily prizes",
+    "promo5Title": "Free delivery",
+    "promo5Sub": "On Kullo Pro"
   },
   "servicesHub": {
     "title": "Services",
@@ -2241,5 +2370,300 @@
         "handed": "Hand to courier"
       }
     }
+  },
+  "shell": {
+    "brandA11y": "kullo",
+    "localeCurrency": "Language & currency",
+    "deliverTo": "Deliver to",
+    "wallet": "Wallet",
+    "defaultCity": "Erbil"
+  },
+  "market": {
+    "title": "Kullo Mart",
+    "navHome": "Home",
+    "navMarket": "Market",
+    "navFood": "Food",
+    "navCart": "Cart",
+    "navAccount": "Account",
+    "navHomeHint": "Food",
+    "deliverTo": "Deliver to",
+    "searchPlaceholder": "Search products, brands or categories…",
+    "chipMarket": "Market",
+    "chipFood": "Food",
+    "flashSale": "Flash Sale",
+    "endsIn": "Ends in",
+    "buyAgain": "Buy again",
+    "viewAll": "View all",
+    "shopByCategory": "Shop by category",
+    "shopByBrand": "Shop by brand",
+    "aroundWorld": "Around the world",
+    "freshProduce": "Fresh fruit & veg",
+    "freshProduceSub": "Always fresh stock",
+    "nescafeSub": "A cooler coffee break",
+    "topSavers": "Top savers",
+    "dairy": "Dairy & eggs",
+    "snacks": "Snacks",
+    "drinks": "Beverages",
+    "explore": "Explore Market",
+    "viewCart": "View cart",
+    "emptyAisle": "No products in this aisle",
+    "cartEmptyTitle": "Cart is empty",
+    "cartEmptyBody": "Add items from Market or Food.",
+    "browseMarket": "Browse Market",
+    "browseFood": "Browse restaurants",
+    "cartMarket": "Market cart",
+    "cartFood": "Food cart",
+    "minOrderRemain": "Add {{amount}} more for min. order",
+    "minOrderMet": "Minimum order reached",
+    "checkoutMarket": "Checkout market (demo)",
+    "checkoutFood": "Continue food checkout",
+    "accountLead": "Orders, addresses and fashion",
+    "orders": "My orders",
+    "ordersHint": "Market and food history",
+    "addresses": "Addresses",
+    "addressesHint": "Delivery points",
+    "profile": "My account",
+    "profileHint": "Profile and settings",
+    "fashion": "Fashion / clothing",
+    "fashionHint": "C2C shopping storefront",
+    "onlyOnKullo": "Only on Kullo",
+    "upTo30Off": "Up to 30% off",
+    "proOffers": "pro offers",
+    "upTo": "Up to",
+    "percentOff50": "50% off",
+    "careClean": "Care & clean",
+    "yourCart": "Your cart"
+  },
+  "taxi": {
+    "hub": {
+      "wallet": "Wallet",
+      "bookRide": "Call taxi",
+      "parcel": "Parcel",
+      "intercity": "InterCity",
+      "airport": "To The Airport",
+      "promos": "Promos",
+      "multistop": "Multi-Stop Ride",
+      "multistopHint": "Multiple stops — shared corridor",
+      "nav": {
+        "home": "Home",
+        "activity": "Activity",
+        "pay": "Pay",
+        "inbox": "Inbox",
+        "account": "Account"
+      },
+      "promo": {
+        "coming": {
+          "title": "Something Big Is Coming",
+          "body": "Kullo Taxi — ride and parcel in one place.",
+          "cta": "Call"
+        },
+        "discover": {
+          "title": "Discover Erbil",
+          "body": "City rides, tips and more on your feed.",
+          "cta": "Explore"
+        },
+        "parcel": {
+          "title": "Send a parcel",
+          "body": "Small or large — courier to the door.",
+          "cta": "Send"
+        },
+        "connect": {
+          "title": "Stay Connected",
+          "body": "Favorite rides, exclusive offers and updates.",
+          "cta": "Follow Kullo"
+        },
+        "support": {
+          "title": "Always Listening",
+          "body": "24/7 dedicated support for rides and parcels.",
+          "cta": "Support"
+        }
+      }
+    },
+    "service": {
+      "passenger": "Ride",
+      "parcel": "Parcel"
+    },
+    "modes": {
+      "city": "Taxi",
+      "shared": "Shared",
+      "airport": "Airport"
+    },
+    "badge": {
+      "city": "Demo ride",
+      "shared": "Shared · demo",
+      "airport": "Airport transfer · demo",
+      "parcel": "Courier · demo"
+    },
+    "lead": {
+      "city": "Where to? Fare and ETA update instantly.",
+      "shared": "Share the route, pay less. Same corridor, shared seats.",
+      "airport": "Airport ↔ city transfer.",
+      "parcel": "Send or pick up a parcel — pick a size, match a courier."
+    },
+    "from": "From",
+    "to": "To",
+    "fromPlaceholder": "Pickup point",
+    "toPlaceholder": "Destination",
+    "wherePlaceholder": "Where would you go?",
+    "parcelFromPlaceholder": "Parcel pickup address",
+    "parcelToPlaceholder": "Delivery address",
+    "parcelSize": "Parcel size",
+    "vehicles": {
+      "ekonomi": "Economy",
+      "konfor": "Comfort",
+      "vip": "VIP"
+    },
+    "parcels": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
+    },
+    "map": {
+      "pickup": "Pick up",
+      "drop": "Drop off"
+    },
+    "vehicleType": "Vehicle type",
+    "payment": "Payment",
+    "allMethods": "All methods (Qi Card, Apple Pay…)",
+    "eta": "ETA",
+    "fare": "Fare estimate",
+    "minutes": "min",
+    "ctaCity": "Call taxi",
+    "ctaShared": "Book a seat",
+    "ctaAirport": "Call transfer",
+    "ctaParcel": "Call courier",
+    "recenter": "Recenter map",
+    "openDriver": "Driver / courier panel",
+    "demoNote": "Demo flow — no real ride is dispatched.",
+    "missingTitle": "Missing info",
+    "missingBody": "Please enter a destination.",
+    "demoCreated": "Demo ride created",
+    "matchedTitle": "Driver matched",
+    "matchedCourierTitle": "Courier matched",
+    "matchedDriver": "Matched driver",
+    "matchedCourier": "Matched courier",
+    "matchedEta": "ETA ~{{min}} min",
+    "matching": "Finding a driver…",
+    "matchingCourier": "Finding a courier…",
+    "goHome": "Home",
+    "intercityBannerTitle": "Intercity shared rides",
+    "intercityBannerBody": "Erbil–Duhok, Erbil–Suli, Baghdad–Erbil… seats and fares.",
+    "intercityBannerCta": "Open",
+    "now": "Now",
+    "forMe": "For me",
+    "confirmPickup": "Confirm pick-up",
+    "confirmPickupHint": "You’ll be picked up at the pin on the map",
+    "bookingOptions": "Booking options",
+    "dateTime": "Date and time",
+    "bookingFor": "Booking for",
+    "bookingForMe": "Me",
+    "confirm": "Confirm",
+    "addStop": "Add stop",
+    "suggestions": "Suggestions",
+    "kmAway": "{{km}} km",
+    "careemTiles": {
+      "taxi": "Taxi",
+      "airport": "To Airport"
+    },
+    "pickupPlaces": {
+      "downtown": "Erbil Downtown",
+      "royal": "Royal City",
+      "ankawa": "Ankawa",
+      "airport": "Erbil International Airport (EIA)",
+      "hertz": "Hertz Rental Car",
+      "meet": "Meet & Greet Hall Erbil International Airport",
+      "mall": "Family Mall"
+    }
+  },
+  "socialAgency": {
+    "title": "Social media agency",
+    "subtitle": "We manage listing and gallery content",
+    "lead": "Content, stories and ads for sellers — Kullo team or AI assistant.",
+    "packBasic": "Starter",
+    "packBasicBody": "4 posts / week · stories · hashtags",
+    "packPro": "Pro gallery",
+    "packProBody": "Daily content · ads · reporting",
+    "packAgency": "Agency",
+    "packAgencyBody": "Full management · shoots · performance",
+    "cta": "Send request",
+    "sentTitle": "Request received",
+    "sentBody": "Our team will contact you about the {{pack}} pack (demo).",
+    "priceBasic": "150K IQD/mo",
+    "pricePro": "350K IQD/mo",
+    "priceAgency": "Custom"
+  },
+  "boost": {
+    "title": "Boost",
+    "subtitle": "Grow your listing in-app and on social",
+    "sellerOnly": "This feature is for seller / dealer accounts.",
+    "pickChannel": "Where should it stand out?",
+    "app": "In the app",
+    "appHint": "Home showcase + search top ranks",
+    "social": "On social media",
+    "socialHint": "Instagram / Facebook / TikTok story & post",
+    "both": "Both",
+    "bothHint": "App + social pack — most visible option",
+    "pay": "Pay from wallet",
+    "successTitle": "Boost active",
+    "successBody": "{{channel}} pack · {{amount}} charged",
+    "needFunds": "Insufficient balance. Add {{need}} to wallet.",
+    "loginFirst": "Sign in to boost"
+  },
+  "about": {
+    "backA11y": "Back",
+    "copy": "Kullo is a mobility marketplace for car sales, rentals, and soon taxi — one app.",
+    "version": "Version {{version}}",
+    "services": {
+      "sell": {
+        "label": "Sales",
+        "hint": "Buy · sell"
+      },
+      "rent": {
+        "label": "Rentals",
+        "hint": "Daily · long-term"
+      },
+      "taxi": {
+        "label": "Taxi",
+        "hint": "Coming soon"
+      }
+    }
+  },
+  "agents": {
+    "title": "Agent inspector",
+    "heroTitle": "Central agent",
+    "heroSub": "The hub that manages every worker",
+    "activeWorkers": "Active workers",
+    "capabilities": "Capabilities",
+    "workers": "Workers",
+    "last24h": "Last 24 hours",
+    "architecture": "Architecture",
+    "status": {
+      "active": "ACTIVE",
+      "paused": "PAUSED",
+      "disabled": "OFF"
+    },
+    "arch": {
+      "central": {
+        "label": "Central agent",
+        "sub": "intent → plan → dispatch → compose"
+      },
+      "planner": {
+        "label": "Task planner",
+        "sub": "DAG + dependency awareness"
+      },
+      "registry": {
+        "label": "Worker registry",
+        "sub": "retry + fallback"
+      },
+      "bus": {
+        "label": "Agent message bus",
+        "sub": "JSON-RPC"
+      },
+      "memory": {
+        "label": "Central memory",
+        "sub": "Redis + DB"
+      }
+    },
+    "callsSuccess": "{{calls}} calls · {{pct}}% success"
   }
 }

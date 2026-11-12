@@ -1,0 +1,137 @@
+{
+  "common": {
+    "back": "Back"
+  },
+  "partnerHub": {
+    "brand": "Kullo Partner",
+    "live": "Live",
+    "switchRole": "Switch role",
+    "exitConsumer": "Back to role select",
+    "courierSoon": "Soon — mode inside Partner",
+    "roleSelect": {
+      "title": "How do you work?",
+      "subtitle": "One Partner. Merchant, driver, or (later) courier — same login, same wallet.",
+      "footnote": "MVP: taxi driver + food merchant. Market and courier next."
+    },
+    "roles": {
+      "merchant": {
+        "title": "Merchant",
+        "body": "Food kitchen — accept, prep, hand off. Market coming soon."
+      },
+      "driver": {
+        "title": "Driver",
+        "body": "Taxi, shared and airport trips. Go online, take jobs."
+      },
+      "courier": {
+        "title": "Courier",
+        "body": "Food / market / parcel delivery. May split to its own app later."
+      }
+    },
+    "nav": {
+      "live": "Live",
+      "trips": "Trips",
+      "earnings": "Earnings",
+      "more": "More",
+      "kitchen": "Kitchen",
+      "menu": "Menu"
+    },
+    "driver": {
+      "title": "Driver",
+      "subtitle": "Taxi · live requests",
+      "incoming": "Incoming",
+      "noTrips": "No requests right now",
+      "filterTitle": "Trip type",
+      "filterHint": "No chip rows — pick in one sheet",
+      "filterAllHint": "Taxi + shared + airport",
+      "listingsLegacy": "Listings (consumer app)"
+    },
+    "merchant": {
+      "title": "Kitchen",
+      "subtitle": "Food merchant · order queue",
+      "open": "Open",
+      "closed": "Closed",
+      "openHint": "Receiving new orders",
+      "closedHint": "Orders paused",
+      "goOpen": "Open the restaurant to see orders",
+      "noOrders": "No active orders",
+      "queue": "Order queue",
+      "menuTitle": "Menu stock",
+      "reject": "Reject",
+      "listingsLegacy": "Listings (consumer app)",
+      "verticalTitle": "Merchant vertical",
+      "verticalHint": "MVP: food. Market is phase 2.",
+      "vertical": {
+        "food": "Food",
+        "foodHint": "Restaurant kitchen panel",
+        "market": "Market",
+        "marketSoon": "Phase 2 — soon"
+      },
+      "filterTitle": "Queue filter",
+      "filter": {
+        "active": "Active",
+        "all": "All",
+        "done": "Done"
+      },
+      "stats": {
+        "orders": "Orders",
+        "revenue": "Revenue",
+        "prep": "Prep"
+      },
+      "status": {
+        "new": "New",
+        "accepted": "Accepted",
+        "preparing": "Preparing",
+        "ready": "Ready",
+        "handed": "Handed off",
+        "cancelled": "Cancelled"
+      },
+      "advance": {
+        "accepted": "Accept",
+        "preparing": "Start prep",
+        "ready": "Mark ready",
+        "handed": "Hand to courier"
+      }
+    }
+  },
+  "driver": {
+    "title": "Driver panel",
+    "subtitle": "Taxi driver or parcel courier — one panel",
+    "online": "Online",
+    "offline": "Offline",
+    "onlineHint": "Receiving requests",
+    "offlineHint": "Requests off — tap to go online",
+    "goOnline": "Go online to see trips",
+    "trips": "Trips",
+    "seats": "seats",
+    "accept": "Accept",
+    "reject": "Reject",
+    "complete": "Complete trip",
+    "payouts": "Earnings / wallet",
+    "role": {
+      "label": "Profile",
+      "taxi": "Taxi driver",
+      "parcel": "Parcel courier"
+    },
+    "stats": {
+      "earnings": "Today earnings",
+      "trips": "Trips",
+      "rating": "Rating",
+      "hours": "Online"
+    },
+    "modes": {
+      "all": "All",
+      "taxi": "Taxi",
+      "shared": "Shared",
+      "airport": "Airport",
+      "parcel": "Parcel"
+    },
+    "status": {
+      "incoming": "New",
+      "active": "Active",
+      "done": "Done"
+    }
+  },
+  "hub": {
+    "pay": "Wallet / Pay"
+  }
+}

@@ -285,7 +285,35 @@
     "apiAddressHint": "Tunnel / soft-live gateway. Kaydetmek için düzenleyip Kaydet’e bas.",
     "apiAddressPlaceholder": "https://….trycloudflare.com",
     "apiAddressReset": "Varsayılana dön",
-    "apiAddressSaved": "API adresi güncellendi"
+    "apiAddressSaved": "API adresi güncellendi",
+    "guestTitle": "Giriş yap, favorilerini kaydet",
+    "guestSub": "İlanlarını takip et, aramalarını sakla.",
+    "roleDealer": "Satıcı",
+    "roleUser": "Kullanıcı",
+    "agentInspector": "Agent Inspector",
+    "favoritesEmpty": "Henüz favori yok",
+    "favoritesEmptySub": "Beğendiğiniz ilanları kalp ile kaydedin; sonra buradan hızlıca dönün.",
+    "favoritesBrowse": "İlanlara göz at",
+    "notificationsClear": "Temizle",
+    "notificationsClearA11y": "Tümünü temizle",
+    "notificationsCount": "{{count}} bildirim",
+    "notificationsEmpty": "Bildirim yok",
+    "notificationsEmptySub": "Fiyat düşüşleri, mesajlar ve kiralama güncellemeleri burada görünür.",
+    "notificationsLoadDemo": "Demo bildirimleri yükle",
+    "savedSearchesCount": "{{count}} kayıt",
+    "savedSearchesEmpty": "Kayıtlı arama yok",
+    "savedSearchesEmptySub": "Sonuç ekranından aramayı kaydet; bir dokunuşla aynı filtrelere dön.",
+    "savedSearchesGo": "Aramaya git",
+    "savedSearchesDeleteTitle": "Silinsin mi?",
+    "savedSearchesDeleteBody": "\"{{title}}\" kayıtlardan kaldırılacak.",
+    "aboutBody": "Kullo; araç satış, kiralama ve yakında taksi çağırma ile tek uygulama altında güvenli bir mobilite pazarıdır.",
+    "aboutSell": "Satış",
+    "aboutSellHint": "Al · sat",
+    "aboutRent": "Kiralama",
+    "aboutRentHint": "Günlük · uzun dönem",
+    "aboutTaxi": "Taksi",
+    "aboutTaxiHint": "Yakında",
+    "versionLabel": "Sürüm {{version}}"
   },
   "common": {
     "loading": "Yükleniyor...",
@@ -712,7 +740,8 @@
       "city": "Şehir",
       "cityPh": "Erbil",
       "note": "Not (isteğe bağlı)",
-      "notePh": "Kısa motivasyon…"
+      "notePh": "Kısa motivasyon…",
+      "headlineCandidate": "{{title}} adayı"
     },
     "cities": {
       "all": "Tümü",
@@ -981,7 +1010,8 @@
     "bookPrivate": "Rezerve et",
     "total": "Toplam",
     "distanceKm": "{{n}} km",
-    "mapSoon": "Harita yükleniyor…"
+    "mapSoon": "Harita yükleniyor…",
+    "hotelAdults_plural": "{{count}} Yetişkin"
   },
   "mart": {
     "title": "Kullo Mart",
@@ -1030,7 +1060,14 @@
     "profile": "Hesabım",
     "profileHint": "Profil ve ayarlar",
     "fashion": "Moda / giyim",
-    "fashionHint": "C2C alışveriş vitrini"
+    "fashionHint": "C2C alışveriş vitrini",
+    "careClean": "Temizlik",
+    "yourCart": "Sepetin",
+    "onlyOnKullo": "Sadece Kullo’da",
+    "upTo30Off": "İndirim %30’a var",
+    "proOffers": "özel fırsatlar",
+    "upTo": "Kadardır",
+    "percentOff50": "%50 indirim"
   },
   "ride": {
     "hub": {
@@ -1222,6 +1259,12 @@
       "sedan": "Sedan",
       "suv": "SUV",
       "van": "Van / pickup"
+    },
+    "slots": {
+      "today1400": "Bugün · 14:00",
+      "today1700": "Bugün · 17:00",
+      "tomorrow1000": "Yarın · 10:00",
+      "tomorrow1600": "Yarın · 16:00"
     }
   },
   "partner": {
@@ -1280,7 +1323,8 @@
     "contractCreatedTitle": "Kontrat oluşturuldu",
     "contractCreatedBody": "{{type}} · {{lang}} · {{amount}} (demo)",
     "hubEntry": "Kullo Partner",
-    "hubEntryHint": "Merchant · Sürücü"
+    "hubEntryHint": "Merchant · Sürücü",
+    "hubAppMissing": "Kullo Partner uygulaması yüklü değil. Ayrı APK olarak kurun."
   },
   "driver": {
     "title": "Sürücü paneli",
@@ -1322,7 +1366,25 @@
   },
   "guide": {
     "subtitle": "Araç rehberi ve yerel haberler",
-    "demoNote": "Demo içerik — editöryel CMS sonra bağlanır."
+    "demoNote": "Demo içerik — editöryel CMS sonra bağlanır.",
+    "articles": {
+      "usedChecklist": {
+        "title": "Erbil’de ikinci el alırken kontrol listesi",
+        "meta": "Rehber · 6 dk"
+      },
+      "hatwan": {
+        "title": "Hatwan kuru: IQD/USD haftalık özet",
+        "meta": "Haber · Bugün"
+      },
+      "airportTaxi": {
+        "title": "Havalimanı transferi vs şehir taksisi",
+        "meta": "Rehber · 4 dk"
+      },
+      "toggChina": {
+        "title": "Togg ve Çin markaları Kürdistan’da",
+        "meta": "Haber · Dün"
+      }
+    }
   },
   "wallet": {
     "subtitle": "Bakiye ve ödeme yöntemleri",
@@ -1357,7 +1419,8 @@
       "stripe": "Stripe (Visa/MC)",
       "applePay": "Apple Pay",
       "googlePay": "Google Pay"
-    }
+    },
+    "title": "Cüzdan"
   },
   "currency": {
     "label": "Para birimi",
@@ -1523,6 +1586,26 @@
       "inTransit": "Taşımada",
       "delivered": "Teslim Edildi",
       "cancelled": "İptal Edildi"
+    },
+    "minutesAgo": "{{count}} dk önce",
+    "defaultShipper": "Yük Sahibi",
+    "demo": {
+      "load1Title": "İnşaat Malzemesi - Çimento",
+      "load1Description": "20 ton çimento, paletli",
+      "load2Title": "Soğuk Zincir - Meyve Sebze",
+      "load2Description": "Taze meyve ve sebze, frigorifik araç gerekli",
+      "load3Title": "Mobilya Taşıma",
+      "load3Description": "Ev eşyası ve mobilya, dikkatli taşıma gerekli",
+      "load4Title": "Tarım Ürünleri - Buğday",
+      "load4Description": "25 ton buğday, silobas tercih edilir",
+      "load5Title": "Makine Ekipmanı",
+      "load5Description": "CNC tezgah, lowboy gerekli",
+      "bid1Carrier": "Hızlı Nakliyat",
+      "bid1Msg": "Uygun araç mevcut, hemen başlayabiliriz.",
+      "bid2Carrier": "Güvenli Taşıma",
+      "bid2Msg": "10 yıllık tecrübe, sigortalı taşıma.",
+      "reqReefer": "Frigorifik",
+      "reqDriver": "Tecrübeli Sürücü"
     }
   },
   "pricing": {
@@ -1622,7 +1705,10 @@
     "packAgencyBody": "Tam yönetim · çekim · performans",
     "cta": "Talep gönder",
     "sentTitle": "Talep alındı",
-    "sentBody": "{{pack}} paketi için ekibimiz iletişime geçecek (demo)."
+    "sentBody": "{{pack}} paketi için ekibimiz iletişime geçecek (demo).",
+    "priceBasic": "150K IQD/ay",
+    "pricePro": "350K IQD/ay",
+    "priceAgency": "Özel"
   },
   "realty": {
     "title": "Emlak",
@@ -1767,7 +1853,11 @@
       "upcoming": "Yakında",
       "sold_out": "Tükendi",
       "constructing": "İnşaatta"
-    }
+    },
+    "aiSuggest1": "Erbil’de 3+1 satılık daire",
+    "aiSuggest2": "Bağdat kiralık 2 yatak",
+    "aiSuggest3": "Villa + havuz Shaqlawa",
+    "aiSuggest4": "100 m² altı ofis"
   },
   "shop": {
     "title": "Alışveriş",
@@ -1978,7 +2068,50 @@
     "viewItems": "Ürünleri gör",
     "voucherBank": "Banka kartlarıyla %50",
     "minSpend": "Min. IQD 12000",
-    "moreInfo": "Daha fazla"
+    "moreInfo": "Daha fazla",
+    "orderingEyebrow": "Yemek",
+    "orderingTitle": "Favori lezzetini bul",
+    "orderingOpen": "Menüye git →",
+    "cravingPizza": "Pizza",
+    "cravingBurger": "Burger",
+    "cravingSushi": "Sushi",
+    "cravingGrill": "Izgara",
+    "cravingChicken": "Tavuk",
+    "cravingPasta": "Pasta",
+    "cravingCoffee": "Kahve",
+    "cravingDessert": "Tatlı",
+    "cravingLocal": "Yerel",
+    "dishShawarma": "Shawarma dürüm",
+    "cuisineFastFood": "Fast Food",
+    "cuisineGrills": "Izgara",
+    "cuisineBurgers": "Burger",
+    "cuisineSandwiches": "Sandviç",
+    "cuisineKebab": "Kebab",
+    "cuisineShawarma": "Shawarma",
+    "cuisineSushi": "Sushi",
+    "tabAll": "Tümü",
+    "tabFood": "Yemek",
+    "tabGroceries": "Market",
+    "tabStores": "Mağazalar",
+    "tabHealth": "Sağlık+",
+    "dishPepperoni": "Pepperoni pizza",
+    "dishSmashBurger": "Smash burger",
+    "dishSalmonRoll": "Salmon roll",
+    "dishAdana": "Adana kebab",
+    "dishCrispy": "Crispy bucket",
+    "dishCarbonara": "Carbonara",
+    "dishFlatWhite": "Flat white",
+    "savePercent": "%{{n}} indirim",
+    "promo1Title": "Flash Sale",
+    "promo1Sub": "%50 indirim + IQD 500 teslimat",
+    "promo2Title": "Chicken Fries",
+    "promo2Sub": "Sınırlı süre",
+    "promo3Title": "En çok satanlar",
+    "promo3Sub": "%30 indirim · Pro +%10",
+    "promo4Title": "Sipariş ver & kazan",
+    "promo4Sub": "Günlük ödüller",
+    "promo5Title": "Ücretsiz teslimat",
+    "promo5Sub": "Kullo Pro ile"
   },
   "servicesHub": {
     "title": "Hizmetler",
@@ -2278,5 +2411,266 @@
         "handed": "Kuryeye ver"
       }
     }
+  },
+  "shell": {
+    "brandA11y": "kullo",
+    "localeCurrency": "Dil ve para birimi",
+    "deliverTo": "Teslimat adresi",
+    "wallet": "Cüzdan",
+    "defaultCity": "Erbil"
+  },
+  "market": {
+    "title": "Kullo Mart",
+    "navHome": "Ana",
+    "navMarket": "Market",
+    "navFood": "Yemek",
+    "navCart": "Sepet",
+    "navAccount": "Hesap",
+    "navHomeHint": "Yemek",
+    "deliverTo": "Teslimat adresi",
+    "searchPlaceholder": "Ürün, marka veya kategori ara…",
+    "chipMarket": "Market",
+    "chipFood": "Yemek",
+    "flashSale": "Flash Sale",
+    "endsIn": "Bitiş",
+    "buyAgain": "Tekrar al",
+    "viewAll": "Tümü",
+    "shopByCategory": "Kategoriye göre alışveriş",
+    "shopByBrand": "Markaya göre alışveriş",
+    "aroundWorld": "Dünyadan lezzetler",
+    "freshProduce": "Taze sebze & meyve",
+    "freshProduceSub": "Her gün taze stok",
+    "nescafeSub": "Serin bir kahve molası",
+    "topSavers": "En iyi fırsatlar",
+    "dairy": "Süt ve yumurta",
+    "snacks": "Atıştırmalıklar",
+    "drinks": "İçecekler",
+    "explore": "Market'i keşfet",
+    "viewCart": "Sepeti gör",
+    "emptyAisle": "Bu rafta ürün yok",
+    "cartEmptyTitle": "Sepet boş",
+    "cartEmptyBody": "Market veya Food'dan ürün ekle.",
+    "browseMarket": "Market'e git",
+    "browseFood": "Restoranlara git",
+    "cartMarket": "Market sepeti",
+    "cartFood": "Yemek sepeti",
+    "minOrderRemain": "Min. sipariş için {{amount}} daha ekle",
+    "minOrderMet": "Minimum sipariş tamam",
+    "checkoutMarket": "Market siparişi (demo)",
+    "checkoutFood": "Yemek siparişine devam",
+    "accountLead": "Siparişler, adresler ve moda vitrini",
+    "orders": "Siparişlerim",
+    "ordersHint": "Market ve yemek geçmişi",
+    "addresses": "Adresler",
+    "addressesHint": "Teslimat noktaları",
+    "profile": "Hesabım",
+    "profileHint": "Profil ve ayarlar",
+    "fashion": "Moda / giyim",
+    "fashionHint": "C2C alışveriş vitrini",
+    "onlyOnKullo": "Sadece Kullo’da",
+    "upTo30Off": "İndirim %30’a var",
+    "proOffers": "özel fırsatlar",
+    "upTo": "Kadardır",
+    "percentOff50": "%50 indirim",
+    "careClean": "Temizlik",
+    "yourCart": "Sepetin"
+  },
+  "taxi": {
+    "hub": {
+      "wallet": "Cüzdan",
+      "bookRide": "Taksi çağır",
+      "parcel": "Paket",
+      "intercity": "Şehirler arası",
+      "airport": "Havalimanı",
+      "promos": "Kampanyalar",
+      "multistop": "Çok duraklı",
+      "multistopHint": "Birden fazla durağa git — paylaşımlı rota",
+      "nav": {
+        "home": "Ev",
+        "activity": "Etkinlik",
+        "pay": "Ödeme",
+        "inbox": "Gelen kutusu",
+        "account": "Hesap"
+      },
+      "promo": {
+        "coming": {
+          "title": "Büyük bir şey geliyor",
+          "body": "Kullo Taksi — yolcu ve paket tek yerde.",
+          "cta": "Çağır"
+        },
+        "discover": {
+          "title": "Erbil’i keşfet",
+          "body": "Şehir içi yolculuklar, öneriler ve daha fazlası.",
+          "cta": "Keşfet"
+        },
+        "parcel": {
+          "title": "Paket gönder",
+          "body": "Küçük veya büyük — kurye kapında.",
+          "cta": "Gönder"
+        },
+        "connect": {
+          "title": "Bağlı kal",
+          "body": "Favori rotalar, özel teklifler ve güncellemeler.",
+          "cta": "Kullo’yu takip et"
+        },
+        "support": {
+          "title": "Her zaman dinliyoruz",
+          "body": "7/24 destek — yolcu ve paket soruların için buradayız.",
+          "cta": "Destek"
+        }
+      }
+    },
+    "service": {
+      "passenger": "Yolcu",
+      "parcel": "Paket"
+    },
+    "modes": {
+      "city": "Taksi",
+      "shared": "Paylaşımlı",
+      "airport": "Havalimanı"
+    },
+    "badge": {
+      "city": "Demo çağrı",
+      "shared": "Paylaşımlı · demo",
+      "airport": "Airport transfer · demo",
+      "parcel": "Kurye · demo"
+    },
+    "lead": {
+      "city": "Nereden nereye? Tahmini ücret ve ETA anında hesaplanır.",
+      "shared": "Rotayı paylaş, daha uygun ücret. Aynı güzergâhta koltuk paylaşırsın.",
+      "airport": "Havalimanı ↔ şehir transferi.",
+      "parcel": "Paket al veya gönder — boyutu seç, kurye eşleşsin."
+    },
+    "from": "Nereden",
+    "to": "Nereye",
+    "fromPlaceholder": "Alış noktası",
+    "toPlaceholder": "Varış noktası",
+    "wherePlaceholder": "Nereye gideceksin?",
+    "parcelFromPlaceholder": "Paket alınacak adres",
+    "parcelToPlaceholder": "Teslim adresi",
+    "parcelSize": "Paket boyutu",
+    "vehicles": {
+      "ekonomi": "Ekonomi",
+      "konfor": "Konfor",
+      "vip": "VIP"
+    },
+    "parcels": {
+      "small": "Küçük",
+      "medium": "Orta",
+      "large": "Büyük"
+    },
+    "map": {
+      "pickup": "Alış",
+      "drop": "Teslim"
+    },
+    "vehicleType": "Araç tipi",
+    "payment": "Ödeme",
+    "allMethods": "Tüm yöntemler (Qi Card, Apple Pay…)",
+    "eta": "Tahmini varış",
+    "fare": "Ücret tahmini",
+    "minutes": "dakika",
+    "ctaCity": "Taksi çağır",
+    "ctaShared": "Koltuk ayırt",
+    "ctaAirport": "Transfer çağır",
+    "ctaParcel": "Kurye çağır",
+    "recenter": "Konumu yenile",
+    "openDriver": "Taksici / taşıyıcı paneli",
+    "demoNote": "Bu bir demo akıştır — gerçek çağrı yapılmaz.",
+    "missingTitle": "Eksik bilgi",
+    "missingBody": "Lütfen varış noktasını girin.",
+    "demoCreated": "Demo çağrı oluşturuldu",
+    "matchedTitle": "Sürücü eşleşti",
+    "matchedCourierTitle": "Kurye eşleşti",
+    "matchedDriver": "Eşleşen sürücü",
+    "matchedCourier": "Eşleşen kurye",
+    "matchedEta": "ETA ~{{min}} dk",
+    "matching": "Sürücü aranıyor…",
+    "matchingCourier": "Kurye aranıyor…",
+    "goHome": "Ana sayfa",
+    "intercityBannerTitle": "Şehirler arası seferler",
+    "intercityBannerBody": "Erbil–Duhok, Erbil–Suli, Bağdat–Erbil… koltuk ve fiyat listesi.",
+    "intercityBannerCta": "Aç",
+    "now": "Şimdi",
+    "forMe": "Benim için",
+    "confirmPickup": "Alış noktasını onayla",
+    "confirmPickupHint": "Haritada gösterilen noktadan alınacaksın",
+    "bookingOptions": "Rezervasyon seçenekleri",
+    "dateTime": "Tarih ve saat",
+    "bookingFor": "Kimin için",
+    "bookingForMe": "Ben",
+    "confirm": "Onayla",
+    "addStop": "Durak ekle",
+    "suggestions": "Öneriler",
+    "kmAway": "{{km}} km",
+    "careemTiles": {
+      "taxi": "Taksi",
+      "airport": "Havalimanı"
+    },
+    "pickupPlaces": {
+      "downtown": "Erbil Downtown",
+      "royal": "Royal City",
+      "ankawa": "Ankawa",
+      "airport": "Erbil International Airport (EIA)",
+      "hertz": "Hertz Rental Car",
+      "meet": "Meet & Greet Hall Erbil International Airport",
+      "mall": "Family Mall"
+    }
+  },
+  "about": {
+    "backA11y": "Geri",
+    "copy": "Kullo; araç satış, kiralama ve yakında taksi çağırma ile tek uygulama altında bir mobilite pazarıdır.",
+    "version": "Sürüm {{version}}",
+    "services": {
+      "sell": {
+        "label": "Satış",
+        "hint": "Al · sat"
+      },
+      "rent": {
+        "label": "Kiralama",
+        "hint": "Günlük · uzun dönem"
+      },
+      "taxi": {
+        "label": "Taksi",
+        "hint": "Yakında"
+      }
+    }
+  },
+  "agents": {
+    "title": "Ajan Denetçisi",
+    "heroTitle": "Merkez Ajan",
+    "heroSub": "Tüm worker'ları yöneten merkez ajan",
+    "activeWorkers": "Aktif Worker",
+    "capabilities": "Yetenek",
+    "workers": "Worker'lar",
+    "last24h": "Son 24 saat",
+    "architecture": "Mimari",
+    "status": {
+      "active": "AKTİF",
+      "paused": "DURAKLATILDI",
+      "disabled": "KAPALI"
+    },
+    "arch": {
+      "central": {
+        "label": "Merkez Ajan",
+        "sub": "intent → plan → dispatch → compose"
+      },
+      "planner": {
+        "label": "Görev Planlayıcı",
+        "sub": "DAG + bağımlılık farkındalığı"
+      },
+      "registry": {
+        "label": "Worker Kaydı",
+        "sub": "retry + fallback"
+      },
+      "bus": {
+        "label": "Ajan Mesaj Bus",
+        "sub": "JSON-RPC"
+      },
+      "memory": {
+        "label": "Merkez Bellek",
+        "sub": "Redis + DB"
+      }
+    },
+    "callsSuccess": "{{calls}} çağrı · {{pct}}% başarı"
   }
 }

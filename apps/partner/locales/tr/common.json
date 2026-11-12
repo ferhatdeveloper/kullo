@@ -1,0 +1,137 @@
+{
+  "common": {
+    "back": "Geri"
+  },
+  "partnerHub": {
+    "brand": "Kullo Partner",
+    "live": "Canlı",
+    "switchRole": "Rol değiştir",
+    "exitConsumer": "Rol seçimine dön",
+    "courierSoon": "Yakında — Partner içinde mod",
+    "roleSelect": {
+      "title": "Nasıl çalışıyorsun?",
+      "subtitle": "Tek Partner. Merchant, sürücü veya (ileride) kurye — aynı giriş, aynı cüzdan.",
+      "footnote": "MVP: taksi sürücü + yemek merchant. Market ve kurye sonraki faz."
+    },
+    "roles": {
+      "merchant": {
+        "title": "Merchant",
+        "body": "Yemek mutfağı — sipariş kabul, hazırla, teslim et. Market yakında."
+      },
+      "driver": {
+        "title": "Sürücü",
+        "body": "Taksi, paylaşımlı ve havalimanı seferleri. Online ol, talep al."
+      },
+      "courier": {
+        "title": "Kurye",
+        "body": "Yemek / market / paket teslimatı. Hacim gelince ayrı app olabilir."
+      }
+    },
+    "nav": {
+      "live": "Canlı",
+      "trips": "Sefer",
+      "earnings": "Kazanç",
+      "more": "Diğer",
+      "kitchen": "Mutfak",
+      "menu": "Menü"
+    },
+    "driver": {
+      "title": "Sürücü",
+      "subtitle": "Taksi · canlı talep",
+      "incoming": "Gelen talepler",
+      "noTrips": "Şu an talep yok",
+      "filterTitle": "Sefer tipi",
+      "filterHint": "Chip yok — tek sheet’ten seç",
+      "filterAllHint": "Taksi + paylaşımlı + havalimanı",
+      "listingsLegacy": "İlan paneli (tüketici app)"
+    },
+    "merchant": {
+      "title": "Mutfak",
+      "subtitle": "Yemek merchant · sipariş kuyruğu",
+      "open": "Açık",
+      "closed": "Kapalı",
+      "openHint": "Yeni sipariş alıyorsun",
+      "closedHint": "Siparişler kapalı",
+      "goOpen": "Sipariş görmek için restoranı aç",
+      "noOrders": "Aktif sipariş yok",
+      "queue": "Sipariş kuyruğu",
+      "menuTitle": "Menü stok",
+      "reject": "Reddet",
+      "listingsLegacy": "İlan paneli (tüketici app)",
+      "verticalTitle": "Merchant dikeyi",
+      "verticalHint": "MVP: yemek. Market sonraki faz.",
+      "vertical": {
+        "food": "Yemek",
+        "foodHint": "Restoran mutfak paneli",
+        "market": "Market",
+        "marketSoon": "Faz 2 — yakında"
+      },
+      "filterTitle": "Kuyruk filtresi",
+      "filter": {
+        "active": "Aktif",
+        "all": "Tümü",
+        "done": "Biten"
+      },
+      "stats": {
+        "orders": "Sipariş",
+        "revenue": "Ciro",
+        "prep": "Hazırlık"
+      },
+      "status": {
+        "new": "Yeni",
+        "accepted": "Kabul",
+        "preparing": "Hazırlanıyor",
+        "ready": "Hazır",
+        "handed": "Teslim",
+        "cancelled": "İptal"
+      },
+      "advance": {
+        "accepted": "Kabul et",
+        "preparing": "Hazırla",
+        "ready": "Hazır",
+        "handed": "Kuryeye ver"
+      }
+    }
+  },
+  "driver": {
+    "title": "Sürücü paneli",
+    "subtitle": "Taksici veya paket taşı — aynı panel",
+    "online": "Çevrimiçi",
+    "offline": "Çevrimdışı",
+    "onlineHint": "Talep alıyorsun",
+    "offlineHint": "Talepler kapalı — dokunarak aç",
+    "goOnline": "Talep görmek için çevrimiçi ol",
+    "trips": "Seferler",
+    "seats": "koltuk",
+    "accept": "Kabul",
+    "reject": "Reddet",
+    "complete": "Seferi bitir",
+    "payouts": "Kazanç / cüzdan",
+    "role": {
+      "label": "Profil",
+      "taxi": "Taksici",
+      "parcel": "Paket taşı"
+    },
+    "stats": {
+      "earnings": "Bugün kazanç",
+      "trips": "Sefer",
+      "rating": "Puan",
+      "hours": "Online"
+    },
+    "modes": {
+      "all": "Tümü",
+      "taxi": "Taksi",
+      "shared": "Paylaşımlı",
+      "airport": "Havalimanı",
+      "parcel": "Paket"
+    },
+    "status": {
+      "incoming": "Yeni",
+      "active": "Aktif",
+      "done": "Bitti"
+    }
+  },
+  "hub": {
+    "pay": "Cüzdan / Pay"
+  }
+}
