@@ -1,0 +1,65 @@
+{
+  "cli": {
+    "version": ">= 15.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "simulator": true
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://localhost:3000",
+        "EXPO_PUBLIC_AUTH_URL": "http://localhost:5000",
+        "EXPO_PUBLIC_ORCHESTRATOR_URL": "http://localhost:4050"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "resourceClass": "m1-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.kullo.berqenas.com",
+        "EXPO_PUBLIC_AUTH_URL": "https://auth.kullo.berqenas.com",
+        "EXPO_PUBLIC_ORCHESTRATOR_URL": "https://orch.kullo.berqenas.com"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "ios": {
+        "resourceClass": "m1-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.kullo.berqenas.com",
+        "EXPO_PUBLIC_AUTH_URL": "https://auth.kullo.berqenas.com",
+        "EXPO_PUBLIC_ORCHESTRATOR_URL": "https://orch.kullo.berqenas.com"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "./google-services.json",
+        "track": "internal"
+      },
+      "ios": {
+        "appleId": "",
+        "ascAppId": "",
+        "appleTeamId": ""
+      }
+    }
+  }
+}
