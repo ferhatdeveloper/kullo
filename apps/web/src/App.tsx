@@ -80,12 +80,12 @@ const BUDGETS = [
 const SERVICES = [
   { id: "taxi", label: "Taksi", desc: "Anında yolculuk", href: "#services" },
   { id: "rent", label: "Kiralama", desc: "Günlük / aylık", href: "#rentals" },
+  { id: "food", label: "Yemek", desc: "Restoranlar", href: "#food" },
   { id: "auction", label: "Müzayede", desc: "Canlı teklif", href: "#auctions" },
   { id: "wallet", label: "Cüzdan", desc: "Hatwan / IQD", href: "#wallet" },
-  { id: "wash", label: "Yıkama", desc: "Mobil servis", href: "#services" },
   { id: "shared", label: "Paylaşımlı", desc: "Şehirler arası", href: "#services" },
   { id: "boost", label: "Boost", desc: "İlan öne çıkar", href: "#sell" },
-  { id: "guide", label: "Rehber", desc: "Alım ipuçları", href: "#why" },
+  { id: "courier", label: "Kurye", desc: "Hızlı teslimat", href: "#services" },
 ] as const;
 
 const WHY = [
@@ -295,7 +295,7 @@ export function App() {
         body={
           page === "privacy"
             ? [
-                "Seyyare, hesap, ilan ve yolculuk verilerini hizmeti sunmak için işler.",
+                "Kullo, hesap, ilan ve yolculuk verilerini hizmeti sunmak için işler.",
                 "Oturum jetonları cihazda güvenli saklanır.",
                 "Soft-launch döneminde veriler demo ortamında tutulabilir.",
               ]
@@ -319,9 +319,9 @@ export function App() {
       <header className="dc-nav">
         <div className="dc-nav__inner">
           <button type="button" className="dc-nav__brand" onClick={goHome}>
-            <img src="/brand/seyyare-mark-light.png" alt="" width={32} height={32} />
+            <img src="/brand/kullo-logo-exact.png" alt="" width={32} height={32} />
             <span>
-              seyyare<span>.men</span>
+              kullo<span>.berqenas.com</span>
             </span>
           </button>
 
@@ -353,17 +353,17 @@ export function App() {
 
       <main>
         {/* —— Hero + floating search —— */}
-        <section className="dc-hero" aria-label="Seyyare">
+        <section className="dc-hero" aria-label="Kullo">
           <div className="dc-hero__frame">
             <img className="dc-hero__img" src={HERO_IMAGE} alt="" />
             <div className="dc-hero__veil" />
             <div className="dc-hero__copy">
               <h1>
-                Irak araç
+                Irak genel
                 <br />
                 <em>pazarı</em>
               </h1>
-              <p>Hayalindeki aracı bul — al, kirala, yolculuk et</p>
+              <p>Araç, kiralama, taksi, yemek, kurye — tek platform</p>
             </div>
 
             <div className="dc-search-wrap">
@@ -476,10 +476,10 @@ export function App() {
           </div>
         </section>
 
-        {/* —— Seyyare services (extra) —— */}
+        {/* —— Kullo services (extra) —— */}
         <section className="dc-sec" id="services">
           <div className="dc-sec__head">
-            <h2>Seyyare servisleri</h2>
+            <h2>Kullo servisleri</h2>
             <button type="button" className="dc-linkbtn" onClick={() => setMoreOpen((v) => !v)}>
               {moreOpen ? "Gizle" : "Daha fazla"}
             </button>
@@ -673,7 +673,7 @@ export function App() {
         {/* —— Why buy —— */}
         <section className="dc-panel dc-panel--why" id="why">
           <div className="dc-panel__inner">
-            <h2 className="dc-why__title">Neden Seyyare?</h2>
+            <h2 className="dc-why__title">Neden Kullo?</h2>
             <div className="dc-why">
               {WHY.map((w) => (
                 <article key={w.title}>
@@ -791,7 +791,7 @@ export function App() {
 
         {/* —— App download —— */}
         <section className="dc-app" id="app">
-          <img src="/brand/seyyare-mark-dark.png" alt="" width={48} height={48} />
+          <img src="/brand/kullo-logo-exact.png" alt="" width={48} height={48} />
           <div>
             <h2>Mobilde devam et</h2>
             <p>Android soft APK hazır · mağaza yayını prod domain sonrası.</p>
@@ -802,9 +802,9 @@ export function App() {
       <footer className="dc-foot">
         <div className="dc-foot__inner">
           <div className="dc-foot__brand">
-            <img src="/brand/seyyare-mark-light.png" alt="" width={24} height={24} />
+            <img src="/brand/kullo-logo-exact.png" alt="" width={24} height={24} />
             <span>
-              seyyare<span>.men</span>
+              kullo<span>.berqenas.com</span>
             </span>
           </div>
           <div className="dc-foot__cols">
@@ -833,7 +833,7 @@ export function App() {
               </button>
             </div>
           </div>
-          <p>© {new Date().getFullYear()} Seyyare · Irak araç pazarı</p>
+          <p>© {new Date().getFullYear()} Kullo · Irak genel pazarı</p>
         </div>
       </footer>
     </div>
@@ -1022,9 +1022,9 @@ function PricingPage({
       <header className="dc-nav">
         <div className="dc-nav__inner">
           <button type="button" className="dc-nav__brand" onClick={onBack}>
-            <img src="/brand/seyyare-mark-light.png" alt="" width={32} height={32} />
+            <img src="/brand/kullo-logo-exact.png" alt="" width={32} height={32} />
             <span>
-              seyyare<span>.men</span>
+              kullo<span>.berqenas.com</span>
             </span>
           </button>
 
@@ -1259,9 +1259,9 @@ function PricingPage({
       <footer className="dc-foot">
         <div className="dc-foot__inner">
           <div className="dc-foot__brand">
-            <img src="/brand/seyyare-mark-light.png" alt="" width={24} height={24} />
+            <img src="/brand/kullo-logo-exact.png" alt="" width={24} height={24} />
             <span>
-              seyyare<span>.men</span>
+              kullo<span>.berqenas.com</span>
             </span>
           </div>
           <div className="dc-foot__cols">
@@ -1286,7 +1286,7 @@ function PricingPage({
               <button type="button">Şartlar</button>
             </div>
           </div>
-          <p>© {new Date().getFullYear()} Seyyare · Irak araç pazarı</p>
+          <p>© {new Date().getFullYear()} Kullo · Irak genel pazarı</p>
         </div>
       </footer>
     </div>
