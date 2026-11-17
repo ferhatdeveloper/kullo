@@ -37,6 +37,23 @@
     "plugins": [
       "expo-router",
       "expo-font",
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Canlı sefer ve teslimat için konum kullanılır.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isIosBackgroundLocationEnabled": true
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#F36A1C",
+          "sounds": []
+        }
+      ],
       "./plugins/withMonorepoRoot.js"
     ],
     "experiments": {

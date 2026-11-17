@@ -1,6 +1,6 @@
-# Seyyare Web (marketing)
+# Kullo Web (marketing)
 
-Public marketplace landing for soft-live / production gateway.
+Public marketplace landing for kullo.berqenas.com.
 
 ## Dev
 
@@ -12,7 +12,7 @@ pnpm dev       # http://localhost:5173 (proxies /api → :8088)
 
 ## Docker
 
-Built as `seyyare-web` and proxied from gateway nginx at `/`.
+Built as `kullo-web` and proxied from gateway nginx at `/`.
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.soft.yml --env-file .env up -d --build web nginx

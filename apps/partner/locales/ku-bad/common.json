@@ -1,0 +1,137 @@
+{
+  "common": {
+    "back": "Paş"
+  },
+  "partnerHub": {
+    "brand": "Kullo Partner",
+    "live": "Zindî",
+    "switchRole": "Rola biguherîne",
+    "exitConsumer": "Vegere hilbijartina rolê",
+    "courierSoon": "Zû — moda di Partner de",
+    "roleSelect": {
+      "title": "Tu çawa dixebitî?",
+      "subtitle": "Yek Partner. Bazirgan, şofer, an (paşê) kurye — heman têketinê, heman berîk.",
+      "footnote": "MVP: şoferê taksiyê + bazirganê xwarinê. Bazaar û kurye di qonaxa din de."
+    },
+    "roles": {
+      "merchant": {
+        "title": "Bazirgan",
+        "body": "Metbexê xwarinê — qebûl bike, amade bike, radest bike. Bazaar zû tê."
+      },
+      "driver": {
+        "title": "Şofer",
+        "body": "Taksî, hevpar û balafirgehê. Online be, daxwazan bistîne."
+      },
+      "courier": {
+        "title": "Kurye",
+        "body": "Radestkirina xwarinê / bazaar / pakêt. Dibe ku paşê bibe app-a cuda."
+      }
+    },
+    "nav": {
+      "live": "Zindî",
+      "trips": "Sefer",
+      "earnings": "Qezenc",
+      "more": "Zêdetir",
+      "kitchen": "Metbex",
+      "menu": "Menû"
+    },
+    "driver": {
+      "title": "Şofer",
+      "subtitle": "Taksî · daxwazên zindî",
+      "incoming": "Daxwazên nû",
+      "noTrips": "Niha daxwaz tune",
+      "filterTitle": "Cureya seferê",
+      "filterHint": "Ji lîsteyê hilbijêre",
+      "filterAllHint": "Taksî + hevpar + balafirgehê",
+      "listingsLegacy": "Îlan (app-a xerîdar)"
+    },
+    "merchant": {
+      "title": "Metbex",
+      "subtitle": "Bazirganê xwarinê · rêza fermanê",
+      "open": "Vekirî",
+      "closed": "Girtî",
+      "openHint": "Fermanên nû distînî",
+      "closedHint": "Ferman girtî ne",
+      "goOpen": "Xwaringehê veke ku fermanan bibînî",
+      "noOrders": "Fermanên çalak tune",
+      "queue": "Rêza fermanê",
+      "menuTitle": "Stoka menûyê",
+      "reject": "Red bike",
+      "listingsLegacy": "Îlan (app-a xerîdar)",
+      "verticalTitle": "Cureya bazirgan",
+      "verticalHint": "MVP: xwarin. Bazaar di qonaxa 2 de.",
+      "vertical": {
+        "food": "Xwarin",
+        "foodHint": "Panela metbexê ya xwaringehê",
+        "market": "Bazaar",
+        "marketSoon": "Qonaxa 2 — zû"
+      },
+      "filterTitle": "Fîltera rêzê",
+      "filter": {
+        "active": "Çalak",
+        "all": "Hemû",
+        "done": "Qediya"
+      },
+      "stats": {
+        "orders": "Ferman",
+        "revenue": "Dahat",
+        "prep": "Amadekirin"
+      },
+      "status": {
+        "new": "Nû",
+        "accepted": "Qebûl kir",
+        "preparing": "Tê amadekirin",
+        "ready": "Amade",
+        "handed": "Radest kir",
+        "cancelled": "Betal kir"
+      },
+      "advance": {
+        "accepted": "Qebûl bike",
+        "preparing": "Dest pê bike",
+        "ready": "Amade",
+        "handed": "Bide kuryeyê"
+      }
+    }
+  },
+  "driver": {
+    "title": "Panela şofer",
+    "subtitle": "Taksîvan an kuryeyê pakêt — yek panel",
+    "online": "Online",
+    "offline": "Offline",
+    "onlineHint": "Daxwazan distînî",
+    "offlineHint": "Daxwaz girtî ne — bikirtînin ku vekin",
+    "goOnline": "Online be ku seferen bibînî",
+    "trips": "Sefer",
+    "seats": "kursî",
+    "accept": "Qebûl bike",
+    "reject": "Red bike",
+    "complete": "Seferê biqedîne",
+    "payouts": "Qezenc / berîk",
+    "role": {
+      "label": "Profîl",
+      "taxi": "Taksîvan",
+      "parcel": "Kuryeyê pakêt"
+    },
+    "stats": {
+      "earnings": "Qezenca îro",
+      "trips": "Sefer",
+      "rating": "Puan",
+      "hours": "Online"
+    },
+    "modes": {
+      "all": "Hemû",
+      "taxi": "Taksî",
+      "shared": "Hevpar",
+      "airport": "Balafirgehê",
+      "parcel": "Pakêt"
+    },
+    "status": {
+      "incoming": "Nû",
+      "active": "Çalak",
+      "done": "Qediya"
+    }
+  },
+  "hub": {
+    "pay": "Berîk / Pay"
+  }
+}

@@ -1,19 +1,34 @@
-# Kullo (kullo.berqenas.com) — Küresel AI-Destekli Araç Platformu
+# Kullo (kullo.berqenas.com) — Irak Genel Pazarı Süper-App
 
-Kullo, 5 dilde (Kürtçe Badini/Sorani, Arapça, Türkçe, İngilizce, Farsça) çalışan, AI destekli, mobil öncelikli, araç satış + kiralama platformudur.
+Kullo, 5 dilde (Kürtçe Badini/Sorani, Arapça, Türkçe, İngilizce, Farsça) çalışan, AI destekli, mobil öncelikli süper-app platformudur.
 
 ## Özellikler
 
+### Araç Pazarı
 - AI destekli görsel araç tanıma (marka, model, yıl)
 - AI fiyat tahmini ve açıklanabilir fiyat breakdown
 - AI hasar tespiti (çoklu açı fotoğraftan)
-- Otomatik çoklu dil çevirisi (OpenRouter)
-- AI asistan (doğal dilde araç arama)
 - Dinamik kiralama fiyatlandırması
+- Dealer/Showroom profilleri + puanlama
+
+### Taksi & Ulaşım
+- Anlık taksi çağırma
+- Paylaşımlı yolculuk
+- Havalimanı transferi
+- Sürücü konum takibi
+
+### Yemek Sipariş
+- Restoran listeleme
+- Sipariş yönetimi
+- Kurye takibi
+
+### Ortak Özellikler
+- Otomatik çoklu dil çevirisi (OpenRouter)
+- AI asistan (doğal dilde arama)
 - Konum tabanlı arama (PostGIS)
 - Gerçek zamanlı mesajlaşma
-- Favoriler, kaydedilmiş aramalar, fiyat alarmları
-- Dealer/Showroom profilleri + puanlama
+- Favoriler, kaydedilmiş aramalar
+- Kullo Cüzdan (Hatwan / IQD)
 
 ## Mimari
 
@@ -51,7 +66,7 @@ React Native (Expo) ─► Nginx ─► PostgREST  ─► PostgreSQL 16 + PostGI
 ```bash
 # 1. Repo'yu klonla
 git clone https://github.com/ferhatdeveloper/kullo.git
-cd seyyare.men
+cd kullo
 
 # 2. Environment dosyasını kopyala
 cp .env.example .env
@@ -60,14 +75,15 @@ cp .env.example .env
 # 3. Backend servislerini başlat
 docker compose up -d
 
-# 4. Veritabanı migration'larını çalıştır
-docker compose exec postgrest psql -U seyyare -d seyyare -f /docker-entrypoint-initdb.d/migrations/001_initial_schema.sql
-
-# 5. Bağımlılıkları kur
+# 4. Bağımlılıkları kur
 pnpm install
 
-# 6. Mobil uygulamayı başlat
+# 5. Mobil uygulamayı başlat (tüketici)
 cd apps/mobile
+pnpm start
+
+# 6. Partner uygulamasını başlat (sürücü/merchant)
+cd apps/partner
 pnpm start
 ```
 
@@ -82,14 +98,24 @@ Expo Go ile QR kodu tarayın ve uygulama açılacaktır.
 - `ku-bad` — Kürtçe Badini (LTR)
 - `ku-sor` — Kürtçe Sorani (RTL)
 
+## Uygulamalar
+
+| App | Açıklama | Platform |
+|-----|----------|----------|
+| `apps/mobile` | Tüketici süper-app | iOS, Android (Expo) |
+| `apps/partner` | Sürücü/Merchant uygulaması | iOS, Android (Expo) |
+| `apps/web` | Marketing web sitesi | Web (Vite) |
+
 ## Yol Haritası
 
 - [x] Faz 1 — Temel altyapı (monorepo, Docker, DB, auth, Expo bootstrap)
-- [ ] Faz 2 — AI temel (OpenRouter, vision, price, translate)
-- [ ] Faz 3 — Sosyal & keşif (favoriler, arama, mesajlaşma)
-- [ ] Faz 4 — Kiralama modülü
-- [ ] Faz 5 — İleri AI (hasar, asistan, analitik)
-- [ ] Faz 6 — Polish, store yayını, beta
+- [x] Faz 2 — AI temel (OpenRouter, vision, price, translate)
+- [x] Faz 3 — Sosyal & keşif (favoriler, arama, mesajlaşma)
+- [x] Faz 4 — Kiralama modülü
+- [x] Faz 5 — Taksi & yolculuk modülü
+- [x] Faz 6 — Yemek sipariş modülü
+- [x] Faz 7 — Partner uygulaması (sürücü/merchant)
+- [ ] Faz 8 — Store yayını, production deployment
 
 ## Lisans
 
