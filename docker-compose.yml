@@ -79,7 +79,7 @@ services:
       PGRST_DB_PRE_REQUEST: public.pre_request
       PGRST_ADMIN_ENABLED: "false"
     ports:
-      - "${POSTGREST_PORT}:3000"
+      - "${POSTGREST_PORT:-3000}:3000"
     networks:
       - seyyare-net
 
@@ -91,7 +91,7 @@ services:
       sh -c "redis-server --appendonly yes
       ${REDIS_PASSWORD:+--requirepass ${REDIS_PASSWORD}}"
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -111,8 +111,8 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
-      - "${MINIO_PORT}:9000"
-      - "${MINIO_CONSOLE_PORT}:9001"
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
     volumes:
       - minio_data:/data
     healthcheck:
@@ -144,7 +144,7 @@ services:
       JWT_REFRESH_TTL: ${JWT_REFRESH_TTL}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET}
     ports:
-      - "${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}"
+      - "${AUTH_SERVICE_PORT:-5000}:${AUTH_SERVICE_PORT:-5000}"
     networks:
       - seyyare-net
 
@@ -168,7 +168,7 @@ services:
       MINIO_USER: ${MINIO_ROOT_USER}
       MINIO_PASS: ${MINIO_ROOT_PASSWORD}
     ports:
-      - "${AI_SERVICE_PORT}:${AI_SERVICE_PORT}"
+      - "${AI_SERVICE_PORT:-4000}:${AI_SERVICE_PORT:-4000}"
     networks:
       - seyyare-net
 
@@ -197,7 +197,7 @@ services:
       # PSP webhook shared secret (POST /webhooks/psp → X-PSP-Webhook-Secret)
       PSP_WEBHOOK_SECRET: ${PSP_WEBHOOK_SECRET:-}
     ports:
-      - "${ORCHESTRATOR_PORT}:${ORCHESTRATOR_PORT}"
+      - "${ORCHESTRATOR_PORT:-4050}:${ORCHESTRATOR_PORT:-4050}"
     networks:
       - seyyare-net
 
