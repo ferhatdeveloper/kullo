@@ -1,0 +1,158 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "DM Sans";
+      src: url("assets/fonts/DMSans-Medium.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: "DM Sans";
+      src: url("assets/fonts/DMSans-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #f4f4f6;
+      font-family: "DM Sans", sans-serif;
+      color: #111111;
+    }
+    #svc-head {
+      position: absolute;
+      left: 120px;
+      top: 120px;
+    }
+    #svc-kicker {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ff6a00;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    #svc-title {
+      font-size: 64px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #0b0b0c;
+    }
+    #svc-grid {
+      position: absolute;
+      left: 120px;
+      top: 320px;
+      right: 120px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
+    }
+    .svc-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 36px 32px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      min-height: 220px;
+    }
+    .svc-card strong {
+      display: block;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #0b0b0c;
+    }
+    .svc-card span {
+      display: block;
+      font-size: 22px;
+      font-weight: 500;
+      color: #4a4a52;
+      line-height: 1.35;
+    }
+    .svc-accent {
+      width: 40px;
+      height: 4px;
+      background: #ff6a00;
+      border-radius: 2px;
+      margin-bottom: 22px;
+    }
+    #svc-trust {
+      position: absolute;
+      left: 120px;
+      bottom: 120px;
+      display: flex;
+      gap: 28px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #4a4a52;
+    }
+    #svc-trust span::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #ff6a00;
+      border-radius: 50%;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+  </style>
+  <div id="root" data-composition-id="services" data-width="1920" data-height="1080">
+    <div id="svc-head" class="clip" data-start="0.1" data-duration="3.7" data-track-index="0">
+      <div id="svc-kicker">Seyyare servisleri</div>
+      <h2 id="svc-title">Al. Kirala. Yolculuk et.</h2>
+    </div>
+    <div id="svc-grid" class="clip" data-start="0.2" data-duration="3.6" data-track-index="1">
+      <div class="svc-card" id="svc-1">
+        <div class="svc-accent"></div>
+        <strong>Taksi</strong>
+        <span>Anında yolculuk</span>
+      </div>
+      <div class="svc-card" id="svc-2">
+        <div class="svc-accent"></div>
+        <strong>Kiralama</strong>
+        <span>Günlük / aylık</span>
+      </div>
+      <div class="svc-card" id="svc-3">
+        <div class="svc-accent"></div>
+        <strong>Müzayede</strong>
+        <span>Canlı teklif</span>
+      </div>
+      <div class="svc-card" id="svc-4">
+        <div class="svc-accent"></div>
+        <strong>Cüzdan</strong>
+        <span>Hatwan / IQD</span>
+      </div>
+    </div>
+    <div id="svc-trust" class="clip" data-start="1.4" data-duration="2.4" data-track-index="2">
+      <span>Doğrulanmış satıcı</span>
+      <span>AI asistan</span>
+      <span>Cüzdan ödemesi</span>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo(
+      "#svc-head",
+      { opacity: 0, y: 24 },
+      { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+      0.1,
+    );
+    ["#svc-1", "#svc-2", "#svc-3", "#svc-4"].forEach((sel, i) => {
+      tl.fromTo(
+        sel,
+        { opacity: 0, y: 36 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+        0.35 + i * 0.18,
+      );
+    });
+    tl.fromTo(
+      "#svc-trust",
+      { opacity: 0 },
+      { opacity: 1, duration: 0.35, ease: "power2.out" },
+      1.4,
+    );
+    window.__timelines = window.__timelines || {};
+    window.__timelines["services"] = tl;
+  </script>
+</template>

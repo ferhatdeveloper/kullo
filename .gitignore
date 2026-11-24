@@ -70,3 +70,9 @@ minio-data/
 .cache/
 .parcel-cache/
 .run/
+
+# Brag / Hyperframes local tooling
+.agents/
+brag-output/composition-scaffold/
+brag-output/composition/.hyperframes/
+brag-output/composition/node_modules/
