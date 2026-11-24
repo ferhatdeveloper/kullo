@@ -20,3 +20,10 @@
 
 - Flame `#FF6A00` · Ink `#0B0B0C` · Paper `#F4F4F6`
 - Domain: seyyare.men
+
+## Launch video (`/brag`)
+
+- `../brag-output/brag.mp4` — 20s landscape tanıtım
+- `../brag-output/brag.jpg` — poster / thumbnail
+- `../brag-output/share-copy.txt` — paylaşım metni
+- Üretim notları: `../brag-output/README.md`

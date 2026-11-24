@@ -1,0 +1,220 @@
+<!doctype html>
+<html
+  lang="tr"
+  data-resolution="landscape"
+  data-composition-variables='[
+    {"id":"color-ground","type":"color","label":"Background","default":"#0B0B0C"},
+    {"id":"color-ink","type":"color","label":"Text","default":"#FFFFFF"},
+    {"id":"color-accent","type":"color","label":"Accent","default":"#FF6A00"},
+    {"id":"color-paper","type":"color","label":"Paper","default":"#F4F4F6"},
+    {"id":"font-display","type":"string","label":"Display font","default":"DM Sans"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "DM Sans";
+        src: url("assets/fonts/DMSans-Medium.woff2") format("woff2");
+        font-weight: 500;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "DM Sans";
+        src: url("assets/fonts/DMSans-Bold.woff2") format("woff2");
+        font-weight: 700;
+        font-style: normal;
+      }
+      :root {
+        --color-ground: #0b0b0c;
+        --color-ink: #ffffff;
+        --color-accent: #ff6a00;
+        --color-paper: #f4f4f6;
+        --font-display: "DM Sans";
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--color-ground);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: var(--color-ground);
+        font-family: var(--font-display), sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="20"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div
+        id="hook"
+        class="clip"
+        data-composition-id="hook"
+        data-composition-src="compositions/hook.html"
+        data-start="0"
+        data-duration="3.5"
+        data-track-index="0"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <div
+        id="search"
+        class="clip"
+        data-composition-id="search"
+        data-composition-src="compositions/search.html"
+        data-start="3.5"
+        data-duration="4.5"
+        data-track-index="0"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <div
+        id="services"
+        class="clip"
+        data-composition-id="services"
+        data-composition-src="compositions/services.html"
+        data-start="8"
+        data-duration="4"
+        data-track-index="0"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <div
+        id="auction"
+        class="clip"
+        data-composition-id="auction"
+        data-composition-src="compositions/auction.html"
+        data-start="12"
+        data-duration="4"
+        data-track-index="0"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <div
+        id="outro"
+        class="clip"
+        data-composition-id="outro"
+        data-composition-src="compositions/outro.html"
+        data-start="16"
+        data-duration="4"
+        data-track-index="0"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <audio
+        id="music"
+        class="clip"
+        data-start="0"
+        data-duration="20"
+        data-track-index="2"
+        data-volume="0.45"
+        data-fade-in="0.4"
+        data-fade-out="1.5"
+        src="assets/music/happy-beats-business-moves-vol-11-by-ende-dot-app.mp3"
+      ></audio>
+
+      <audio
+        id="sfx-click"
+        class="clip"
+        data-start="6.9"
+        data-duration="0.1"
+        data-track-index="3"
+        data-volume="0.55"
+        src="assets/sfx/interface/click_001.ogg"
+      ></audio>
+
+      <audio
+        id="sfx-drop1"
+        class="clip"
+        data-start="8.35"
+        data-duration="0.11"
+        data-track-index="3"
+        data-volume="0.4"
+        src="assets/sfx/interface/drop_001.ogg"
+      ></audio>
+
+      <audio
+        id="sfx-drop2"
+        class="clip"
+        data-start="8.65"
+        data-duration="0.11"
+        data-track-index="4"
+        data-volume="0.4"
+        src="assets/sfx/interface/drop_001.ogg"
+      ></audio>
+
+      <audio
+        id="sfx-drop3"
+        class="clip"
+        data-start="8.95"
+        data-duration="0.11"
+        data-track-index="3"
+        data-volume="0.4"
+        src="assets/sfx/interface/drop_001.ogg"
+      ></audio>
+
+      <audio
+        id="sfx-drop4"
+        class="clip"
+        data-start="9.25"
+        data-duration="0.11"
+        data-track-index="4"
+        data-volume="0.4"
+        src="assets/sfx/interface/drop_001.ogg"
+      ></audio>
+
+      <audio
+        id="sfx-auction"
+        class="clip"
+        data-start="13.2"
+        data-duration="0.13"
+        data-track-index="3"
+        data-volume="0.5"
+        src="assets/sfx/interface/bong_001.ogg"
+      ></audio>
+
+      <audio
+        id="sfx-logo"
+        class="clip"
+        data-start="17.4"
+        data-duration="0.8"
+        data-track-index="3"
+        data-volume="0.65"
+        src="assets/sfx/impact/impactBell_heavy_000.ogg"
+      ></audio>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>
